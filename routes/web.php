@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PuertaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AccesoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,9 @@ Route::get('/saludar', function (){
 });
 
 Route::get('/entrar',[PuertaController::class,'formulario']);
-
+Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
+Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
+Route::get('/adentro',[AccesoController::class,'adentro'])->name('adentro');
 
 
 

@@ -7,11 +7,12 @@
  <title>Document</title>
 </head>
 <body>
- <form action="">
+ <form action="{{route('adentro')}}">
   <label for='nombre'>nombre</label>
   <input type='text' name='nombre' id='nombre'><br>
   <label for='contra'>contra</label>
   <input type='text' name='contra' id='contra'><br>
+  <input type='submit'>
  </form>
 </body>
 </html>
