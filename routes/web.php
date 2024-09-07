@@ -3,6 +3,7 @@
 use App\Http\Controllers\PuertaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccesoController;
+use App\Http\Controllers\PeriodoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,9 +30,12 @@ Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Con
 Route::get('/adentro',[AccesoController::class,'adentro'])->name('adentro');
 Route::get('/login',[AccesoController::class,'login'])->name('login');
 Route::get('/registro',[AccesoController::class,'registro'])->name('registro');
-Route::get('/periodo',[AccesoController::class,'periodo'])->name('periodo');
+//Route::get('/periodo',[AccesoController::class,'periodo'])->name('periodo');
 Route::get('/reporte',[AccesoController::class,'reporte'])->name('reporte');
 Route::get('/estatus',[AccesoController::class,'estatus'])->name('estatus');
+
+Route::resource('periodos',PeriodoController::class);
+
 
 
 
