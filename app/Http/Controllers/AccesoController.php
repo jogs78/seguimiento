@@ -22,4 +22,24 @@ class AccesoController extends Controller
         return view('acceso.adentro');
     }
 
+    public function login(){
+        return view('alumno.login');
+    }
+
+    public function registro(){
+        return view('alumno.registro');
+    }
+
+    public function periodo(){
+        return view('coordinador.crear-periodo');
+    }
+
+    public function reporte(){
+        return view('alumno.reporte-proyecto');
+    }
+
+    public function estatus(){
+        return view('coordinador.estatus-alumno');
+    }
+
 }
