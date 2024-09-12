@@ -29,13 +29,13 @@ Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
 Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
 Route::get('/adentro',[AccesoController::class,'adentro'])->name('adentro');
 Route::get('/login',[AccesoController::class,'login'])->name('login');
-Route::get('/registro',[AccesoController::class,'registro'])->name('registro');
+//Route::get('/registro',[AccesoController::class,'registro'])->name('registro');
 //Route::get('/periodo',[AccesoController::class,'periodo'])->name('periodo');
 Route::get('/reporte',[AccesoController::class,'reporte'])->name('reporte');
 Route::get('/estatus',[AccesoController::class,'estatus'])->name('estatus');
 
 Route::resource('periodos',PeriodoController::class);
-
+Route::resource('registro',EstudianteController::class); //registro de estudiantes estudiantes y proyecto 
 
 
 
