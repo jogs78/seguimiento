@@ -4,6 +4,8 @@ use App\Http\Controllers\PuertaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccesoController;
 use App\Http\Controllers\PeriodoController;
+use App\Http\Controllers\EstudianteController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +37,7 @@ Route::get('/reporte',[AccesoController::class,'reporte'])->name('reporte');
 Route::get('/estatus',[AccesoController::class,'estatus'])->name('estatus');
 
 Route::resource('periodos',PeriodoController::class);
-Route::resource('registro',EstudianteController::class); //registro de estudiantes estudiantes y proyecto 
+Route::resource('estudiantes',EstudianteController::class); //registro de estudiantes estudiantes y proyecto 
 
 
 
