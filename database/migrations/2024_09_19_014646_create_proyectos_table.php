@@ -17,12 +17,15 @@ return new class extends Migration
             $table->string("objetivo_general");
             $table->string("justificacion");
             $table->string("lugar");
-            $table->bigInteger("asesor_id")->unsinged();
-            $table->foreign("asesor_id")->refences("id")->on("asesores");
-            $table->bigInteger("empresa_id")->unsinged();
-            $table->foreign("empresa_id")->refences("id")->on("empresas");
-            $table->bigInteger("periodo_id")->unsinged();
-            $table->foreign("periodo_id")->refences("id")->on("periodos");
+            $table->foreignId('asesor_id')->constrained('asesores');
+            $table->foreignId('empresa_id')->constrained('empresas');
+            $table->foreignId('periodo_id')->constrained('asesores');
+//            $table->bigInteger("asesor_id")->unsinged();
+//            $table->foreign("asesor_id")->refences("id")->on("asesores");
+//            $table->bigInteger("empresa_id")->unsinged();
+//            $table->foreign("empresa_id")->refences("id")->on("empresas");
+//            $table->bigInteger("periodo_id")->unsinged();
+//            $table->foreign("periodo_id")->refences("id")->on("periodos");
             $table->timestamps();
         });
     }
