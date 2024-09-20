@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreEstudianteRequest;
 use App\Http\Requests\UpdateEstudianteRequest;
 use App\Models\Estudiante;
-
+use App\Models\Carrera;
+use App\Models\Proyecto;
 class EstudianteController extends Controller
 {
     /**
@@ -24,7 +25,8 @@ class EstudianteController extends Controller
     public function create()
     {
         //MOSTRAR FORMULARIO PARA CREAR
-        return view('estudiante.crear');
+        $carreras = Carrera::all();
+        return view('estudiante.crear',compact('carreras'));
     }
 
     /**
@@ -33,11 +35,19 @@ class EstudianteController extends Controller
     public function store(StoreEstudianteRequest $request)
     {
         //GUARDAR LOS DATOS QUE VIENEN DEL FORMULARIO DE CREAR
+        $proyecto_nuevo = new Proyecto();
+        $proyecto_nuevo->nombre = $request->input('nombre_del_proyecto');
+        $proyecto_nuevo->save();
+
+        $datos =$request->all();
+        $datos['proyecto_id']= $proyecto_nuevo->id;
+
         $nuevo = new Estudiante;
-        $nuevo->fill($request->all());
+        $nuevo->fill($datos);
 
         $nuevo->save();
-        return redirect()->route("estudiante.index");
+
+        return redirect()->route("estudiantes.index");
     }
 
     /**

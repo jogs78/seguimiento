@@ -12,25 +12,48 @@
         @csrf
         <label for='nombre'>Nombre/s</label>
         <input type='text' name='nombre' id='nombre'><br>
+        
+        <label for='apellido_paterno'>Apellido Paterno</label>
+        <input type='text' name='apellido_paterno' id='apellido_paterno'><br>
 
-        <label for='apellidos'>Apellidos</label>
-        <input type='text' name='apellidos' id='apellidos'><br>
+        <label for='apellido_materno'>Apellido Materno</label>
+        <input type='text' name='apellido_materno' id='apellido_materno'><br>
 
-        <label for='correo'>Correo Electronico</label>
-        <input type='email' name='correo' id='correo'><br>
+        <label for='correo_electronico'>Correo Electronico</label>
+        <input type='text' name='correo_electronico' id='correo_electronico'><br>
+
+        <label for='numero_de_control'>Numero de control</label>
+        <input type='text' name='numero_de_control' id='numero_de_control'><br>
 
         <label for='nombreproyecto'>Nombre del Proyecto</label>
-        <input type='text' name='nameproyecto' id='nameproyecto'><br>
+        <input type='text' name='nombre_del_proyecto' id='nombre_del_proyecto'><br>
+
+        <label for='telefono'>Telefono</label>
+        <input type='text' name='telefono' id='telefono'><br>
+
+        <label for='carrera_id'>Carrera</label>
+        <select name="carrera_id" id="carrera_id">
+            @foreach ($carreras as $carrera)
+                <option value="{{$carrera->id}}">{{$carrera->nombre}}</option>
+            @endforeach
+        </select>
+        <br>
+
+        <label for='direccion'>Direccion</label>
+        <input type='text' name='direccion' id='direccion'><br>
+
+        <label for='institucion_seguiridad_social'>institucion_seguiridad_social</label>
+
+        <select name="institucion_seguiridad_social" id="institucion_seguridad_social" size="3">
+            <option value="IMSS">IMSS</option>
+            <option value="ISSSTE">ISSSTE</option>
+            <option value="OTROS">OTROS</option>
+        </select>
+        <br>
 
 
-
-        <label for='nombreasesor'>Nombre/s Del Asesor Interno</label>
-        <input type='text' name='nombreasesor' id='nombreasesor'><br>
-
-        <label for='apellidoasesor'>Apellidos Del Asesor Interno</label>
-        <input type='text' name='apellidosasesor' id='apellidosasesor'><br>
-
-
+        <label for='numero_de_seguridad_social'>Numero de seguridad social</label>
+        <input type='text' name='numero_de_seguridad_social' id='numero_de_seguridad_social'><br>
 
         <input type='submit'>
     </form>

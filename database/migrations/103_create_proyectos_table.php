@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('proyectos', function (Blueprint $table) {
             $table->id();
             $table->string("nombre");
-            $table->string("objetivo_general");
-            $table->string("justificacion");
-            $table->string("lugar");
-            $table->foreignId('asesor_id')->constrained('asesores');
-            $table->foreignId('empresa_id')->constrained('empresas');
-            $table->foreignId('periodo_id')->constrained('asesores');
+            $table->string("objetivo_general")->nullable()->default(null);
+            $table->string("justificacion")->nullable()->default(null);
+            $table->string("lugar")->nullable()->default(null);
+            $table->foreignId('asesor_id')->nullable()->default(null)->constrained('asesores');
+            $table->foreignId('empresa_id')->nullable()->default(null)->constrained('empresas');
+            $table->foreignId('periodo_id')->nullable()->default(null)->constrained('asesores');
 //            $table->bigInteger("asesor_id")->unsinged();
 //            $table->foreign("asesor_id")->refences("id")->on("asesores");
 //            $table->bigInteger("empresa_id")->unsinged();
