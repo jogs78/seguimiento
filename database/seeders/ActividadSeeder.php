@@ -11,7 +11,7 @@ class ActividadSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-    {
+    {/*
 
         $nueva = new Actividad();
         $nueva->orden = "1";
@@ -32,8 +32,8 @@ class ActividadSeeder extends Seeder
         $nueva->descripcion = "Desarollar la vista del log in";
         $nueva->save();
 
-        /*
-         $actividad = new Actividad();
+        
+        $actividad = new Actividad();
         $actividad->orden = "3";
         $actividad->nombre = "Entrevistas";
         $actividad->semanas = "1";

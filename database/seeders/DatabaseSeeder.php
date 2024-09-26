@@ -23,15 +23,15 @@ class DatabaseSeeder extends Seeder
             AsesorSeeder::class,
             CarreraSeeder::class,
             ConfiguracionSeeder::class,
-            EmpresaSeeder::class,
-            EspecificoSeeder::class,
+            //EmpresaSeeder::class,
+            //EspecificoSeeder::class,
             EstudianteSeeder::class,
             PeriodoSeeder::class,
-            PrimeroSeeder::class,
-            ProyectoSeeder::class,
-            SeguimientoSeeder::class,
-            SegundoSeeder::class,
-            UltimoSeeder::class,
+            //PrimeroSeeder::class,
+            //ProyectoSeeder::class,
+            //SeguimientoSeeder::class,
+            //SegundoSeeder::class,
+           // UltimoSeeder::class,
         ]);
     }
     

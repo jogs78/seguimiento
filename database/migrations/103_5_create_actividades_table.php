@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("nombre");
             $table->integer("semanas");
             $table->string("descripcion");
-            $table->foreignId('proyecto_id');
+            $table->foreignId('proyecto_id')->nullable()->default(null)->constrained('proyectos');
             $table->timestamps();
         });
     }

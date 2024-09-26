@@ -16,9 +16,9 @@ return new class extends Migration
             $table->integer('primero_promedio');
             $table->integer('segundo_promedio');
             $table->integer('final_promedio');
-            $table->foreignId('primero_id');
-            $table->foreignId('segundo_id');
-            $table->foreignId('final_id');
+            $table->foreignId('primero_id')->nullable()->default(null)->constrained('primeros');
+            $table->foreignId('segundo_id')->nullable()->default(null)->constrained('segundos');
+            $table->foreignId('final_id')->nullable()->default(null)->constrained('ultimos');
             $table->timestamps();
         });
     }
