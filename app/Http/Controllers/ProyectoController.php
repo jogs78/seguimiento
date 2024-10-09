@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Proyecto;
 use App\Http\Requests\StoreProyectoRequest;
 use App\Http\Requests\UpdateProyectoRequest;
+use App\Models\Periodo;
+use App\Models\Asesor;
+use App\Models\Empresa;
 
 class ProyectoController extends Controller
 {
@@ -22,7 +25,12 @@ class ProyectoController extends Controller
     public function create()
     {
         //
+        $periodos = Periodo::all();
+        $empresas = Empresa::all();
+        $asesores = Asesor::all();
+        return view('proyecto.crear',compact('periodos','empresas','asesores'));
     }
+    
 
     /**
      * Store a newly created resource in storage.

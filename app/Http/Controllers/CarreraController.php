@@ -63,4 +63,18 @@ class CarreraController extends Controller
     {
         //
     }
+
+    public function mostrar($pagina)
+    {
+        // Logica para determinar qué vista devolver
+        if ($pagina == 'estatus') {
+            return view('coordinador.estatus-estudiante');
+        }
+        elseif ($pagina == 'asignar') {
+            return view('coordinador.asignar-asesor');
+        }
+        else {
+            return abort(404); // Si la página no existe, lanzamos un 404
+        }
+    }
 }

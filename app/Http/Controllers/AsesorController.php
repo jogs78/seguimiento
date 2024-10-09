@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asesor;
 use App\Http\Requests\StoreAsesorRequest;
 use App\Http\Requests\UpdateAsesorRequest;
+use Illuminate\Http\Request;
 
 class AsesorController extends Controller
 {
@@ -63,4 +64,21 @@ class AsesorController extends Controller
     {
         //
     }
+
+public function mostrar($pagina)
+    {
+        // Logica para determinar qué vista devolver
+        if ($pagina == 'no-calificaciones') {
+            return view('asesor.no-calificacion');
+        } elseif ($pagina == 'calificaciones') {
+            return view('asesor.calificacion');
+        } elseif ($pagina == 'proyectos-asignados') {
+            return view('asesor.listar-proyecto');
+        } elseif ($pagina == 'promedio') {
+            return view('asesor.promedio');
+        } else {
+            return abort(404); // Si la página no existe, lanzamos un 404
+        }
+    }
+
 }

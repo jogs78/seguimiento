@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estatus de alumnos</title>
+    <title>Fuera de plazo</title>
 </head>
 <body>
-    <h2>Estatus de Alumnos</h2>
-
-    <input type="text" name="Buscar" id="Buscar" ><br>
-
+    <p>Estas fuera del perido</p> <br>
+    <p> las fechas son:</p> 
+    <p>al</p>
 </body>
 </html>

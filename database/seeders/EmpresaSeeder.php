@@ -24,6 +24,7 @@ class EmpresaSeeder extends Seeder
         $empresa->puesto_titular = "Representante legal de la Sociedad";
         $empresa->asesor_externo = "Daniela Robles Cruz";
         $empresa->puesto_asesor = "Asesora financiera";
+        $empresa->informacion = "Somos una empresa encargada de almecenar productos alimienticios";
         $empresa->save(); 
 
         $empresa = new Empresa();
@@ -37,6 +38,7 @@ class EmpresaSeeder extends Seeder
         $empresa->puesto_titular = "Dueño de la marca";
         $empresa->asesor_externo = "Alfonso Mena Becerra";
         $empresa->puesto_asesor = "Asesor de Ventas e imagen";
+        $empresa->informacion = "Somos una empresa productora y distribuidora de productos fritos";
         $empresa->save(); 
     }
 

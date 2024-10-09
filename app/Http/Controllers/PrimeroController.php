@@ -22,6 +22,7 @@ class PrimeroController extends Controller
     public function create()
     {
         //
+        return view('seguimientos.primer-seguimiento');
     }
 
     /**

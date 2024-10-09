@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             AsesorSeeder::class,
             CarreraSeeder::class,
             ConfiguracionSeeder::class,
-            //EmpresaSeeder::class,
+            EmpresaSeeder::class,
             //EspecificoSeeder::class,
             EstudianteSeeder::class,
             PeriodoSeeder::class,

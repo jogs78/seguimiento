@@ -21,8 +21,7 @@ return new class extends Migration
             $table->string('correo');
             $table->string('titular');
             $table->string('puesto_titular');
-            $table->string('asesor_externo');
-            $table->string('puesto_asesor');
+            $table->striin('informacion');
             $table->timestamps();
         });
     }
