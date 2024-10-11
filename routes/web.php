@@ -9,6 +9,8 @@ use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\PrimeroController;
 use App\Http\Controllers\AsesorController;
 use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\ActividadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,22 +42,19 @@ Route::get('/login',[AccesoController::class,'login'])->name('login');
 Route::get('/reporte',[AccesoController::class,'reporte'])->name('reporte');
 Route::get('/estatus',[AccesoController::class,'estatus'])->name('estatus');
 
+//rutas de los CRUD 
+Route::resource('proyectos',ProyectoController::class);
+Route::resource('periodos',PeriodoController::class);
+Route::resource('estudiantes',EstudianteController::class)->except(['show']);
+Route::resource('primeros',PrimeroController::class);
+Route::resource('asesores',AsesorController::class)->except(['show']);
+Route::resource('carreras',CarreraController::class)->except(['show']);
+Route::resource('empresas',EmpresaController::class);
+Route::resource('actividades',ActividadController::class);
 
 //rutas de vistas para aviso o Extras al CRUD
 Route::get('/asesores/{pagina}', [AsesorController::class, 'mostrar']);
 Route::get('/carreras/{pagina}', [CarreraController::class, 'mostrar']);
+Route::get('/estudiantes/{pagina}', [EstudianteController::class, 'mostrar']);
 
-
-//rutas de los CRUD 
-Route::resource('proyectos',ProyectoController::class);
-Route::resource('periodos',PeriodoController::class);
-Route::resource('estudiantes',EstudianteController::class);
-Route::resource('primeros',PrimeroController::class);
-Route::resource('asesores',AsesorController::class);
-Route::resource('carreras',CarreraController::class);
-
-
-/*
-
-
-*/
+//Route::post('/subir', [EstudianteController::class, 'subirPDF'])->name('subir.pdf');

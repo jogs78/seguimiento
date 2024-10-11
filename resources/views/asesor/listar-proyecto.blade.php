@@ -9,6 +9,7 @@
     <p>Lista de Proyectos Asignados</p>
     <table border="1">
             <!-- llenar tabla  con los datos de residencia -->
+             <!-- lista del crud de proyectos? -->
     </table>
 </body>
 </html>

@@ -7,7 +7,7 @@
 </head>
 <body>
     <p>Seguimiento numero: </p><span></span> <br>
-    <label for="comentario">Deje sus comentarios aqui: </label><textarea name="comentario" id="comentario"></textarea>
+    <!-- espacio para el comentario-->
     <p>El promedio es de: </p> <span></span>
     <input type="submit">
 </body>

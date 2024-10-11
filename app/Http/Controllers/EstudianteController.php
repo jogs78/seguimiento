@@ -89,4 +89,61 @@ class EstudianteController extends Controller
         $estudiante->delete();
         return redirect()->route("estudiante.index");
     }
+
+    public function mostrar($pagina)
+    {
+        // Logica para determinar qué vista devolver
+        if ($pagina == 'alta-proyecto') {
+            return view('estudiante.alta-proyecto');
+        }/*
+        elseif ($pagina == 'asignar') {
+            return view('coordinador.asignar-asesor');
+        }*/
+        elseif ($pagina == 'imprimir-solicitud') {
+            return view('estudiante.impresiones.solicitud');
+        }
+        elseif ($pagina == 'imprimir-anteproyecto') {
+            return view('estudiante.impresiones.anteproyecto');
+        } 
+        elseif ($pagina == 'fuera-periodo') {
+            return view('asesor.avisos.fuera-periodo');
+        }
+        elseif ($pagina == 'no-calificacion') {
+            return view('estudiante.avisos.no-calificacion');
+        }
+        elseif ($pagina == 'calificacion') {
+            return view('estudiante.calificacion');
+        }
+        elseif ($pagina == 'no-promedio') {
+            return view('estudiante.avisos.no-promedio');
+        }
+        elseif ($pagina == 'si-promedio') {
+            return view('estudiante.avisos.si-promedio');
+        }
+        elseif ($pagina == 'promedio') {
+            return view('estudiante.promedio');
+        }
+        else {
+            return abort(404); // Si la página no existe, lanzamos un 404
+        }
+    }
+
+    public function pdf(Request $request)
+    {
+        // Validar que el archivo sea un PDF
+        $request->validate([
+            'archivo' => 'required|mimes:pdf|max:2048',  // Máximo tamaño 2MB
+        ]);
+
+        // Guardar el archivo en una carpeta dentro de 'storage'
+        if ($request->file('archivo')) {
+            $archivo = $request->file('archivo');
+            $nombreArchivo = time().'_'.$archivo->getClientOriginalName(); // Nombre único
+            $ruta = $archivo->storeAs('pdfs', $nombreArchivo, 'public'); // Guardar en storage/app/public/pdfs
+
+            return back()->with('success', 'Archivo subido exitosamente.')->with('ruta', $ruta);
+        }
+
+        return back()->with('error', 'Hubo un problema al subir el archivo.');
+    }
 }

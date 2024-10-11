@@ -13,7 +13,9 @@ class ActividadController extends Controller
      */
     public function index()
     {
-        //
+        //Listar
+        $todos = Actividad::all();
+        return view('actividad.listar',compact('todos'));
     }
 
     /**
@@ -21,7 +23,9 @@ class ActividadController extends Controller
      */
     public function create()
     {
-        //
+        //MOSTRAR FORMULARIO PARA CREAR
+        $actividades = Actividad::all();
+        return view('actividad.crear',compact('actividades'));
     }
 
     /**

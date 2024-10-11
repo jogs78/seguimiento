@@ -42,7 +42,7 @@
         @foreach ($errors->get('telefono') as $texto) 
             <li>{{$texto}}</li>
         @endforeach
-        <input type='text' name='telefono' id='telefono' value="{{old('telefono')}}"><br>
+        <input type='tel' name='telefono' id='telefono' value="{{old('telefono')}}"><br>
 
         <label for='carrera_id'>Carrera</label>
         <select name="carrera_id" id="carrera_id">

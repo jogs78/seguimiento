@@ -21,7 +21,9 @@ class EmpresaController extends Controller
      */
     public function create()
     {
-        //
+        //MOSTRAR FORMULARIO PARA CREAR
+        $empresas = Empresa::all();
+        return view('empresa.crear',compact('empresas'));
     }
 
     /**

@@ -26,7 +26,7 @@ class StoreEstudianteRequest extends FormRequest
             "apellido_paterno"=>"required",
             "apellido_materno"=>"required",
             "correo_electronico"=>"required|email",
-            "numero_de_control"=>"required|max_digits:3|min_digits:3|gt:555",
+            "numero_de_control"=>"required|max_digits:8|min_digits:3|gt:555",
             "nombre_del_proyecto"=>"required",
             "telefono"=>"required|numeric|max_digits:10|min_digits:10",
             "carrera"=>"required",

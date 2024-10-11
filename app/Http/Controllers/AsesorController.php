@@ -69,14 +69,17 @@ public function mostrar($pagina)
     {
         // Logica para determinar qué vista devolver
         if ($pagina == 'no-calificaciones') {
-            return view('asesor.no-calificacion');
+            return view('asesor.avisos.no-calificacion');
         } elseif ($pagina == 'calificaciones') {
             return view('asesor.calificacion');
         } elseif ($pagina == 'proyectos-asignados') {
             return view('asesor.listar-proyecto');
         } elseif ($pagina == 'promedio') {
             return view('asesor.promedio');
-        } else {
+        } elseif ($pagina == 'fuera-periodo') {
+        return view('asesor.avisos.fuera-periodo');
+        }
+        else {
             return abort(404); // Si la página no existe, lanzamos un 404
         }
     }

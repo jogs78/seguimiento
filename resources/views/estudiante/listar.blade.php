@@ -36,7 +36,7 @@
         @endforeach
         </tbody>
     </table>
-    <a href="{{route("estudiantes.create")}}">agregar un periodo</a>
+    <a href="{{route("estudiantes.create")}}">agregar un estudiante</a>
 
 </body>
 </html>
