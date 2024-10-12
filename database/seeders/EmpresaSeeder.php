@@ -14,8 +14,9 @@ class EmpresaSeeder extends Seeder
     public function run(): void 
     {
         $empresa = new Empresa();
+        $empresa->id = 1;
         $empresa->nombre = "Almacenes y graneros Torre de roca S.A";
-        $empresa->giro = "Servicios";
+        $empresa->giro = "servicios";
         $empresa->rfc = "HNG184936OUY";
         $empresa->direccion = "5ta norte y 6ta poniente 120 - C";
         $empresa->telefono = "9614829432";

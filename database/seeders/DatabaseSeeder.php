@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             EstudianteSeeder::class,
             PeriodoSeeder::class,
             //PrimeroSeeder::class,
-            //ProyectoSeeder::class,
+            ProyectoSeeder::class,
             //SeguimientoSeeder::class,
             //SegundoSeeder::class,
            // UltimoSeeder::class,

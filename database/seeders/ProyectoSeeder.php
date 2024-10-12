@@ -18,6 +18,7 @@ class ProyectoSeeder extends Seeder
         $proyecto->objetivo_general = "Desarrollar un sistema que automatice la supervisión de residencia profesional en el departamento de ingenierías";
         $proyecto->lugar = "Tecnológico Nacional de México Campus Tuxtla Gutiérrez";
         $proyecto->informacion = "contacto@ittg.edu.mx";
+        $proyecto->empresa_id = 1;
         $proyecto->save(); 
 
         $proyecto = new Proyecto();
@@ -25,6 +26,7 @@ class ProyectoSeeder extends Seeder
         $proyecto->objetivo_general = "Desarrollar un API para la automatización de proceso de titulación usando el framework Laravel.";
         $proyecto->lugar = "Tecnológico Nacional de México Campus Tuxtla Gutiérrez";
         $proyecto->informacion = "contacto@ittg.edu.mx";
+        $proyecto->empresa_id = 1;
         $proyecto->save(); 
     }
 }

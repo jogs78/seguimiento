@@ -34,18 +34,7 @@ class PeriodoController extends Controller
     {
         //GUARDAR LOS DATOS QUE VIENEN DEL FORMULARIO DE CREAR
         $nuevo = new Periodo;
-//        dd($request->all());
         $nuevo->fill($request->all());
-/*        $nuevo->nombre = $request->nombreperiodo;
-        $nuevo->fecha_inicio = $request->fechainicio;
-        $nuevo->fecha_final = $request->fechaconclusion;
-        $nuevo->fecha_inicio_1er_reporte = $request->fechainicio1;
-        $nuevo->fecha_final_1er_reporte = $request->fechafin1;
-        $nuevo->fecha_inicio_2do_reporte = $request->fechainicio2;
-        $nuevo->fecha_final_2do_reporte = $request->fechafin2;
-        $nuevo->fecha_inicio_reporte_final = $request->fechainiciof;
-        $nuevo->fecha_final_reporte_final = $request->fechafinf;
-*/
         $nuevo->save();
         return redirect()->route("periodos.index");
     }

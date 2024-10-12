@@ -13,7 +13,9 @@ class EmpresaController extends Controller
      */
     public function index()
     {
-        //
+        //Listar
+        $todos = Empresa::all();
+        return view('empresa.listar',compact('todos'));
     }
 
     /**
@@ -31,7 +33,11 @@ class EmpresaController extends Controller
      */
     public function store(StoreEmpresaRequest $request)
     {
-        //
+        //GUARDAR LOS DATOS QUE VIENEN DEL FORMULARIO DE CREAR
+        $nuevo = new Empresa;
+        $nuevo->fill($request->all());
+        $nuevo->save();
+        return redirect()->route("empresas.index");
     }
 
     /**
@@ -47,7 +53,7 @@ class EmpresaController extends Controller
      */
     public function edit(Empresa $empresa)
     {
-        //
+        return view('empresa.editar',compact("empresa"));
     }
 
     /**
@@ -55,7 +61,10 @@ class EmpresaController extends Controller
      */
     public function update(UpdateEmpresaRequest $request, Empresa $empresa)
     {
-        //
+        //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
+        $empresa->fill($request->all());
+        $empresa->save();
+        return redirect()->route("empresas.index");
     }
 
     /**
@@ -63,6 +72,16 @@ class EmpresaController extends Controller
      */
     public function destroy(Empresa $empresa)
     {
-        //
+        //ELIMINAR EL PERIODO QUE ME DIGAN
+        $empresa->delete();
+        //cheacar si esta siendo usada
+        if($empresa->proyectos->count()==0){
+
+            //no puedes borrar la empresa porque la tiene al menos un proyecto
+        }else{
+
+            //borrar la empresa 
+        }
+        return redirect()->route("empresas.index");
     }
 }

@@ -6,7 +6,7 @@
     <title>Registro Empresa</title>
 </head>
 <body>
-    <h2>Registra la empresa en la que haras tu residencia</h2>
+    <h2>Registra la empresa en la que tendras tu residencia</h2>
 
     <form action="{{route("empresas.store")}}" method="POST" enctype="application/x-www-form-urlencoded">
         @csrf
@@ -17,20 +17,24 @@
         <label for='giro'>Escoge el Giro, Ramo o Sector</label> <br>
         {{$errors->first("giro")}}
 
-        <input type='radio' name='giro' value="{{old('industrial')}}">
+        <input type='radio' name='giro' id='giro' value='industrial'>
         <label for="industrial">Industrial</label>
-        <input type='radio' name='giro' value="{{old('servicios')}}">
+        <input type='radio' name='giro' id='giro' value='servicios'>
         <label for="servicios">Servicios</label> <br>
-        <input type='radio' name='giro' value="{{old('publico')}}">
+        <input type='radio' name='giro' id='giro' value='publico'>
         <label for="publico">Publico</label>
-        <input type='radio' name='giro' value="{{old('privado')}}">
+        <input type='radio' name='giro' id='giro' value='privado'>
         <label for="privado">Privado</label>
-        <input type='radio' name='giro' value="{{old('otro')}}">
+        <input type='radio' name='giro' id='giro' value='otro'>
         <label for="otro">Otro</label><br>
         
         <label for='rfc'>RFC</label>
         {{$errors->first("rfc")}}
         <input type='text' name='rfc' id='rfc' value="{{old('rfc')}}"><br>
+
+        <label for='direccion'>Direccion</label>
+        {{$errors->first("rfc")}}
+        <input type='text' name='direccion' id='direccion' value="{{old('direccion')}}"><br>
 
         <label for='telefono'>Telefono</label>
         {{$errors->first("telefono")}}
