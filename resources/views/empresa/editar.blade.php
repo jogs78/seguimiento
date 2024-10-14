@@ -15,16 +15,18 @@
         <input type='text' name='nombre' id='nombre' value="{{$empresa->nombre}}"><br>
 
         <label for='giro'>Escoge el Giro, Ramo o Sector</label> <br>
+        <label for='giro'>giro actual:</label>
+        <input type='text' name='giro' id='giro'value="{{$empresa->giro}}" readonly><br>
 
-        <input type='radio' name='giro' value="{{$empresa->giro}}"> <!-- $empresa->giro == 'industrial' ? 'checked' : '' -->
+        <input type='radio' name='giro' value="industrial"> <!-- $empresa->giro == 'industrial' ? 'checked' : '' -->
         <label for="industrial">Industrial</label>
-        <input type='radio' name='giro' value="{{$empresa->giro}}">
+        <input type='radio' name='giro' value="servicios"> <!-- $empresa->giro -->
         <label for="servicios">Servicios</label> <br>
-        <input type='radio' name='giro' value="{{$empresa->giro}}">
+        <input type='radio' name='giro' value="publico">
         <label for="publico">Publico</label>
-        <input type='radio' name='giro' value="{{$empresa->giro}}">
+        <input type='radio' name='giro' value="privado">
         <label for="privado">Privado</label>
-        <input type='radio' name='giro' value="{{$empresa->giro}}">
+        <input type='radio' name='giro' value="otro">
         <label for="otro">Otro</label><br>
         <label for='rfc'>RFC</label>
         <input type='text' name='rfc' id='rfc'value="{{$empresa->rfc}}"><br>
@@ -43,7 +45,7 @@
         <label for='puesto_asesor'>Puesto del asesor externo</label>
         <input type='text' name='puesto_asesor' id='puesto_asesor'value="{{$empresa->puesto_asesor}}"><br>
         <label for='informacion'>Informacion adicional de la empresa:</label>
-        <textarea name='informacion' id='informacion' value="{{$empresa->informacion}}"></textarea><br>
+        <input type='text' name='informacion' id='informacion'value="{{$empresa->informacion}}"><br>
         <input type='submit'>
     </form>
 

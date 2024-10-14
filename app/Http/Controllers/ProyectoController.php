@@ -16,7 +16,9 @@ class ProyectoController extends Controller
      */
     public function index()
     {
-        //
+        //Listar
+        $todos = Proyecto::all();
+        return view('proyecto.listar',compact('todos'));
     }
 
     /**
@@ -28,7 +30,8 @@ class ProyectoController extends Controller
         $periodos = Periodo::all();
         $empresas = Empresa::all();
         $asesores = Asesor::all();
-        return view('proyecto.crear',compact('periodos','empresas','asesores'));
+        $proyectos = Proyecto::all();
+        return view('proyecto.crear',compact('periodos','empresas','asesores','proyectos'));
     }
     
 
@@ -37,7 +40,11 @@ class ProyectoController extends Controller
      */
     public function store(StoreProyectoRequest $request)
     {
-        //
+        //GUARDAR LOS DATOS QUE VIENEN DEL FORMULARIO DE CREAR
+        $nuevo = new Proyecto;
+        $nuevo->fill($request->all());
+        $nuevo->save();
+        return redirect()->route("proyectos.index");
     }
 
     /**
@@ -53,7 +60,7 @@ class ProyectoController extends Controller
      */
     public function edit(Proyecto $proyecto)
     {
-        //
+        return view('proyecto.editar',compact("proyecto"));
     }
 
     /**
@@ -61,7 +68,10 @@ class ProyectoController extends Controller
      */
     public function update(UpdateProyectoRequest $request, Proyecto $proyecto)
     {
-        //
+        //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
+        $proyecto->fill($request->all());
+        $proyecto->save();
+        return redirect()->route("proyectos.index");
     }
 
     /**
@@ -69,6 +79,8 @@ class ProyectoController extends Controller
      */
     public function destroy(Proyecto $proyecto)
     {
-        //
+        //ELIMINAR EL PERIODO QUE ME DIGAN
+        $proyecto->delete();
+        return redirect()->route("proyectos.index");
     }
 }

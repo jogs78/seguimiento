@@ -14,25 +14,26 @@
         {{$errors->first("nombre")}}
         <input type='text' name='nombre' id='nombre' value="{{old('nombre')}}"><br>
 
-        <label for='objetivo'>Objetivo General</label>
-        <!--{{$errors->first("nombre")}}-->
+        <label for='objetivo_general'>Objetivo General</label>
+        {{$errors->first("objetivo_general")}}
         <input type='text' name='objetivo_general' id='objetivo_general' value="{{old('objetivo_general')}}"><br>
 
         <label for='lugar'>Lugar</label>
-        <!--{{$errors->first("nombre")}}-->
+        {{$errors->first("lugar")}}
         <input type='text' name='lugar' id='lugar' value="{{old('lugar')}}"><br>
 
         <label for='informacion'>Informacion</label>
-        <!--{{$errors->first("nombre")}}-->
+        {{$errors->first("informacion")}}
         <input type='text' name='informacion' id='informacion' value="{{old('informacion')}}"><br>
 
         <label for='justificacion'>Justificacion</label>
-        <!--{{$errors->first("nombre")}}-->
+        {{$errors->first("justificacion")}}
         <input type='text' name='justificacion' id='justificacion' value="{{old('justificacion')}}"><br>
 
 
         <label for='asesor_id'>Asesor</label>
         <select name="asesor_id" id="asesor_id">
+        {{$errors->first("asesor_id")}}
             @foreach ($asesores as $asesor)
                 <option value="{{$asesor->id}}">{{$asesor->nombre}}</option>
             @endforeach
@@ -41,6 +42,7 @@
 
         <label for='empresa_id'>Empresa</label>
         <select name="empresa_id" id="empresa_id">
+        {{$errors->first("empresa_id")}}
             @foreach ($empresas as $empresa)
                 <option value="{{$empresa->id}}">{{$empresa->nombre}}</option>
             @endforeach
@@ -49,6 +51,7 @@
 
         <label for='periodo_id'>Periodo</label>
         <select name="periodo_id" id="Periodo_id">
+        {{$errors->first("periodo_id")}}
             @foreach ($periodos as $periodo)
                 <option value="{{$periodo->id}}">{{$periodo->nombre}}</option>
             @endforeach

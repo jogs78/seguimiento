@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Proyecto extends Model
 {
     use HasFactory;
+    protected $fillable = ["nombre", "objetivo_general", "lugar", "informacion", "justificacion"];
 }

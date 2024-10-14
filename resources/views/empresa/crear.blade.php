@@ -33,7 +33,7 @@
         <input type='text' name='rfc' id='rfc' value="{{old('rfc')}}"><br>
 
         <label for='direccion'>Direccion</label>
-        {{$errors->first("rfc")}}
+        {{$errors->first("direccion")}}
         <input type='text' name='direccion' id='direccion' value="{{old('direccion')}}"><br>
 
         <label for='telefono'>Telefono</label>
@@ -62,7 +62,7 @@
 
         <label for='informacion'>Informacion adicional de la empresa: </label>
         {{$errors->first("informacion")}}
-        <textarea name='informacion' id='informacion' value="{{old('informacion')}}"></textarea><br>
+        <input type='text' name='informacion' id='informacion' value="{{old('informacion')}}"><br>
        
         <input type='submit'>
     </form>
