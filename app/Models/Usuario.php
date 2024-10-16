@@ -9,11 +9,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Usuario extends Authenticatable
 {
     use HasFactory;
-    public function usa()//: MorphToMany
-    {
-//        return $this->morphOne()  morphToMany(Medio::class, 'usa','usables');
-        return $this->morphTo();
 
+    public function usa()
+    {
+        return $this->morphTo();
     }
 
 }
