@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Primero extends Model
 {
     use HasFactory;
+
+    public function seguimiento()
+    {
+        return $this->belongsTo(Seguimiento::class);
+    }
 }

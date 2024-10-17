@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Carrera extends Model
 {
     use HasFactory;
+
+    public function estudiantes(){
+        return $this->hasMany(Estudiante::class);
+    }
+
+    public function periodo()
+    {
+        return $this->hasOne(Periodo::class);
+    }
 }

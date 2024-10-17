@@ -11,5 +11,23 @@ class Estudiante extends Model
     
     protected $fillable = ["nombre","apellido_paterno","apellido_materno","correo_electronico","numero_de_control",
                             "proyecto_id","telefono","carrera_id","direccion","institucion_seguridad_social",
-                            "numero_de_seguridad_social"];
+                            "numero_de_seguridad_social"
+                        ];
+
+    public function proyecto()
+    {
+        return $this->hasOne(Proyecto::class);
+    }
+
+    public function asesor()
+    {
+        return $this->belongsTo(Asesor::class);
+    }
+
+    public function carrera()
+    {
+        return $this->belongsTo(Carrera::class);
+    }
+
+    
 }

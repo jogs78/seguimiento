@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePeriodoRequest;
 use App\Http\Requests\UpdatePeriodoRequest;
 use App\Models\Periodo;
-
+use Illuminate\Support\Facades\Auth;
 class PeriodoController extends Controller
 {
     /**
@@ -53,8 +53,10 @@ class PeriodoController extends Controller
     public function edit(Periodo $periodo)
     {
         //MOSTRAR EL FORMULARIO PARA EDITAR UN PERIODO
+        $usuario = Auth::user();
 
-        return view('coordinador.periodo.editar',compact("periodo"));
+        echo  $usuario->usa->nombre .  "quiere modificar el periodo";
+//        return view('coordinador.periodo.editar',compact("periodo"));
     }
 
     /**

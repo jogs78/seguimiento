@@ -13,15 +13,7 @@ class CarreraSeeder extends Seeder
      */
     public function run(): void
     {
-        $nueva = new Carrera();
-        $nueva->nombre = "Sistemas";
-        $nueva->coordinador = "Obdulia Rios Coutiño"; 
-        $nueva->save();
-
-        $nueva = new Carrera();
-        $nueva->nombre = "Mecanica";
-        $nueva->coordinador = "Mario de la Cruz Padilla"; 
-        $nueva->save();
+        
 
     }
 }

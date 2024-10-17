@@ -9,4 +9,9 @@ class Actividad extends Model
 {
     use HasFactory;
     protected $table = "actividades";
+
+    public function proyecto()
+    {
+        return $this->belongsTo(Proyecto::class);
+    }
 }
