@@ -13,13 +13,9 @@ class Periodo extends Model
                            "fecha_inicio_2do_reporte", "fecha_final_2do_reporte", "fecha_inicio_reporte_final", "fecha_final_reporte_final"
                         ];
 
-    public function carrera()
-    {
-        return $this->belongsTo(Carrera::class);
-    }
 
-    public function seguimientos(){
-        return $this->hasMany(Seguimiento::class);
+    public function proyectos(){
+        return $this->hasMany(Proyecto::class);
     }
 
 

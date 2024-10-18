@@ -15,6 +15,21 @@ class Proyecto extends Model
         return $this->belongsTo(Empresa::class);
     }
 
+    public function asesor()
+    {
+        return $this->belongsTo(Asesor::class);
+    }
+
+    public function seguimiento()
+    {
+        return $this->belongsTo(Seguimientos::class);
+    }
+
+    public function periodo()
+    {
+        return $this->belongsTo(Periodo::class);
+    }
+
     public function estudiante()
     {
         return $this->belongsTo(Estudiante::class);
@@ -23,5 +38,13 @@ class Proyecto extends Model
     public function actividades()
     {
         return $this->hasMany(Actividad::class);
+    }
+
+    public function especificos(){
+        return $this->hasMany(Especifico::class);
+    }
+
+    public function seguimientos(){
+        return $this->hasMany(Seguimiento::class);
     }
 }

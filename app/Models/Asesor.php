@@ -10,8 +10,8 @@ class Asesor extends Model
     use HasFactory;
     protected $table = "asesores";
 
-    public function estudiantes()
+    public function proyectos()
     {
-        return $this->hasMany(Estudiante::class);
+        return $this->hasMany(Proyecto::class);
     }
 }

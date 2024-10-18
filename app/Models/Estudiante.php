@@ -19,11 +19,6 @@ class Estudiante extends Model
         return $this->hasOne(Proyecto::class);
     }
 
-    public function asesor()
-    {
-        return $this->belongsTo(Asesor::class);
-    }
-
     public function carrera()
     {
         return $this->belongsTo(Carrera::class);
