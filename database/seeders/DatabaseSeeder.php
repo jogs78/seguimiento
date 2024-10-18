@@ -32,7 +32,8 @@ class DatabaseSeeder extends Seeder
             //SeguimientoSeeder::class,
             //SegundoSeeder::class,
            // UltimoSeeder::class,
-           UsuarioSeeder::class
+           UsuarioSeeder::class,
+           CoordinadorSeeder::class
         ]);
     }
     

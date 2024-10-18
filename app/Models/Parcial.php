@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Coordinador extends Model
+class Parcial extends Model
 {
     use HasFactory;
 
-    protected $table = "coordinadores";
+    protected $table = "parciales";
 
-    public function carrera()
+    public function seguimiento()
     {
-        return $this->hasOne(Carrera::class);
+        return $this->belongsTo(Seguimiento::class);
     }
 }

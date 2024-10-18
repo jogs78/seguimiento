@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carreras', function (Blueprint $table) {
+        Schema::create('coordinadores', function (Blueprint $table) {
             $table->id();
-            $table->string("nombre");
+            $table->string('nombre');
+            $table->string('apellido_paterno');
+            $table->string('apellido_materno');
+            $table->string('correo_electronico');
+            $table->foreignId('carrera_id')->nullable()->default(null)->constrained('carreras');
             $table->timestamps();
         });
     }
@@ -23,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carreras');
+        Schema::dropIfExists('coordinadors');
     }
 };

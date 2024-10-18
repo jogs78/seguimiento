@@ -17,4 +17,9 @@ class Carrera extends Model
     {
         return $this->hasOne(Periodo::class);
     }
+
+    public function coordinador()
+    {
+        return $this->belongsTo(Coordinador::class);
+    }
 }

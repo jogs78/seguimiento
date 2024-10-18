@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('apellido_materno');
             $table->string('correo_electronico');
             $table->string('numero_de_control');
-            $table->foreignId('proyecto_id')->nullable()->default(null)->constrained('proyectos');
             $table->string('telefono');
-            $table->foreignId('carrera_id')->nullable()->default(null)->constrained('carreras');
             $table->string('direccion');
-            $table->enum('institucion_seguridad_social',['IMSS','ISSSTE','OTROS']);
-            $table->string('numero_de_seguridad_social');
+            $table->enum('institucion_seguridad_social',["IMSS","ISSSTE","OTROS"]);
+            $table->integer('numero_seguridad_social');
+            $table->foreignId('carrera_id')->nullable()->default(null)->constrained('carreras');
+            $table->foreignId('proyecto_id')->nullable()->default(null)->constrained('proyectos');
             $table->timestamps();
         });
     }
