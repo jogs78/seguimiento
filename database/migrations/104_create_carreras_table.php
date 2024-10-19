@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('carreras', function (Blueprint $table) {
             $table->id();
             $table->string("nombre");
-            $table->string("clave");
-            $table->string("modalidad");
+            $table->string("clave")->nullable();
+            $table->string("modalidad")->nullable();
             $table->timestamps();
         });
     }

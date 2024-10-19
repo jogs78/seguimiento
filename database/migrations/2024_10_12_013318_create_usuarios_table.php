@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('usa_id')->nullable();
             $table->string('usa_type')->nullable();
-            $table->string('nombre_usuario');
+            $table->string('nombre_usuario')->unique();
             $table->string('contraseña');
             $table->timestamps();
         });

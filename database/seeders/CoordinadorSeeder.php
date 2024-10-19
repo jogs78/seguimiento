@@ -13,7 +13,7 @@ class CoordinadorSeeder extends Seeder
      */
     public function run(): void
     {
-        $nueva = new Carrera();
+        $nueva = new Coordinador();
         $nueva->nombre = "Obdulia";
         $nueva->apellido_paterno = "Rios";
         $nueva->apellido_materno = "Coutiño";
@@ -21,7 +21,7 @@ class CoordinadorSeeder extends Seeder
         $nueva->carrera_id = 1;
         $nueva->save();
 
-        $nueva = new Carrera();
+        $nueva = new Coordinador();
         $nueva->nombre = "Mario";
         $nueva->apellido_paterno = "de la Cruz";
         $nueva->apellido_materno = "Padilla";
