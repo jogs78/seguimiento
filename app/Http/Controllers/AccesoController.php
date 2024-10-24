@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class AccesoController extends Controller
 {
+
     public function login(){
         return view('acceso.formulario');
     }
-
+    
     public function salida(){
+        Auth::logout();
         return view('acceso.adios');
     }
 

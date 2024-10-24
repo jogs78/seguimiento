@@ -7,6 +7,7 @@
 </head>
 <body>
     <h1>Bienvenido que bueno que entraste!! </h1>
+    @dump(Auth::user()->usa->nombre)
     <a href="{{route('Cambiar_Contraseña')}}">Cambiar la Contraseña</a>
     <a href="{{route('salida')}}">Salir</a>
 </body>

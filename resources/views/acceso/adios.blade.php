@@ -7,5 +7,6 @@
 </head>
 <body>
     <h1>  Vuelve Pronto  </h1>
+    <a href="{{route('login')}}">INICIAR</a>
 </body>
 </html>

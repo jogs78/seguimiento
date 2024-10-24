@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\PuertaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccesoController;
 use App\Http\Controllers\PeriodoController;
@@ -32,7 +31,9 @@ Route::get('/saludar', function (){
 });
 
 //rutas de introduccion o practica
-Route::get('/entrar',[PuertaController::class,'formulario']);
+Route::get('/home' ,function () {
+    return view('acceso.adentro');
+} )->name('home')->middleware('auth');
 Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
 Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
 Route::post('/adentro',[AccesoController::class,'adentro'])->name('adentro');
