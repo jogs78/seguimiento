@@ -7,6 +7,7 @@ use App\Models\Estudiante;
 use App\Models\Usuario;
 use Illuminate\Auth\Access\Response;
 
+
 class EstudiantePolicy
 {
     /**
@@ -36,11 +37,12 @@ class EstudiantePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Usuario $actual, Estudiante $estudiante): bool
+    public function update( Usuario $actual, Estudiante $estudiante): bool
     {   
         Log::channel('debug')->info("Es un usuario: $actual->usa_type su id de estudiantes es $estudiante->id y su id de usuario es $actual->usa_id");
         //return $actual->usa_id === $estudiante->id;
-        if ($actual->usa_type == "App\Models\Estudiante" && $estudiante->id == $actual->usa_id ) return true;
+        if ($actual->usa_type == "App\Models\Estudiante" && $estudiante->id == $actual->usa_id ) {return true;}
+        if ($actual->usa_type == "App\Models\Coordinador" ) return true;
         return false;
     }
 

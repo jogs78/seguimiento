@@ -21,6 +21,7 @@ class ProyectoSeeder extends Seeder
         $proyecto->informacion = "contacto@ittg.edu.mx";
         $proyecto->justificacion = "El desarrollo de un sistema para el control del proceso administrativo de seguimiento a las 
 residencias en el departamento de ingenierías en el Instituto Tecnológico de Tuxtla Gutiérrez";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 1;
         $proyecto->empresa_id = 1;
         $proyecto->externo_id = 1;
@@ -35,6 +36,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Instituto de ciencia, tecnologia e innovacion del estado de chiapas";
         $proyecto->informacion = "InstitutoDeCiencia@gmail.com";
         $proyecto->justificacion = "Agilizacion de los tramites del estado de chiapas";
+        $proyecto->origen = "Banco de Proyectos";
         //$proyecto->asesor_id = 2;
         $proyecto->externo_id = 2;
         $proyecto->empresa_id = 2;
@@ -48,6 +50,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "CFE Tranmision";
         $proyecto->informacion = "CfeTransmision@gmail.com";
         $proyecto->justificacion = "Mejorar los procesos de tranmision, atraves de un modulo de monitoreo";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 1;
         $proyecto->externo_id=3;
         $proyecto->empresa_id = 3;
@@ -61,6 +64,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Secretaria de Infraestructura, Comunicaciones y transporte";
         $proyecto->informacion = "SecDeInfraestrutura@gmail.com";
         $proyecto->justificacion = "Crear modulos para la seguridad de los empleados y la proyecto";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 3;
         $proyecto->externo_id = 4;
         $proyecto->empresa_id = 4;
@@ -74,6 +78,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "COSMOS71";
         $proyecto->informacion = "Cosmos71@gmail.com";
         $proyecto->justificacion = "Dajar al alcanze de los estudiantes un herramienta para experimentacion satelital";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 4;
         $proyecto->empresa_id = 5;
         $proyecto->periodo_id = 1;
@@ -86,6 +91,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Comision Federal de Electricidad";
         $proyecto->informacion = "CFE@hotmail.com";
         $proyecto->justificacion = "Dejar un sitio de facil acceso 24/7 a capacitacion para los trabajadores";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 2;
         $proyecto->empresa_id = 6;
         $proyecto->periodo_id = 2;
@@ -98,6 +104,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Instituto De Elecciones y participacion Ciudadana (IEPC)";
         $proyecto->informacion = "IEPC@hotmail.com";
         $proyecto->justificacion = "Existe equipo computacional nuevo y antiguo en un mismo sitio por lo que se tendra que evaluar que equipos son utiles aun";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 2;
         $proyecto->empresa_id = 7;
         $proyecto->periodo_id = 2;
@@ -110,6 +117,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Consejo de la Judicatura del poder Judicial del estado";
         $proyecto->informacion = "ConsejoJudicatura@hotmail.com";
         $proyecto->justificacion = "Tener los acuerdos alcanze de todos los trabajadores y empleados";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 1;
         $proyecto->empresa_id = 8;
         $proyecto->periodo_id = 2;
@@ -122,6 +130,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Tecnológico Nacional de México Campus Tuxtla Gutiérrez";
         $proyecto->informacion = "contacto@ittg.edu.mx";
         $proyecto->justificacion = "Optimizacion del proyecto (Dielect) mediante el uso del FPGA";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 4;
         $proyecto->empresa_id = 1;
         $proyecto->periodo_id = 2;
@@ -134,6 +143,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->lugar = "Tecnológico Nacional de México Campus Tuxtla Gutiérrez";
         $proyecto->informacion = "contacto@ittg.edu.mx";
         $proyecto->justificacion = "Facilitar el aprendizaje de inteligencia artificial";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 5;
         $proyecto->empresa_id = 1;
         $proyecto->periodo_id = 2;
@@ -147,6 +157,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->informacion = "contacto@ittg.edu.mx";
         $proyecto->justificacion = "La implementación de una API para la automatización del proceso de titulación tiene como objetivo 
 principal optimizar y agilizar los trámites necesarios";
+        $proyecto->origen = "Banco de Proyectos";
         $proyecto->asesor_id = 1;
         $proyecto->empresa_id = 1;
         $proyecto->periodo_id = 1;

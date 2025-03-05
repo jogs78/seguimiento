@@ -29,7 +29,7 @@ class SeguimientoController extends Controller
         
         Log::channel('debug')->info('checar');
         if( ! Gate::allows('calificar', [Seguimiento::class, $estudiante->proyecto ])){
-            echo "No puede";
+            return view('estudiante.aviso.no-autorizado');
             return;
         }
         $usuario = Auth::getUser();

@@ -50,9 +50,9 @@
         </table>
         <div class="horizontal marriba">
             <p class="bold cuadro marginr">OPCION ELEGIDA: </p>
-            <p class="marginr">Banco de Proyecto ( )</p>
-            <p class="marginr">Propuesta propia ( )</p>
-            <p class="marginr">Trabajador ( )</p> 
+            <p class="marginr">Banco de Proyecto <input type="checkbox" {{ $estudiante->proyecto->origen === 'Banco de Proyectos' ? 'checked' : '' }}></p>
+            <p class="marginr">Propuesta propia <input type="checkbox" {{ $estudiante->proyecto->origen === 'Propuesta propia' ? 'checked' : '' }}></p>
+            <p class="marginr">Trabajador <input type="checkbox" {{ $estudiante->proyecto->origen === 'Trabajador' ? 'checked' : '' }}></p> 
         </div>
         <div class="horizontal marriba">
             <p class="bold cuadro marginr">PERIODO PROYECTADO: </p>
@@ -155,10 +155,10 @@
                     <table class="tabla">
                         <tr>
                         <th class="cuadro nsemanas">Para Seguridad <br>Social Acudir: </th>
-                            <th class="cuadro" style="width: 25%;">IMSS <br><input type="checkbox" {{ $estudiante->institucion_seguridad_social === 'IMSS' ? 'checked' : '' }}></th><!--Cambiar-->
-                            <th class="cuadro" style="width: 25%;">ISSSTE <br><input type="checkbox" {{ $estudiante->institucion_seguridad_social === 'ISSSTE' ? 'checked' : '' }}></th><!--Cambiar-->
-                            <th class="cuadro" style="width: 25%;"> OTROS <br><input type="checkbox" {{ $estudiante->institucion_seguridad_social === 'OTROS' ? 'checked' : '' }}></th><!--Cambiar-->
-                            <th class="cuadro" style="width: 25%;">No. :  <p>{{$estudiante->numero_de_seguridad_social}}</p> </th><!--Cambiar-->
+                            <th class="cuadro" style="width: 25%;">IMSS <br><input style="padding-top: 20px;" type="checkbox" {{ $estudiante->institucion_seguridad_social === 'IMSS' ? 'checked' : '' }}></th>
+                            <th class="cuadro" style="width: 25%;">ISSSTE <br><input style="padding-top: 20px;" type="checkbox" {{ $estudiante->institucion_seguridad_social === 'ISSSTE' ? 'checked' : '' }}></th>
+                            <th class="cuadro" style="width: 25%;"> OTROS <br><input style="padding-top: 20px;" type="checkbox" {{ $estudiante->institucion_seguridad_social === 'OTROS' ? 'checked' : '' }}></th>
+                            <th class="cuadro" style="width: 25%;">No. :  <p>{{$estudiante->numero_de_seguridad_social}}</p> </th>
                         </tr>
                     </table> 
                 </div>

@@ -12,6 +12,7 @@ use App\Models\Proyecto;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\ConfiguracionServiceProvider;
 use App\Models\Periodo;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -81,6 +82,9 @@ class EstudianteController extends Controller
     public function edit(Estudiante $estudiante)
     {
         //MOSTRAR EL FORMULARIO PARA EDITAR UN ESTUDIANTE
+        if( ! Gate::allows('update',$estudiante)){
+            return view('estudiante.aviso.no-autorizado');
+        }
 
         return view('estudiante.editar',compact("estudiante"));
     }
@@ -90,11 +94,23 @@ class EstudianteController extends Controller
      */
     public function update(UpdateEstudianteRequest $request, Estudiante $estudiante)
     {
+    
+        if( ! Gate::allows('update',$estudiante)){
+            return view('estudiante.aviso.no-autorizado');
+        }
         //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
         $estudiante->fill($request->all());
         $estudiante->save();
-        return redirect()->route("estudiantes.index");
-        //return redirect()->route("estudiantes.index");
+        
+        $usuario = Auth::getUser();
+        $tipo = $usuario->usa_type;
+        switch ($tipo) {
+        
+        case 'App\Models\Coordinador':
+            return redirect()->route("estudiantes.index");
+        break;
+    }
+    return redirect()->route("home");
 
     }
 
