@@ -32,9 +32,18 @@ class SeguimientoPolicy
         Log::channel('debug')->info("tengo $actual->use_type   , $proyecto->asesor_id  y $actual->usa_id  ");
 
         if ($actual->usa_type == "App\Models\Asesor"  && $proyecto->asesor_id ==  $actual->usa_id ){
+            //falta considerar ¿ya lo hice?
+            //estoy en tiempo
             return true;
         }         
-        if ($actual->usa_type == "App\Models\Externo" && $proyecto->externo_id == $actual->usa_id ) return true;
+        if ($actual->usa_type == "App\Models\Externo" && $proyecto->externo_id == $actual->usa_id ) {
+
+            //falta considerar ¿ya lo hice?
+            //estoy en tiempo
+            return true;
+        }
+
+        
         return false; 
     }
 
