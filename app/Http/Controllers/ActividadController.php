@@ -8,6 +8,7 @@ use App\Models\Periodo;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreActividadRequest;
 use App\Http\Requests\UpdateActividadRequest;
+use Illuminate\Support\Facades\Gate;
 
 
 class ActividadController extends Controller
@@ -17,6 +18,10 @@ class ActividadController extends Controller
      */
     public function index(Proyecto $proyecto)
     {
+        if (! Gate::allows('update',$proyecto)){
+            return view('estudiante.aviso.no-autorizado');
+
+        }
         $todos = $proyecto->actividades;
         return view('proyecto.mostrar',compact('todos','proyecto'));
 
@@ -86,7 +91,8 @@ class ActividadController extends Controller
      */
     public function destroy(Proyecto $proyecto, Actividad $actividad)
     {   
-        $actividad = $proyecto->actividades()->where('id', $actividad->id)->first();
+        $proyecto = Proyecto::findOrFail($proyectoId);
+        $actividad = $proyecto->actividad()->findOrFail($actividadId);
 
     if (!$actividad) {
         abort(404, 'La actividad no se encontró o no pertenece a este proyecto.');

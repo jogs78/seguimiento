@@ -28,8 +28,7 @@ class ProyectoController extends Controller
     {
         //Listar
         $todos = Proyecto::all();
-        //return view('proyecto.listar',compact('todos'));
-        return view ('proyecto.mostrar',compact('todos')); // ,compact('proyecto'));
+        return view ('proyecto.mostrar',compact('todos'));
     }
 
 
@@ -137,7 +136,7 @@ class ProyectoController extends Controller
     {
         Log::channel('debug')->info('checar');
         if (! Gate::allows('update',$proyecto)){
-            return "NO PUEDE ACTUALIZAR";
+            return view('estudiante.aviso.no-autorizado');
 
         }
         //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
@@ -180,5 +179,7 @@ class ProyectoController extends Controller
         return view('proyecto.crear', compact('asesores','empresas','periodo','externos'));
 
     }
+
+    
 
 }
