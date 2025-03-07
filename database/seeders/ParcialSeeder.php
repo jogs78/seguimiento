@@ -38,6 +38,7 @@ class ParcialSeeder extends Seeder
         $parcial->comentarios_externo = "primer externo comentario";        
         $parcial->save(); 
 ////////////////
+/*
         $parcial = new Parcial();
         $parcial->estudiante_id = 1;
         $parcial->promedio_parcial = 100;
@@ -62,7 +63,7 @@ class ParcialSeeder extends Seeder
         $parcial->promedio_externo = 100;
         $parcial->comentarios_externo = "segundo externo comentario";        
         $parcial->save(); 
- 
+*/ 
 ////////////////
         $parcial = new Parcial();
         $parcial->estudiante_id = 2;

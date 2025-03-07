@@ -142,7 +142,7 @@
         <tr>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Nombre y firma asesor externo</th>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Sello de la empresa, organismo o dependencia</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación: <br> {{$segundo->califico_externo}}  </th>
         </tr>
     </table>
     <p>Evaluación por el Asesor Interno:</p>
@@ -214,7 +214,7 @@
         <tr>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Nombre y firma asesor interno</th>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Sello de la Institución</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación <br> {{$segundo->califico_interno}} </th>
         </tr>
     </table>
     <table class="tabla">
