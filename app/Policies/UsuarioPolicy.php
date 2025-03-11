@@ -13,7 +13,10 @@ class UsuarioPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -21,7 +24,10 @@ class UsuarioPolicy
      */
     public function view(User $user, Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -29,7 +35,7 @@ class UsuarioPolicy
      */
     public function create(User $user): bool
     {
-        //
+        
     }
 
     /**
@@ -37,7 +43,10 @@ class UsuarioPolicy
      */
     public function update(User $user, Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -45,7 +54,10 @@ class UsuarioPolicy
      */
     public function delete(User $user, Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**

@@ -13,7 +13,10 @@ class CoordinadorPolicy
      */
     public function viewAny(Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -21,7 +24,10 @@ class CoordinadorPolicy
      */
     public function view(Usuario $usuario, Coordinador $coordinador): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -29,7 +35,10 @@ class CoordinadorPolicy
      */
     public function create(Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -37,7 +46,10 @@ class CoordinadorPolicy
      */
     public function update(Usuario $usuario, Coordinador $coordinador): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
@@ -45,7 +57,10 @@ class CoordinadorPolicy
      */
     public function delete(Usuario $usuario, Coordinador $coordinador): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**

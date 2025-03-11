@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Configuracion;
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Auth\Access\Response;
 
 class ConfiguracionPolicy
@@ -11,7 +11,7 @@ class ConfiguracionPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(Usuario $actual): bool
     {
         //
     }
@@ -19,39 +19,43 @@ class ConfiguracionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Configuracion $configuracion): bool
+    public function view(Usuario $actual, Configuracion $configuracion): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(Usuario $actual): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Configuracion $configuracion): bool
+    public function update(Usuario $actual, Configuracion $configuracion): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Configuracion $configuracion): bool
+    public function delete(Usuario $actual, Configuracion $configuracion): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Configuracion $configuracion): bool
+    public function restore(Usuario $actual, Configuracion $configuracion): bool
     {
         //
     }
@@ -59,7 +63,7 @@ class ConfiguracionPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Configuracion $configuracion): bool
+    public function forceDelete(Usuario $actual, Configuracion $configuracion): bool
     {
         //
     }

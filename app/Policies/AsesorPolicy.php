@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Asesor;
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Auth\Access\Response;
 
 class AsesorPolicy
@@ -11,7 +11,7 @@ class AsesorPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(Usuario $actual): bool
     {
         //
     }
@@ -19,39 +19,43 @@ class AsesorPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Asesor $asesor): bool
+    public function view(Usuario $actual, Asesor $asesor): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(Usuario $actual): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Asesor $asesor): bool
+    public function update(Usuario $actual, Asesor $asesor): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Asesor $asesor): bool
+    public function delete(Usuario $actual, Asesor $asesor): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador"  ) return true;
+        return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Asesor $asesor): bool
+    public function restore(Usuario $actual, Asesor $asesor): bool
     {
         //
     }
@@ -59,7 +63,7 @@ class AsesorPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Asesor $asesor): bool
+    public function forceDelete(Usuario $actual, Asesor $asesor): bool
     {
         //
     }

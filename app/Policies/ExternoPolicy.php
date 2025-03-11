@@ -29,7 +29,8 @@ class ExternoPolicy
      */
     public function create(Usuario $usuario): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Estudiante" ) return true;
+        return false;
     }
 
     /**
@@ -37,7 +38,10 @@ class ExternoPolicy
      */
     public function update(Usuario $usuario, Externo $externo): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Estudiante" ) return true;
+        if ($actual->usa_type == "App\Models\Coordiandor" ) return true;
+        return false;
+        
     }
 
     /**
@@ -45,7 +49,8 @@ class ExternoPolicy
      */
     public function delete(Usuario $usuario, Externo $externo): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordiandor" ) return true;
+        return false;
     }
 
     /**

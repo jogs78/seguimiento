@@ -13,9 +13,10 @@ class SeguimientoPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(Usuario $actual): bool
+    public function viewAny(Usuario $actual, Proyecto $proyecto): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Estudainte" && $proyecto->externo_id == $actual->usa_id ) return true;
+        return false;
     }
 
     /**
@@ -23,7 +24,11 @@ class SeguimientoPolicy
      */
     public function view(Usuario $actual, Seguimiento $seguimiento): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Asesor"  && $proyecto->asesor_id ==  $actual->usa_id ){
+            return true;
+        }         
+        if ($actual->usa_type == "App\Models\Externo" && $proyecto->externo_id == $actual->usa_id ) return true;
+        return false; 
     }
 
     public function calificar(Usuario $actual, Proyecto $proyecto): bool
@@ -43,7 +48,11 @@ class SeguimientoPolicy
      */
     public function delete(Usuario $actual, Seguimiento $seguimiento): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
+
     }
 
     /**

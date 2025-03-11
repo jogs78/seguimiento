@@ -29,7 +29,8 @@ class PeriodoPolicy
      */
     public function create(User $user): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador" ) return true;
+        return false;
     }
 
     /**
@@ -37,7 +38,8 @@ class PeriodoPolicy
      */
     public function update(User $user, Periodo $periodo): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador" ) return true;
+        return false;
     }
 
     /**
@@ -45,7 +47,8 @@ class PeriodoPolicy
      */
     public function delete(User $user, Periodo $periodo): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Coordinador" ) return true;
+        return false;
     }
 
     /**

@@ -31,7 +31,7 @@ class EstudiantePolicy
      */
     public function create(User $user): bool
     {
-        //
+        
     }
 
     /**
@@ -51,7 +51,10 @@ class EstudiantePolicy
      */
     public function delete(User $user, Estudiante $estudiante): bool
     {
-        //
+        if ($actual->usa_type == "App\Models\Externo" ) return false;
+        if ($actual->usa_type == "App\Models\Asesor" ) return false;
+        if ($actual->usa_type == "App\Models\Estudiante" ) return false;
+        if ($actual->usa_type == "App\Models\Coordinador" ) return false;
     }
 
     /**
