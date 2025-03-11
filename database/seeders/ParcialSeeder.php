@@ -35,7 +35,9 @@ class ParcialSeeder extends Seeder
         $parcial->conocimiento_externo = 20;
         $parcial->etico_externo = 10;
         $parcial->promedio_externo = 100;
-        $parcial->comentarios_externo = "primer externo comentario";        
+        $parcial->comentarios_externo = "primer externo comentario";
+        $parcial->califico_externo = '2025-03-11 14:30:00';  
+        $parcial->califico_interno = '2025-03-11 15:30:00';              
         $parcial->save(); 
 ////////////////
 /*
@@ -87,7 +89,9 @@ class ParcialSeeder extends Seeder
         $parcial->conocimiento_externo = 20;
         $parcial->etico_externo = 10;
         $parcial->promedio_externo = 100;
-        $parcial->comentarios_externo = "segundo externo comentario";        
+        $parcial->comentarios_externo = "segundo externo comentario";  
+        $parcial->califico_externo = '2025-02-11 14:30:00';  
+        $parcial->califico_interno = '2025-02-11 15:30:00';       
         $parcial->save(); 
 
          

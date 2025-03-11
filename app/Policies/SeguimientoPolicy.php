@@ -15,7 +15,7 @@ class SeguimientoPolicy
      */
     public function viewAny(Usuario $actual, Proyecto $proyecto): bool
     {
-        if ($actual->usa_type == "App\Models\Estudainte" && $proyecto->externo_id == $actual->usa_id ) return true;
+        if ($actual->usa_type == "App\Models\Estudiante" && $proyecto->externo_id == $actual->usa_id ) return true;
         return false;
     }
 

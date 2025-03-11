@@ -140,9 +140,9 @@
     <p>Observaciones: </p><p>{{$primer->comentarios_externo}}</p>
     <table class="tabla">
         <tr>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Nombre y firma asesor externo</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{$estudiante->proyecto->externo->nombre}} {{$estudiante->proyecto->externo->apellido_paterno}} {{$estudiante->proyecto->externo->apellido_materno}} <br> Nombre y firma asesor externo</th>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Sello de la empresa, organismo o dependencia</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{ \Carbon\Carbon::parse($primer->califico_externo)->format('Y-m-d') }} <br> Fecha de Evaluación</th> 
         </tr>
     </table>
     <p>Evaluación por el Asesor Interno:</p>
@@ -212,9 +212,9 @@
     <p>Observaciones: </p><p>{{$primer->comentarios_interno}}</p>
     <table class="tabla">
         <tr>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Nombre y firma asesor interno</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{$estudiante->proyecto->asesor->nombre}} {{$estudiante->proyecto->asesor->apellido_paterno}} {{$estudiante->proyecto->asesor->apellido_materno}} <br> Nombre y firma asesor interno</th>
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Sello de la Institución</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Fecha de Evaluación</th>
+            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{ \Carbon\Carbon::parse($primer->califico_interno)->format('Y-m-d') }} <br> Fecha de Evaluación</th>  
         </tr>
     </table>
     <table class="tabla">
