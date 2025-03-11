@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Seguimiento;
 use App\Http\Requests\SeguimientoRequest;
 use App\Models\Estudiante;
@@ -42,6 +43,9 @@ class SeguimientoController extends Controller
                     $segui = Parcial::firstOrCreate(
                         ['estudiante_id' => $estudiante->id,'consecutivo' => $consecutivo ], 
                     );
+                    $segui->califico_interno=Carbon::now();
+                    $segui->save();
+
                     return view('seguimientos.parcial.calificar-interno',compact('estudiante','consecutivo','segui'));                    
                 }
                 
@@ -49,7 +53,9 @@ class SeguimientoController extends Controller
                     $ultimo = Parcial::firstOrCreate(
                         ['estudiante_id' => $estudiante->id], 
                     );
-                    
+                    $ultimo->califico_interno=Carbon::now();
+                    $ultimo->save();
+
                     return view('seguimientos.ultimo.calificar-interno',compact('estudiante','consecutivo','ultimo'));
 
                 }
@@ -61,12 +67,17 @@ class SeguimientoController extends Controller
                     $segui = Parcial::firstOrCreate(
                         ['estudiante_id' => $estudiante->id, 'consecutivo' => $consecutivo ],
                     );
+                    $segui->califico_externo=Carbon::now();
+                    $segui->save();
+
                     return view('seguimientos.parcial.calificar-externo',compact('estudiante','consecutivo','segui'));                    
                 }
                 if($consecutivo == 'ultimo' ){
                     $ultimo = Parcial::firstOrCreate(
                         ['estudiante_id' => $estudiante->id],
                     );
+                    $ultimo->califico_externo=Carbon::now();
+                    $ultimo->save();
                     return view('seguimientos.ultimo.calificar-externo',compact('estudiante','consecutivo','ultimo'));
 
                 }                break;

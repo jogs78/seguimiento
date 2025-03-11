@@ -39,8 +39,8 @@ return new class extends Migration
             $table->integer('mejoras_interno')->nullable()->default(null); 
             $table->float  ('promedio_interno')->nullable()->default(null); 
             $table->text('comentarios_interno')->nullable()->default(null);
-
-
+            $table->timestamp('califico_externo')->nullable()->default(null);
+            $table->timestamp('califico_interno')->nullable()->default(null);
             //$table->morphs('parciales');
             $table->string('ruta')->nullable()->default(null); 
             $table->timestamps();
