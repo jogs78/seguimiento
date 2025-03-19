@@ -31,7 +31,7 @@ class ConfiguracionSeeder extends Seeder
 
         $nueva = new Configuracion();
         $nueva->variable = "periodo_id";
-        $nueva->valor = "1";
+        $nueva->valor = "2";
         $nueva->save();
 
     }

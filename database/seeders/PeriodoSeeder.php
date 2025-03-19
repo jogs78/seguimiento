@@ -26,7 +26,7 @@ class PeriodoSeeder extends Seeder
         $periodo->save(); 
     
         $periodo = new Periodo();
-        $periodo->nombre = "Enero – Julio 2024";
+        $periodo->nombre = "Enero – Julio 2025";
         $periodo->fecha_inicio = "2025-01-08";
         $periodo->fecha_final = "2025-06-12";
         $periodo->fecha_inicio_1er_reporte = "2025-01-09";

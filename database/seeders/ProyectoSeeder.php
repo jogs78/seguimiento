@@ -25,7 +25,7 @@ residencias en el departamento de ingenierías en el Instituto Tecnológico de T
         $proyecto->asesor_id = 1;
         $proyecto->empresa_id = 1;
         $proyecto->externo_id = 1;
-        $proyecto->periodo_id = 1;
+        $proyecto->periodo_id = 2;
         $proyecto->save(); 
 
 

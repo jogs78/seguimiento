@@ -13,10 +13,14 @@ class ParcialSeeder extends Seeder
      */
     public function run(): void
     {
+        
         $parcial = new Parcial();
+        
         $parcial->estudiante_id = 1;
         $parcial->promedio_parcial = 100;
         $parcial->consecutivo = 1;
+
+
         $parcial->puntualidad_interno = 10;
         $parcial->conocimiento_interno = 20;
         $parcial->equipo_interno = 15;
@@ -24,7 +28,10 @@ class ParcialSeeder extends Seeder
         $parcial->orden_interno = 20;
         $parcial->mejoras_interno = 15;
         $parcial->promedio_interno = 15;  
-        $parcial->comentarios_interno = "primer interno comentario";        
+        $parcial->comentarios_interno = "primer interno comentario";   
+        $parcial->califico_interno = '2025-03-11 15:30:00';     
+   
+
         $parcial->puntualidad_externo = 5;
         $parcial->equipo_externo = 10;
         $parcial->iniciativa_externo = 5;
@@ -37,7 +44,9 @@ class ParcialSeeder extends Seeder
         $parcial->promedio_externo = 100;
         $parcial->comentarios_externo = "primer externo comentario";
         $parcial->califico_externo = '2025-03-11 14:30:00';  
-        $parcial->califico_interno = '2025-03-11 15:30:00';              
+
+
+
         $parcial->save(); 
 ////////////////
 /*

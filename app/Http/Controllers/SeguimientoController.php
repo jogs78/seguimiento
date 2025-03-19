@@ -27,11 +27,14 @@ class SeguimientoController extends Controller
      */
     public function create(Estudiante $estudiante,$consecutivo)
     {
+
+        $decision = Gate::inspect('calificar', [Seguimiento::class, $estudiante->proyecto, $consecutivo, $estudiante->id ]);
+
         
         Log::channel('debug')->info('checar');
-        if( ! Gate::allows('calificar', [Seguimiento::class, $estudiante->proyecto ])){
-            return view('estudiante.aviso.no-autorizado');
-            return;
+        if( ! $decision->allowed() ){
+            $razon = $decision->message();
+            return view('estudiante.aviso.no-autorizado', compact('razon'));
         }
         $usuario = Auth::getUser();
         //dd($usuario->usa_type);
@@ -79,8 +82,8 @@ class SeguimientoController extends Controller
                     $ultimo->califico_externo=Carbon::now();
                     $ultimo->save();
                     return view('seguimientos.ultimo.calificar-externo',compact('estudiante','consecutivo','ultimo'));
-
-                }                break;
+                }
+                break;
             
             
             default:

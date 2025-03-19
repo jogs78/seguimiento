@@ -60,11 +60,14 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
               <div class="centro"> <p>Seguimiento</p></div>
               <div style="padding-bottom:10px;" class="centro"> <p>Realizado</p></div>
               @endif
+{{--
               @if ( is_null($estudiante->primer->puntualidad_interno) )
                 Sin calificaciones del asesor interno
-                @else
+              @else
                 <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer')}}">Primer</a></div>
-            @endif
+              @endif
+--}}
+
       @endforeach
     </td>
     <td>

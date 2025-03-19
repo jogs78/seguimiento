@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Usted no está autorizado a realizar esta acción</h1>
+    <h1>Usted no está autorizado a realizar esta acción {{$razon}}</h1>
     <p id="countdown">Será redirigido en 10 segundos...</p>
 
     <script>
