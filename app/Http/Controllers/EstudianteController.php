@@ -189,10 +189,14 @@ class EstudianteController extends Controller
         //return view('estudiante.impresiones.anteproyecto'); 
     }
 
-    public function primer()
+    public function primer(Estudiante $estudiante)
     {
-        $estudiante = Auth::getUser()->usa;
-        $externo = Auth::getUser()->usa;
+        if (is_null($estudiante->id)){
+            $estudiante = Auth::getUser()->usa;
+        }
+        //tendriamos que saber 
+        //si es un estudiante
+        //$externo = Auth::getUser()->usa;
         $primer = $estudiante->primer;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.primer',compact('estudiante','primer')); 
         return $pdf->download('Primer_Seguimiento ' . $estudiante->numero_de_control .'.pdf');

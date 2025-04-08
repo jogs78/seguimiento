@@ -65,7 +65,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
               <div class="centro"> <p>Sin calificaciones</p></div>
               <div class="centro"> <p> del asesor externo</p></div>
               @elseif(!is_null($estudiante->primer?->puntualidad_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer')}}">Primer</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}">Primer</a></div>
               @endif
           
       @endforeach
