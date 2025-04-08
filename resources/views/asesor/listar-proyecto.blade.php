@@ -83,7 +83,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
               <div class="centro"> <p>Sin calificaciones</p></div>
               <div class="centro"> <p> del asesor externo</p></div>
               @elseif(!is_null($estudiante->segundo?->puntualidad_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo')}}">Segundo</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}">Segundo</a></div>
               @endif
       @endforeach
     </td>
@@ -100,7 +100,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
               <div class="centro"> <p>Sin calificaciones</p></div>
                 <div class="centro"> <p> del asesor externo</p></div>
                 @elseif(!is_null($estudiante->ultimo?->promedio_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo')}}">Ultimo</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}">Ultimo</a></div>
               @endif
       @endforeach
     </td>

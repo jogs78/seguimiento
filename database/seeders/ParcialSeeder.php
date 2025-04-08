@@ -27,7 +27,7 @@ class ParcialSeeder extends Seeder
         $parcial->dedicado_interno = 20;
         $parcial->orden_interno = 20;
         $parcial->mejoras_interno = 15;
-        $parcial->promedio_interno = 15;  
+        $parcial->promedio_interno = 100;  
         $parcial->comentarios_interno = "primer interno comentario";   
         $parcial->califico_interno = '2025-03-11 15:30:00';     
    

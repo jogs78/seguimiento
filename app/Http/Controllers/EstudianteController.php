@@ -202,17 +202,21 @@ class EstudianteController extends Controller
         return $pdf->download('Primer_Seguimiento ' . $estudiante->numero_de_control .'.pdf');
     }
 
-    public function segundo()
+    public function segundo(Estudiante $estudiante)
     {
-        $estudiante = Auth::getUser()->usa;
+        if (is_null($estudiante->id)){
+            $estudiante = Auth::getUser()->usa;
+        }
         $segundo = $estudiante->segundo;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.segundo',compact('estudiante','segundo')); 
         return $pdf->download('Segundo_Seguimiento ' . $estudiante->numero_de_control . '.pdf');      
     }
 
-    public function ultimo()
+    public function ultimo(Estudiante $estudiante)
     {
-        $estudiante = Auth::getUser()->usa;
+        if (is_null($estudiante->id)){
+            $estudiante = Auth::getUser()->usa;
+        }
         $ultimo = $estudiante->ultimo;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.ultimo',compact('estudiante','ultimo')); 
         return $pdf->download('Ultimo_Seguimiento ' . $estudiante->numero_de_control .'.pdf');

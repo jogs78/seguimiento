@@ -65,7 +65,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
               <div class="centro"> <p>Sin calificaciones</p></div>
               <div class="centro"> <p> del asesor interno</p></div>
               @elseif(!is_null($estudiante->primer?->puntualidad_externo))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer')}}">Primer</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}">Primer</a></div>
               @endif
 
 
@@ -74,17 +74,19 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     <td>
     @foreach ($proyecto->estudiantes as $estudiante)
           @if (is_null($estudiante->segundo?->puntualidad_externo))
-          <div class="centro"><a href="{{route('realizar-seguimientos',[$estudiante->id,'segundo'])}}">Realizar</a></div>
+          <a href="{{route('realizar-seguimientos',[$estudiante->id,'segundo'])}}" class="centro">Realizar</a>
           @else
               <div class="centro"> <p>Seguimiento</p></div>
               <div style="padding-bottom:10px;" class="centro"> <p>Realizado</p></div>
+              @endif
+
               @if ( is_null($estudiante->segundo?->puntualidad_interno) )
                 <div class="centro"> <p>Sin calificaciones</p></div>
                 <div class="centro"> <p> del asesor interno</p></div>
                 @elseif(!is_null($estudiante->segundo?->puntualidad_externo))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo')}}">Segundo</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}">Segundo</a></div>
               @endif
-            @endif
+           
       @endforeach
     </td>
     <td>
@@ -94,13 +96,15 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
           @else
               <div class="centro"> <p>Revisar</p></div>
               <div style="padding-bottom:10px;" class="centro"> <p>Seguimiento</p></div>
+              @endif
+
               @if ( is_null($estudiante->ultimo?->promedio_interno) )
               <div class="centro"> <p>Sin calificaciones</p></div>
               <div class="centro"> <p> del asesor interno</p></div>
               @elseif(!is_null($estudiante->ultimo?->promedio_externo))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo')}}">Ultimo</a></div>
+                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}">Ultimo</a></div>
               @endif
-            @endif
+           
       @endforeach
     </td>
    </tr>

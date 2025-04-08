@@ -32,7 +32,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
    <th class="thfondo">Nombre estudiante(s)</th>
    <th class="thfondo">Seguimiento 1</th>
    <th class="thfondo">Seguimiento 2</th>
-   <th class="thfondo">Seguimiento F</th>
+   <th class="thfondo">Seguimiento Final</th>
   </thead>
   <tbody>
  @foreach ($proyectos as $proyecto)
@@ -74,29 +74,44 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          <li>@if (is_null($estudiante->primer))
-            NO
-          @else
-            SI            
-          @endif</li>
+        @if (is_null($estudiante->primer?->puntualidad_interno))
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor interno</p></div>
+        @endif
+        @if ( is_null($estudiante->primer?->puntualidad_externo) )
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor externo</p></div>
+        @elseif(!is_null($estudiante->primer?->puntualidad_interno) && !is_null($estudiante->primer?->puntualidad_externo))
+          <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}">Primer</a></div>
+        @endif
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          <li>@if (is_null($estudiante->segundo))
-            NO
-          @else
-            SI            
-          @endif</li>
+      @if (is_null($estudiante->segundo?->puntualidad_interno))
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor interno</p></div>
+        @endif
+        @if ( is_null($estudiante->segundo?->puntualidad_externo) )
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor externo</p></div>
+        @elseif(!is_null($estudiante->segundo?->puntualidad_interno) && !is_null($estudiante->segundo?->puntualidad_externo))
+          <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}">Segundo</a></div>
+        @endif
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          <li>@if (is_null($estudiante->ultimo))
-            NO
-          @else
-            SI            
-          @endif</li>
+      @if(is_null($estudiante->ultimo?->promedio_interno))
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor interno</p></div>
+        @endif
+        @if ( is_null($estudiante->ultimo?->promedio_externo))
+        <div class="centro"> <p>Sin calificaciones</p></div>
+        <div class="centro"> <p> del asesor externo</p></div>
+        @elseif(!is_null($estudiante->ultimo?->promedio_interno) && !is_null($estudiante->ultimo?->promedio_externo))
+          <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}">Ultimo</a></div>
+        @endif
       @endforeach
     </td>
  
