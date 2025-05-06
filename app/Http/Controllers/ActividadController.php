@@ -63,7 +63,6 @@ class ActividadController extends Controller
      */
     public function edit(Proyecto $proyecto, Actividad $actividad, $actividadId)
     {   
-       //$actividad = $proyecto->actividades->first();
        $actividad = Actividad::find($actividadId);
         return view('actividad.editar',compact("actividad","proyecto"));
     }
@@ -71,17 +70,10 @@ class ActividadController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Proyecto $proyecto, Actividad $actividad)
+    public function update(UpdateActividadRequest $request, Proyecto $proyecto, Actividad $actividad, $actividadId)
     {
         $proyecto = Proyecto::with('actividades')->find($proyecto->id);
-        /*$validated = $request->validate([
-            'nombre' => 'required',
-            'descripcion' => 'required',
-            'semanas' => 'required',
-            'orden' => 'required',
-
-        ]);*/
-
+        $actividad = Actividad::find($actividadId);
         $actividad->fill($request->all());
         $actividad->save();
         return redirect()->route("proyectos.actividades.index",$proyecto->id);
@@ -90,16 +82,12 @@ class ActividadController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Proyecto $proyecto, Actividad $actividad)
+    public function destroy(Proyecto $proyecto, Actividad $actividad, $actividadId)
     {   
-        $proyecto = Proyecto::findOrFail($proyectoId);
-        $actividad = $proyecto->actividad()->findOrFail($actividadId);
-
-    if (!$actividad) {
-        abort(404, 'La actividad no se encontró o no pertenece a este proyecto.');
-    }
+        $proyecto = Proyecto::with('actividades')->find($proyecto->id);
+        $actividad = Actividad::find($actividadId);
         $actividad->delete();
-        dd($actividad);
         return redirect()->route("proyectos.actividades.index",$proyecto->id);
     }
+    
 }
