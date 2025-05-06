@@ -61,9 +61,10 @@ class ActividadController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Proyecto $proyecto, Actividad $actividad)
+    public function edit(Proyecto $proyecto, Actividad $actividad, $actividadId)
     {   
-        $actividad = $proyecto->actividades->first();
+       //$actividad = $proyecto->actividades->first();
+       $actividad = Actividad::find($actividadId);
         return view('actividad.editar',compact("actividad","proyecto"));
     }
 
@@ -73,15 +74,15 @@ class ActividadController extends Controller
     public function update(Request $request, Proyecto $proyecto, Actividad $actividad)
     {
         $proyecto = Proyecto::with('actividades')->find($proyecto->id);
-        $validated = $request->validate([
+        /*$validated = $request->validate([
             'nombre' => 'required',
             'descripcion' => 'required',
             'semanas' => 'required',
             'orden' => 'required',
 
-        ]);
+        ]);*/
 
-        $actividad->fill($validated);
+        $actividad->fill($request->all());
         $actividad->save();
         return redirect()->route("proyectos.actividades.index",$proyecto->id);
     }
