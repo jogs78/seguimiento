@@ -41,16 +41,26 @@
     <div>
         <label for='nombre' class="parrafo" >Correo electronico: </label>
         <div>
+            @if(session('errorsesion'))
+            <div class="alert alert-danger">
+                {{ session('errorsesion') }}
+            </div>
+            @endif
             <span class="error-message">{{ $errors->first("nombre") }}</span>
         </div>
-        <input class="llenar" type='text' name='nombre' id='nombre' placeholder="Ingresa tu correo"><br>
+        <input class="llenar" type='text' name='nombre' id='nombre' value="{{old('nombre')}}" placeholder="Ingresa tu correo"><br>
     </div>
     <div style="margin-top: 20px;">
         <label for='contra'  class="parrafo">Contraseña: </label>
         <div>
+            @if(session('errorcontra'))
+            <div class="alert alert-danger">
+                {{ session('errorcontra') }}
+            </div>
+            @endif
             <span class="error-message">{{ $errors->first("contra") }}</span>
         </div>
-        <input  class="llenar" type="password"  name='contra' id='contra' placeholder="Ingresa tu Contraseña"><br>
+        <input  class="llenar" type="password"  name='contra' id='contra' value="{{old('contra')}}" placeholder="Ingresa tu Contraseña"><br>
     </div>
   <div class="horizontal" style="margin-top: 60px; "><input class="boton" type='submit' value="Entrar"></div>
  </form>

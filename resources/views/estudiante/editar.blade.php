@@ -4,7 +4,6 @@
 .cmayor{background-color: rgb(19, 46, 68);}
 .linea{background-color: rgb(10, 105, 163); height: 4px; border-radius: 2px; width: 90%;} 
 .hderecho {display: flex; justify-content: right; }
-.horizontal {display: flex; justify-content: center; width: 100%;}
 .centro{display: flex; justify-content: center;}
 .titulo{text-align:center; font-size: 50px; font-weight: bold;}
 .subtitulo{text-align:center; font-size: 45px; font-weight: bold;}
@@ -34,19 +33,6 @@
 
         <label for='correo_electronico' class="parrafo">Correo Electronico</label>
         <input type='email' name='correo_electronico' id='correo_electronico'value="{{$estudiante->correo_electronico}}" class="llenar"><br>
-
-
-<!--
-        <label for='nombreproyecto'>Nombre del Proyecto</label>
-        <input type='text' name='nameproyecto' id='nameproyecto'value="{{$estudiante->nameproyecto}}"><br>
-
-        <label for='nombreasesor'>Nombre/s Del Asesor Interno</label>
-        <input type='text' name='nombreasesor' id='nombreasesor'value="{{$estudiante->nombreasesor}}"><br>
-
-        <label for='apellidoasesor'>Apellidos Del Asesor Interno</label>
-        <input type='text' name='apellidosasesor' id='apellidosasesor'value="{{$estudiante->apellidosasesor}}"><br>
--->
-
 
         <input class="boton" type='submit' value="Actualizar">
     </form>

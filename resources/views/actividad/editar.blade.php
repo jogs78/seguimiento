@@ -17,6 +17,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thcontenido{font-weight: normal;}
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
 </style>
 @section('encabezado')
     
@@ -33,9 +39,11 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         {{$errors->first("nombre")}}
         <input type='text' name='nombre' id='nombre' value="{{$actividad->nombre}}" class="llenar"><br>
         
-        <label for='descripcion' class="parrafo">Describe como realizaras tal actividad </label>
+        <div class="form-group">
+        <label for="descripcion" class="parrafo">Describe cómo realizarás tal actividad</label>
         {{$errors->first("descripcion")}}
-        <textarea name='descripcion' id='descripcion' class="llenar">{{$actividad->descripcion}}</textarea><br>
+        <textarea name="descripcion" id="descripcion" style="margin-top:16px; font-size: 18px;  resize: none;" oninput="autoResize(this)">{{$actividad->descripcion}}</textarea>
+        </div>
 
         <label for='semanas' class="parrafo">En cuantas semanas reliazaras tal actividad</label>
         {{$errors->first("semanas")}}
@@ -50,3 +58,16 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     </div>
 </div>
 @endsection
+
+<script>
+  function autoResize(textarea) {
+    textarea.style.height = 'auto'; // Reinicia el alto
+    textarea.style.height = textarea.scrollHeight + 'px'; // Ajusta al contenido
+  }
+
+  // Llama la función al cargar si hay contenido inicial
+  window.addEventListener('DOMContentLoaded', () => {
+    const ta = document.getElementById('descripcion');
+    if (ta) autoResize(ta);
+  });
+</script>

@@ -64,7 +64,7 @@ class SeguimientoController extends Controller
                 }
                 break;
             
-            case 'App\Models\Externo':
+            case 'App\Models\Externo': 
                 if($consecutivo == 'primer' or $consecutivo == 'segundo'){
                     
                     $segui = Parcial::firstOrCreate(

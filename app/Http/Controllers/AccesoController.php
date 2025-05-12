@@ -47,7 +47,7 @@ class AccesoController extends Controller
         $encontrado = Usuario::where('nombre_usuario',$nombre)->first();
 
         if (is_null($encontrado)){
-            echo "no hay resultados";
+            return redirect()->back()->with('errorsesion', 'Correo no encontrado');
         }else{
             //echo "si hay resultados entonces ahora checar la contraseña";
             $contraseña_encriptada = $encontrado->contraseña;
@@ -59,7 +59,7 @@ class AccesoController extends Controller
                 return redirect(route('home'));
             }else{
                 //DIFIERENTES
-                return redirect()->back();
+                return redirect()->back()->with('errorcontra', 'Contraseña no encontrado');
             }
 
 
