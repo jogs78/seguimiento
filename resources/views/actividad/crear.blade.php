@@ -32,40 +32,68 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 <div class="centro">
     <form action="{{route("proyectos.actividades.store",$proyecto->id)}}" method="POST" enctype="application/x-www-form-urlencoded">
         @csrf
-        <label for='nombre' class="parrafo">Nombre de la actividad</label>
-        {{$errors->first("nombre")}}
-        <input type='text' name='nombre' id='nombre' value="{{old('nombre')}}" class="llenar"><br>
+        <div id="formularios-container">
+          <!-- Aquí se agregan los formularios clonados -->
+         </div>
 
-        <div class="form-group">
-        <label for='descripcion' class="parrafo">Describe como realizaras tal actividad </label>
-        {{$errors->first("descripcion")}}
-        <textarea name='descripcion' id='descripcion' value="{{old('descripcion')}}" style="margin-top:16px; font-size: 18px;  resize: none;" oninput="autoResize(this)"></textarea><br>
+        <div class="centro">
+          <button type="button" class="boton" onclick="agregarFormulario()">Agregar otra actividad</button>
         </div>
-
-        <label for='semanas' class="parrafo">En cuantas semanas reliazaras tal actividad</label>
-        {{$errors->first("semanas")}}
-        <input type='number' name='semanas' id='semanas' value="{{old('semanas')}}" style="font-size: 18px; margin-left:12px;"><br>
-
-        <label for='orden' class="parrafo">Cual es el orden de esta actividad (primera, segunda...)</label>
-        {{$errors->first("orden")}}
-        <input type='number' name='orden' id='orden' value="{{old('orden')}}" class="llenar"><br>
 
         
         <div class="centro"><input type='submit' class="boton"></div> <!-- Crear un boton o enlace para tener mas actividades -->
     </form>
 </div>
 </div>
+
+    <!-- Template oculto -->
+      <template id="formulario-template">
+        <div class="formulario-actividad" style="margin-bottom: 30px;">
+          <label for='nombre' class="parrafo">Nombre de la actividad</label>
+        {{$errors->first("nombre")}}
+        <input type='text' name='nombre[]' value="{{old('nombre')}}" class="llenar"><br>
+
+        <div class="form-group">
+        <label for='descripcion' class="parrafo">Describe como realizaras tal actividad </label>
+        {{$errors->first("descripcion")}}
+        <textarea name='descripcion[]'  value="{{old('descripcion')}}" style="margin-top:16px; font-size: 18px;  resize: none;" oninput="autoResize(this)"></textarea><br>
+        </div>
+
+        <label for='semanas' class="parrafo">En cuantas semanas reliazaras tal actividad</label>
+        {{$errors->first("semanas")}}
+        <input type='number' name='semanas[]' value="{{old('semanas')}}" style="font-size: 18px; margin-left:12px;"><br>
+
+        <label for='orden' class="parrafo">Cual es el orden de esta actividad (primera, segunda...)</label>
+        {{$errors->first("orden")}}
+        <input type='number' name='orden[]' value="{{old('orden')}}" class="llenar"><br>
+
+          <hr style="margin-top: 20px;">
+        </div>
+      </template>
     @endsection
 
 <script>
-  function autoResize(textarea) {
-    textarea.style.height = 'auto'; // Reinicia el alto
-    textarea.style.height = textarea.scrollHeight + 'px'; // Ajusta al contenido
-  }
+function agregarFormulario() {
+  const template = document.getElementById('formulario-template');
+  const container = document.getElementById('formularios-container');
+  const clone = template.content.cloneNode(true);
+  container.appendChild(clone);
 
-  // Llama la función al cargar si hay contenido inicial
-  window.addEventListener('DOMContentLoaded', () => {
-    const ta = document.getElementById('descripcion');
-    if (ta) autoResize(ta);
-  });
+  // Autoajustar textareas que se agregan dinámicamente
+  const textareas = container.querySelectorAll('textarea');
+  textareas.forEach(autoResize);
+}
+
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  agregarFormulario(); // Inserta el primer formulario
+
+  // Si ya hay un textarea con id='descripcion' por alguna razón previa
+  const ta = document.getElementById('descripcion');
+  if (ta) autoResize(ta);
+});
 </script>

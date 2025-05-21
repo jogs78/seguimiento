@@ -43,6 +43,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
  <thead>
   <th class="thfondo">Nombre</th>
   <th class="thfondo">Semanas</th>
+  <th class="thfondo">Orden</th>
   <th class="thfondo">Acciones</th>
  </thead>
  <tbody>
@@ -50,9 +51,10 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
   <tr>
    <th class="thcontenido">{{$actividad->nombre}}</th>
    <th class="thcontenido">{{$actividad->semanas}}</th>
+   <th class="thcontenido">{{$actividad->orden}}</th>
    <th style="padding:8px;">
                 <a href="{{route("proyectos.actividades.edit",[$proyecto->id,$actividad->id])}}" class="botonEditar">Editar</a>
-                <form action="{{route("proyectos.actividades.destroy",[$proyecto->id,$actividad->id])}}" method="POST">
+                <form action="{{route("proyectos.actividades.destroy",[$proyecto->id,$actividad->id])}}" method="POST" onsubmit="return confirmarEliminacion()">
                 @method('DELETE')
                 @csrf
                 <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
@@ -76,3 +78,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 </div>
 
 @endsection
+
+<script>
+function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar esta actividad ya no se podrá restaurar.\n¿Seguro que deseas eliminarla?");
+}
+</script>

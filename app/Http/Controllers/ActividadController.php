@@ -37,18 +37,29 @@ class ActividadController extends Controller
         return view('actividad.crear',compact('actividades','proyecto'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request, Proyecto $proyecto)
-    {
-        //guardar las activides
-        $nueva = new Actividad;
-        $nueva->fill($request->all());
-        $nueva->proyecto_id = $proyecto->id;
-        $nueva->save();
-        return redirect(route('proyectos.create'));
+
+    public function store(Request $request, $proyectoId)
+{
+    $nombres = $request->input('nombre');
+    $descripciones = $request->input('descripcion');
+    $semanas = $request->input('semanas');
+    $ordenes = $request->input('orden');
+
+    foreach ($nombres as $i => $nombre) {
+        // Puedes agregar validación adicional aquí
+        Actividad::create([
+            'nombre' => $nombre,
+            'descripcion' => $descripciones[$i],
+            'semanas' => $semanas[$i],
+            'orden' => $ordenes[$i],
+            'proyecto_id' => $proyectoId,
+        ]);
     }
+
+    return redirect()->route('proyectos.create', $proyectoId)
+                     ->with('success', 'Actividades guardadas correctamente.');
+}
+
 
     /**
      * Display the specified resource.

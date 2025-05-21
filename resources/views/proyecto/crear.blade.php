@@ -106,7 +106,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             
             <label for='nombre_e' class="parrafo">Nombre de la Empresa</label>
             {{$errors->first("nombre_e")}}
-            <input type='text' name='nombre_e' id='nombre_e' value="{{old('nombre_e')}}" class="llenar"><br>
+            <input type='text' name='nombre_e' id='nombre_e' value="{{old('nombre_e')}}" class="llenar"><br><br>
             
             <label class="parrafo">Escoge el Giro, Ramo o Sector</label> <br>
             {{$errors->first("giro")}}    
@@ -151,14 +151,6 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <label for='puesto_titular'  class="parrafo">Puesto del Titular</label>
             {{$errors->first("puesto_titular")}}
             <input type='text' name='puesto_titular' id='puesto_titular' value="{{old('puesto_titular')}}" class="llenar"><br>
-           
-            <!--<label for='asesor_externo'>Nombre del Asesor externo</label>
-            {{$errors->first("asesor_externo")}}
-            <input type='text' name='asesor_externo' id='asesor_externo' value="{{old('asesor_externo')}}"><br>
-    
-            <label for='puesto_asesor'>Puesto del Asesor</label>
-            {{$errors->first("puesto_asesor")}}
-            <input type='text' name='puesto_asesor' id='puesto_asesor' value="{{old('puesto_asesor')}}"><br>-->
     
             <label for='informacion_e'  class="parrafo">Informacion adicional de la empresa: </label>
             {{$errors->first("informacion")}}
