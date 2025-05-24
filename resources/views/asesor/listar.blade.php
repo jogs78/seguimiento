@@ -61,8 +61,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         </tbody>
     </table>
     </div>
+
+    <div class="horizontal">
     <div class="centro"><a href="{{route("asesores.create")}}" class="boton" >Agregar un Asesor</a></div>
 
-    <!--<a href="{{route('generar-asesores.excel')}}" class="boton">Descargar lista</a>-->
+    <a href="{{route('generar-asesores.excel')}}" class="boton">Descargar lista</a>
+    </div>
+
 
     @endsection

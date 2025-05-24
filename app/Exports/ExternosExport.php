@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Estudiante;
+use App\Models\Externo;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -11,52 +11,38 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class UsersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class ExternosExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    /**
+    * @return \Illuminate\Support\Collection
+    */
     public function collection()
     {
-        return Estudiante::with('carrera', 'proyecto')->get();
+        return Externo::select('titulo','nombre','apellido_paterno','apellido_materno','correo_electronico','puesto')->get();
     }
-
     public function headings(): array
     {
         return [
             //'ID',
             'Nombre Completo',
             'Correo Electrónico',
-            'Número de Control',
-            'Teléfono',
-            'Dirección',
-            'Institución de Seguridad Social',
-            'Número de Seguridad Social',
-            'Carrera',
-            'Proyecto',
+            'Puesto',
         ];
     }
-
-    public function map($estudiante): array
+    public function map($externo): array
     {
         return [
-            //$estudiante->id,
-            $estudiante->nombre . ' ' . $estudiante->apellido_paterno . ' ' . $estudiante->apellido_materno,
-            $estudiante->correo_electronico,
-            $estudiante->numero_de_control,
-            $estudiante->telefono,
-            $estudiante->direccion,
-            $estudiante->institucion_seguridad_social,
-            $estudiante->numero_de_seguridad_social,
-            optional($estudiante->carrera)->nombre ?? 'N/A',
-            optional($estudiante->proyecto)->nombre ?? 'N/A',
+            //$externo->id,
+            $externo->titulo . ' ' . $externo->nombre . ' ' . $externo->apellido_paterno . ' ' . $externo->apellido_materno,
+            $externo->correo_electronico,
+            $externo->puesto,
         ];
     }
 
-    /**
-     * Estilos para el Excel
-     */
     public function styles(Worksheet $sheet)
     {
         // Aplica estilo a la primera fila (encabezados)
-        $sheet->getStyle('A1:I1')->applyFromArray([ //cambiar I1 por JI si quieres poner el ID tambien
+        $sheet->getStyle('A1:C1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'color' => ['rgb' => '000000'],
@@ -64,7 +50,7 @@ class UsersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithM
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                 'startColor' => [
-                    'rgb' => '29e329'
+                    'rgb' => '5eebeb'
                 ]
             ],
             'alignment' => [
@@ -81,8 +67,8 @@ class UsersExport implements FromCollection, ShouldAutoSize, WithHeadings, WithM
         ]);
 
         // Aplica bordes a todo el contenido (incluyendo encabezados)
-        $lastRow = Estudiante::count() + 1; // +1 por la fila de encabezado
-        $sheet->getStyle("A1:I$lastRow")->applyFromArray([ //cambiar I$lastRow por J$lastRow si quieres poner el ID tambien
+        $lastRow = Externo::count() + 1; // +1 por la fila de encabezado
+        $sheet->getStyle("A1:C$lastRow")->applyFromArray([ 
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,

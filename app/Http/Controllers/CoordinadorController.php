@@ -14,7 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\UsersExport;
-use App\Exports\UsuariosExportar;
+use App\Exports\AsesoresExport;
+use App\Exports\ExternosExport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 
@@ -149,6 +150,10 @@ class CoordinadorController extends Controller
     }
 
     public function exportandoLista(){
-        return Excel::download(new UsuariosExportar, 'Asesores.xlsx');
+        return Excel::download(new AsesoresExport, 'Asesores_Internos.xlsx');
+    }
+
+    public function exportLista(){
+        return Excel::download(new ExternosExport, 'Asesores_Externos.xlsx');
     }
 }

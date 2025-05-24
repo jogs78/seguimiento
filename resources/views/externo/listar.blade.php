@@ -77,5 +77,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         </tbody>
     </table>
     </div>
+    <div class="horizontal">
+
+    <a href="{{route('imprimir-externos.excel')}}" class="boton">Descargar lista</a>
+    </div>
 
     @endsection

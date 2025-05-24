@@ -64,8 +64,8 @@ Route::get('solicitud',[EstudianteController::class,'solicitud'])->middleware('a
 Route::get('promedio',[EstudianteController::class,'promedio'])->middleware('auth')->name('estudiante.promedio');
 Route::get('anteproyecto',[EstudianteController::class,'anteproyecto'])->middleware('auth')->name('estudiante.impresiones.anteproyecto');
 Route::get('primer/{estudiante?}',[EstudianteController::class,'primer'])->middleware('auth')->name('estudiante.impresiones.seguimientos.primer');
-Route::get('segundo',[EstudianteController::class,'segundo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.segundo');
-Route::get('ultimo',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
+Route::get('segundo/{estudiante?}',[EstudianteController::class,'segundo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.segundo');
+Route::get('ultimo/{estudiante?}',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
 //Route::get('/proyecto/crear', [ProyectoController::class, 'registrarProyecto'])->name('proyecto.crear');
 
 //rutas especificas del asesor interno
@@ -120,7 +120,7 @@ Route::get('/estudiantes/{pagina}', [EstudianteController::class, 'mostrar']);
 Route::post('/generar-pdf', [EmpresaController::class,'generarPdf'])->name('generar.pdf');
 Route::get('/generar-excel', [CoordinadorController::class,'exportarLista'])->name('generar-estudiantes.excel');
 Route::get('/generando-excel', [CoordinadorController::class,'exportandoLista'])->name('generar-asesores.excel');
+Route::get('/imprimir-excel', [CoordinadorController::class,'exportLista'])->name('imprimir-externos.excel');
 
 
 
-//Route::post('/subir', [EstudianteController::class, 'subirPDF'])->name('subir.pdf');
