@@ -31,7 +31,7 @@ class CoordinadorController extends Controller
 
 
 
-//        $proyectos = Proyecto::where('periodo_id', $periodo_id)->get();
+        $proyectos = Proyecto::where('periodo_id', $periodo_id)->get();
 
 
         $asesores = Asesor::all();

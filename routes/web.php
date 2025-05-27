@@ -16,6 +16,7 @@ use App\Http\Controllers\SeguimientoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\ExternoController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\CorreoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,6 +122,15 @@ Route::post('/generar-pdf', [EmpresaController::class,'generarPdf'])->name('gene
 Route::get('/generar-excel', [CoordinadorController::class,'exportarLista'])->name('generar-estudiantes.excel');
 Route::get('/generando-excel', [CoordinadorController::class,'exportandoLista'])->name('generar-asesores.excel');
 Route::get('/imprimir-excel', [CoordinadorController::class,'exportLista'])->name('imprimir-externos.excel');
+
+//Para enviar correo
+//Route::post('/enviar-correo', [CorreoController::class, 'enviarCorreo'])->name('correo.enviar');
+// Muestra el formulario para redactar el correo
+//Route::get('/redactar-correo/{usuario}', [CorreoController::class, 'mostrarFormulario'])->name('correo.formulario');
+
+Route::get('/correo/enviar/{id}', [CorreoController::class, 'create'])->name('correo.create');
+Route::post('/correo/enviar', [CorreoController::class, 'send'])->name('correo.send');
+
 
 
 

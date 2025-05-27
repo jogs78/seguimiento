@@ -68,6 +68,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
           <li> {{ $estudiante->numero_control }} {{ $estudiante->nombre }} {{ $estudiante->apellido_paterno }} {{ $estudiante->apellido_materno }}</li>
+      <a href="{{ route('correo.create', $estudiante->id) }}" class="btn btn-primary">
+    Enviar correo
+</a>
       @endforeach
     </td>
 
