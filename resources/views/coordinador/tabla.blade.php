@@ -61,16 +61,30 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
           <input type="submit" value="CAMBIAR." class="boton">          
         @endif
       </form>
-
+      @if ($proyecto->asesor)
+        <form action="{{ route('correo.create', ['type' => 'asesor', 'id' => $proyecto->asesor->id]) }}" method="GET">
+            <button type="submit" class="boton">Enviar correo</button>
+        </form>
+    @else
+        <p style="margin-top:16px;">No hay asesor Interno</p>
+    @endif
     </td>
 
-    <td style="padding:5px;">{{$proyecto->empresa->nombre}}</td>
+    <td style="padding:5px;">{{$proyecto->empresa->nombre}}
+    @if ($proyecto->externo)
+        <form action="{{ route('correo.create', ['type' => 'externo', 'id' => $proyecto->externo->id]) }}" method="GET">
+            <button type="submit" class="boton">Enviar correo</button>
+        </form>
+    @else
+        <p style="margin-top:16px;">No hay asesor Externo</p>
+    @endif
+    </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          <li> {{ $estudiante->numero_control }} {{ $estudiante->nombre }} {{ $estudiante->apellido_paterno }} {{ $estudiante->apellido_materno }}</li>
-      <a href="{{ route('correo.create', $estudiante->id) }}" class="btn btn-primary">
-    Enviar correo
-</a>
+          <div style="padding:5px;"> {{ $estudiante->numero_control }} {{ $estudiante->nombre }} {{ $estudiante->apellido_paterno }} {{ $estudiante->apellido_materno }}</div>
+          <form action="{{ route('correo.create', ['type' => 'estudiante', 'id' => $estudiante->id]) }}" method="GET">
+               <button type="submit" class="boton">Enviar correo</button>
+          </form>
       @endforeach
     </td>
 

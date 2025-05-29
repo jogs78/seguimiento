@@ -30,7 +30,11 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 @endsection
 
 @section('contenido')
-<h1 class="centro">Enviar Correo a {{ $usuario->nombre_usuario }}</h1>
+@if ($usuario->usa)
+    <h1 class="centro">Enviar Correo a {{ $usuario->usa->nombre }} {{ $usuario->usa->apellido_paterno }} {{ $usuario->usa->apellido_materno }} </h1>
+@else
+    <h1 class="centro">Enviar Correo a Usuario desconocido</h1>
+@endif
 
 <div>
     @if(session('success'))
@@ -70,6 +74,34 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             confirmButtonText: 'OK'
         }).then(() => {
             window.location.href = "{{ route('home') }}";
+        });
+    </script>
+@endif
+
+{{-- Error general --}}
+@if(session('error'))
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session("error") }}',
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+{{-- Errores de validación --}}
+@if ($errors->any())
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let errores = {!! json_encode($errors->all()) !!};
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Errores en el formulario',
+            html: '<ul style="text-align: left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>',
+            confirmButtonText: 'Corregir'
         });
     </script>
 @endif

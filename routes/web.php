@@ -128,7 +128,8 @@ Route::get('/imprimir-excel', [CoordinadorController::class,'exportLista'])->nam
 // Muestra el formulario para redactar el correo
 //Route::get('/redactar-correo/{usuario}', [CorreoController::class, 'mostrarFormulario'])->name('correo.formulario');
 
-Route::get('/correo/enviar/{id}', [CorreoController::class, 'create'])->name('correo.create');
+//Route::get('/correo/enviar/{id}', [CorreoController::class, 'create'])->name('correo.create');
+Route::get('/correo/{type}/{id}', [CorreoController::class, 'create'])->name('correo.create');
 Route::post('/correo/enviar', [CorreoController::class, 'send'])->name('correo.send');
 
 
