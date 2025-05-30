@@ -217,7 +217,7 @@
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{ \Carbon\Carbon::parse($primer->califico_interno)->format('Y-m-d') }} <br> Fecha de Evaluación</th>  
         </tr>
     </table>
-    <table class="tabla">
+    <table class="tabla" style="margin-top: 40px;">
         <tr>
             <th style="width: 50px;">Nota:</th><th class="dato" style="text-align: left; ">Este Formato tiene un valor de 10 puntos de la calificación final.</th>
         </tr>

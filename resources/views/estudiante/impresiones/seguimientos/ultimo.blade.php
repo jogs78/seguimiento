@@ -24,32 +24,12 @@
             </th>
         </thead>
     </table>
-    <table>
-        <tr>
-            <th>Nombre del Residente:</th> <th class="dato">{{$estudiante->nombre}}</th><th class="dato">{{$estudiante->apellido_paterno}}</th><th class="dato"> {{$estudiante->apellido_materno}}</th>
-            <th style="padding-left: 50px;">N° de Control:</th> <th class="dato">{{$estudiante->numero_de_control}}</th>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th style=" width: 22%;">Nombre del Proyecto: </th> <th class="dato">{{$estudiante->proyecto->nombre}}</th>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th>Programa Educativo:  </th> <th class="dato">{{$estudiante->carrera->nombre}}</th>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th>Periodo de realización de la Residencia Profesional: </th> <th class="dato">{{$estudiante->proyecto->periodo->nombre}}</th>
-        </tr>
-    </table>
-    <table>
-        <tr>
-            <th>Calificación Parcial (Promedio de ambas evaluaciones):</th> <th class="dato">{{ ($ultimo->promedio_interno + $ultimo->promedio_externo  )/2 }}</th>
-        </tr>
-    </table>
+    
+                <p  class="nomargen">Nombre del Residente: {{$estudiante->nombre}} {{$estudiante->apellido_paterno}} {{$estudiante->apellido_materno}}<span style="display: inline-block; width: 30px;"></span> N° de Control: {{$estudiante->numero_de_control}}</p>
+                <p  class="nomargen">Nombre del Proyecto: {{$estudiante->proyecto->nombre}}</p>
+                <p  class="nomargen">Programa Educativo: {{$estudiante->carrera->nombre}}</p>
+                <p  class="nomargen">Periodo de realización de la Residencia Profesional: {{$estudiante->proyecto->periodo->nombre}}</p>
+                <p  class="nomargen">Calificación Parcial (Promedio de ambas evaluaciones): {{ ($ultimo->promedio_interno + $ultimo->promedio_externo  )/2 }}</p>
 
     <p>Evaluación por el Asesor Externo:</p>
     <div class="cuadro">
@@ -309,14 +289,14 @@
             <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato"> {{ \Carbon\Carbon::parse($ultimo->califico_interno)->format('Y-m-d') }} <br> Fecha de Evaluación</th>  
         </tr>
     </table>
-    <p>**Considerar los criterios a evaluar que correspondan a cada programa educativo y de acuerdo a la naturaleza del proyecto</p>
-    <table class="tabla">
+    <p style="font-size: 10px;" class="nomargen">**Considerar los criterios a evaluar que correspondan a cada programa educativo y de acuerdo a la naturaleza del proyecto</p>
+    <table class="tabla" style="margin: 0; border-spacing: 0; border-collapse: collapse;">
         <tr>
-            <th style="width: 50px;">Nota:</th><th class="dato" style="text-align: left; ">Este formato tiene un valor de 80 puntos de la calificación final.</th>
+            <th style="width: 50px; font-size: 10px;">Nota:</th><th class="dato" style="text-align: left; font-size: 10px;">Este formato tiene un valor de 80 puntos de la calificación final.</th>
         </tr>
     </table>
-    <p style="margin-left:60px;">Original. - Departamento Académico (entregar 2 Evaluaciónes)</p>
-    <p style="margin-left:60px;">Copia. - División de estudios profesionales (entregarla la última evaluación)</p>
-    <p style="margin-left:60px;">Copia. - Estudiante</p>
+    <p style="margin-left:60px; font-size: 10px;" class="nomargen">Original. - Departamento Académico (entregar 2 Evaluaciónes)</p>
+    <p style="margin-left:60px; font-size: 10px;" class="nomargen">Copia. - División de estudios profesionales (entregarla la última evaluación)</p>
+    <p style="margin-left:60px; font-size: 10px;" class="nomargen">Copia. - Estudiante</p>
 </body>
 </html>
