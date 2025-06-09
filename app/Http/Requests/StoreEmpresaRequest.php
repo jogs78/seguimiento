@@ -26,6 +26,10 @@ class StoreEmpresaRequest extends FormRequest
             "giro"=>"required",
             "rfc"=>"required|max:15|min:12",
             "direccion"=>"required",
+            'numero' => 'required',
+            'codigo_postal' => 'required|max:5|min:5',
+            'ciudad' => 'required',
+            'estado' => 'required',
             "telefono"=>"required|numeric",
             "correo"=>"required|email",
             "titular"=>"required",
@@ -47,6 +51,12 @@ class StoreEmpresaRequest extends FormRequest
             "rfc.min" => "El RFC no puede tener menos de 12 caracteres.",
 
             "direccion.required"=>"Es necesario poner la direccion de la empresa",
+            "numero.required"=>"El Numero es requerido, sino tiene favor de poner S/N",
+            "codigo_postal.required"=>"Por favor ingrese un codigo postal",
+            "codigo_postal.min"=>"El codigo postal debe tener una logitud de 5 digitos",
+            "codigo_postal.max"=>"El codigo postal debe tener una logitud de 5 digitos",
+            "ciudad.required"=>"Por favor ingrese la Ciudad",
+            "estado.required"=>"Por favor ingrese el Estado",
 
             "telefono.required"=>"Es necesario poner un numero de telefono",
             "telefono.numeric" => "El campo teléfono solo puede contener números",

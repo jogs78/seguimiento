@@ -19,19 +19,10 @@ return new class extends Migration
             $table->string("informacion")->nullable()->default(null);
             $table->string("justificacion")->nullable()->default(null);
             $table->enum('origen',["Banco de Proyectos","Propuesta propia","Trabajador"]);
- 
             $table->foreignId('asesor_id')->nullable()->default(null)->constrained('asesores');
-            //$table->foreignId('externo_id')->nullable()->default(null)->constrained('externos');
             $table->foreignId('externo_id')->nullable()->default(null)->constrained('externos');
-            //$table->string("externo")->nullable()->default(null);
             $table->foreignId('empresa_id')->nullable()->default(null)->constrained('empresas');
             $table->foreignId('periodo_id')->nullable()->default(null)->constrained('periodos');
-//            $table->bigInteger("asesor_id")->unsinged();
-//            $table->foreign("asesor_id")->refences("id")->on("asesores");
-//            $table->bigInteger("empresa_id")->unsinged();
-//            $table->foreign("empresa_id")->refences("id")->on("empresas");
-//            $table->bigInteger("periodo_id")->unsinged();
-//            $table->foreign("periodo_id")->refences("id")->on("periodos");
             $table->timestamps();
         });
     }

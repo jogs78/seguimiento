@@ -56,12 +56,17 @@ Route::get('asignar-asesores',[CoordinadorController::class,'asignarAsesor1'])->
 Route::post('asignar-asesores',[CoordinadorController::class,'asignarAsesor2'])->middleware('auth')->name('coordinadores.asignarAsesor2');
 Route::put('asignar-asesores/{proyecto_id}',[CoordinadorController::class,'asignarAsesor3'])->middleware('auth')->name('coordinadores.asignarAsesor3');
 
+//rutas de busqueda de nombres
+Route::get('/estudiantes/buscar-estudiante', [EstudianteController::class, 'buscarEstudiante'])->name('estudiantes.buscar-estudiante');
+Route::get('/asesores/buscar-asesor', [AsesorController::class, 'buscarAsesor'])->name('asesores.buscar-asesor');
+Route::get('/externos/buscar-externo', [ExternoController::class, 'buscarExterno'])->name('externos.buscar-externo');
+
 //rutas especificas del estudiante
 Route::get('edit',[EstudianteController::class,'edit'])->middleware('auth')->name('estudiante.editar');
 Route::get('index',[EstudianteController::class,'index'])->middleware('auth')->name('estudiante.index');
 //Route::put('update',[EstudianteController::class,'update'])->middleware('auth')->name('estudiante.update');
 //Route::put('update/{estudiante}', [EstudianteController::class, 'update'])->name('estudiantes.update');
-Route::get('solicitud',[EstudianteController::class,'solicitud'])->middleware('auth')->name('estudiante.impresiones.solicitud');
+Route::get('solicitud', [EstudianteController::class, 'solicitud'])->middleware('auth')->name('estudiante.impresiones.solicitud');
 Route::get('promedio',[EstudianteController::class,'promedio'])->middleware('auth')->name('estudiante.promedio');
 Route::get('anteproyecto',[EstudianteController::class,'anteproyecto'])->middleware('auth')->name('estudiante.impresiones.anteproyecto');
 Route::get('primer/{estudiante?}',[EstudianteController::class,'primer'])->middleware('auth')->name('estudiante.impresiones.seguimientos.primer');

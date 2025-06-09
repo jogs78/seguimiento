@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('giro');
             $table->string('rfc');
-            $table->string('direccion'); //poner calle, numero, codigo postal, ciudad y Estado
+            $table->string('direccion');
+            $table->string('numero'); // Puede incluir letras o "S/N"
+            $table->string('codigo_postal');
+            $table->string('ciudad');
+            $table->string('estado');
             $table->string('telefono');
             $table->string('correo');
             $table->string('titular');
             $table->string('puesto_titular');
-//            $table->string('asesor_externo');
-//            $table->string('puesto_asesor');
             $table->string('informacion');
             $table->timestamps();
         });

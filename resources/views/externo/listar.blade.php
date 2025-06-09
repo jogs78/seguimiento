@@ -26,6 +26,13 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     
 @endsection
 @section('contenido')
+<div style="display: flex; justify-content: flex-end;margin-right: 35px;">
+    <form action="{{ route('externos.index') }}" method="GET" id="formBuscar" style="position: relative;">
+        <input type="text" id="buscar" name="buscar" placeholder="Buscar por nombre" autocomplete="off" value="{{ request('buscar') }}">
+        <button type="submit">Buscar</button>
+        <div id="sugerencias" style="background:white; border:1px solid #ccc; width:220px;"></div>
+    </form>
+</div>
 <div class="horizontal" style="margin-top:20px;"><p class="subtitulo">Asesores Externos Registrados</p></div>
     <!--@php
     $todos = $todos ?? [];
@@ -82,4 +89,43 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     <a href="{{route('imprimir-externos.excel')}}" class="boton">Descargar lista</a>
     </div>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const input = document.getElementById("buscar");
+        const sugerenciasDiv = document.getElementById("sugerencias");
+
+        input.addEventListener("input", function() {
+            const valor = this.value;
+
+            if (valor.length < 2) {
+                sugerenciasDiv.innerHTML = '';
+                return;
+            }
+
+            fetch(`/externos/buscar-externo?term=${encodeURIComponent(valor)}`)
+                .then(res => res.json())
+                .then(data => {
+                    sugerenciasDiv.innerHTML = '';
+                    data.forEach(item => {
+                        const div = document.createElement("div");
+                        div.textContent = item.value;
+                        div.style.padding = "5px";
+                        div.style.cursor = "pointer";
+                        div.addEventListener("click", function() {
+                            input.value = item.value;
+                            sugerenciasDiv.innerHTML = '';
+                        });
+                        sugerenciasDiv.appendChild(div);
+                    });
+                });
+        });
+
+        // Ocultar sugerencias al hacer clic fuera
+        document.addEventListener("click", function(e) {
+            if (!sugerenciasDiv.contains(e.target) && e.target !== input) {
+                sugerenciasDiv.innerHTML = '';
+            }
+        });
+    });
+    </script>
     @endsection

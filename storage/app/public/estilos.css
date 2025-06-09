@@ -34,7 +34,7 @@ h3{
 
 
 .marriba{
-    margin-top: 15px;
+    margin-top: 10px;
     
 }
 .subrayado{
@@ -88,6 +88,11 @@ tr th{
 .fontmini{
     font-size: 10px;
     
+}
+
+.sin-bold {
+    font-weight: normal;
+    font-size: 15px;
 }
 
 

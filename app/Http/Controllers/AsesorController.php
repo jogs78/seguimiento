@@ -8,16 +8,46 @@ use App\Http\Requests\UpdateAsesorRequest;
 use App\Providers\ConfiguracionServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AsesorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $todos = Asesor::all();
-        return view('asesor.listar',compact('todos'));
+        $buscar = $request->input('buscar');
+
+        if ($buscar) {
+            $todos = Asesor::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        } else {
+            $todos = Asesor::all();
+        }
+
+        return view('asesor.listar', compact('todos'));
+    }
+
+    public function buscarAsesor(Request $request)
+    {
+        $termino = $request->input('term');
+
+        $resultados = Asesor::where('nombre', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
+            ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
+            ->limit(10)
+            ->get();
+
+        // Devuelve el nombre completo como sugerencia
+        $sugerencias = $resultados->map(function ($est) {
+            return [
+                'id' => $est->id,
+                'value' => $est->nombre . ' ' . $est->apellido_paterno . ' ' . $est->apellido_materno,
+            ];
+        });
+
+        return response()->json($sugerencias);
     }
 
     /**

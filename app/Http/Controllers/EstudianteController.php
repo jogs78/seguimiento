@@ -24,12 +24,42 @@ class EstudianteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //Listar
-        $todos = Estudiante::all();
-        return view('estudiante.listar',compact('todos'));
+        $buscar = $request->input('buscar');
+
+        if ($buscar) {
+            $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        } else {
+            $todos = Estudiante::all();
+        }
+
+        return view('estudiante.listar', compact('todos'));
     }
+
+    public function buscarEstudiante(Request $request)
+    {
+        $termino = $request->input('term');
+
+        $resultados = Estudiante::where('nombre', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
+            ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
+            ->limit(10)
+            ->get();
+
+        // Devuelve el nombre completo como sugerencia
+        $sugerencias = $resultados->map(function ($est) {
+            return [
+                'id' => $est->id,
+                'value' => $est->nombre . ' ' . $est->apellido_paterno . ' ' . $est->apellido_materno,
+            ];
+        });
+
+        return response()->json($sugerencias);
+    }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -168,16 +198,15 @@ class EstudianteController extends Controller
         }
     }
 
+
     public function solicitud()
-    {
+    {   
         $estudiante = Auth::getUser()->usa;
         $jefe = ConfiguracionServiceProvider::get('jefe_division');
-//        $periodo = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'))->nombre;
         $numeroControl = Auth::user()->numero_de_control; 
         $pdf = Pdf::loadview('estudiante.impresiones.solicitud',compact('jefe','estudiante')); 
         $nombreArchivo = 'Solicitud ' . $estudiante->numero_de_control . '.pdf';
         return $pdf->download($nombreArchivo);
-        //return view('estudiante.impresiones.solicitud'); 
     }
 
     public function anteproyecto()

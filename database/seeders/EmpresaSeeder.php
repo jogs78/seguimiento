@@ -19,6 +19,10 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "publico";
         $empresa->rfc = "TNM140723GFA";
         $empresa->direccion = "KM 29020, Carr. Panamericana 1080, Boulevares, 29050 Tuxtla Gutiérrez, Chis.";
+        $empresa->numero = "1080";
+        $empresa->codigo_postal = "29050";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "96161500461";
         $empresa->correo = "contacto@ittg.edu.mx";
         $empresa->titular = "José Manuel Rosado Pérez";
@@ -32,6 +36,10 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "publico";
         $empresa->rfc = "ICT456321IEC";
         $empresa->direccion = "Calz. Cerro Hueco 3000, Rivera Cerro Hueco, FSTSE, 29094 Tuxtla Gutiérrez, Chis.";
+        $empresa->numero = "3000";
+        $empresa->codigo_postal = " 29094";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9617621043";
         $empresa->correo = "InstitutoDeCiencia@gmail.com";
         $empresa->titular = "Manuel Miguel Mortinez Mora";
@@ -45,6 +53,10 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "servicios";
         $empresa->rfc = "CFE908567TRA";
         $empresa->direccion = "Carr. Panamericana 5675, Plan de Ayala Ampliación Sur, 29020 Tuxtla Gutiérrez, Chis.";
+        $empresa->numero = "5675";
+        $empresa->codigo_postal = "29020";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9685395322";
         $empresa->correo = "CfeTransmision@gmail.com";
         $empresa->titular = "Karla Perez Estrada";
@@ -58,6 +70,10 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "servicios";
         $empresa->rfc = "SIC870652CIS";
         $empresa->direccion = "Av. Universidad Esq. Xola, S/N, Centro Nacional SCT, Cuerpo C, PISO 1, Sección: Oficinas, Narvarte, Delegación Benito Juárez C.P. 03020 Ciudad de México.";
+        $empresa->numero = "S/N";
+        $empresa->codigo_postal = "03020";
+        $empresa->ciudad = "Delegación Benito Juárez";
+        $empresa->estado = "Ciudad de México";
         $empresa->telefono = "55197456";
         $empresa->correo = "SecDeInfraestrutura@gmail.com";
         $empresa->titular = "Juan Carlos Pérez Martínez";
@@ -71,12 +87,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "privado";
         $empresa->rfc = "COS870652MOS";
         $empresa->direccion = "4ta sur oriente, colonia naranjos #45";
+        $empresa->numero = "S/N";
+        $empresa->codigo_postal = "29020";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9675519745";
         $empresa->correo = "Cosmos71@gmail.com";
         $empresa->titular = "Luis Miguel Torres García";
         $empresa->puesto_titular = "Dueño";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Investigacion del espacio y cuerpos celestes";
         $empresa->save(); 
 
@@ -86,12 +104,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "publico";
         $empresa->rfc = "CFE870652EFC";
         $empresa->direccion = "Paseo De La Reforma #164 - Piso 16, Deleg. Cuauhtémoc C.P. 06600 Ciudad de México.";
+        $empresa->numero = "164";
+        $empresa->codigo_postal = "06600";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9605884423";
         $empresa->correo = "CFE@hotmail.com";
         $empresa->titular = "Sofía Alejandra Gómez Ríos";
         $empresa->puesto_titular = "Presidenta General";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Consolidarnos como la empresa de energía líder en México, con solvencia técnica y financiera, que procura el fortalecimiento de nuestro capital humano y garantiza el servicio de energía eléctrica con calidad y sentido social";
         $empresa->save(); 
 
@@ -101,12 +121,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "publico";
         $empresa->rfc = "IEP870652CPE";
         $empresa->direccion = "Perif. Sur Pte. #2185, Penipak, 29060 Tuxtla Gutiérrez, Chis.";
+        $empresa->numero = "2185";
+        $empresa->codigo_postal = "29060";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9618576489";
         $empresa->correo = "IEPC@hotmail.com";
         $empresa->titular = "Valeria Cristina Castro López";
         $empresa->puesto_titular = "Directora Ejecutiva";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Ser un referente a nivel nacional en la gestión de procesos electorales e implementación de mecanismos de participación ciudadana a nivel local, garantizando inclusión, igualdad y participación informada de la ciudadanía";
         $empresa->save(); 
 
@@ -116,12 +138,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "publico";
         $empresa->rfc = "CJP870652EJP";
         $empresa->direccion = "libramiento norte No. 2100, Fraccionamiento El Bosque C.P. 29049 Tuxtla Gutiérrez, Chiapas.";
+        $empresa->numero = "2100";
+        $empresa->codigo_postal = "29049";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = " 9616178700";
         $empresa->correo = "ConsejoJudicatura@hotmail.com";
         $empresa->titular = "Guillermo Ramos Pérez";
         $empresa->puesto_titular = "Presidente del Consejo";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Ser un referente a nivel nacional en la gestión de procesos electorales e implementación de mecanismos de participación ciudadana a nivel local, garantizando inclusión, igualdad y participación informada de la ciudadanía";
         $empresa->save(); 
 
@@ -131,12 +155,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "servicios";
         $empresa->rfc = "HNG184936OUY";
         $empresa->direccion = "5ta norte y 6ta poniente 120 - C";
+        $empresa->numero = "2100";
+        $empresa->codigo_postal = "29049";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9614829432";
         $empresa->correo = "Torre_Roca_SA@gmail.com";
         $empresa->titular = "Marcos Alcantara Solis";
         $empresa->puesto_titular = "Representante legal de la Sociedad";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Somos una empresa encargada de almecenar productos alimienticios";
         $empresa->save(); 
 
@@ -146,12 +172,14 @@ class EmpresaSeeder extends Seeder
         $empresa->giro = "industrial";
         $empresa->rfc = "IYO969745PMU";
         $empresa->direccion = "9na sur y 3ra oriente 76 - A";
+        $empresa->numero = "2100";
+        $empresa->codigo_postal = "29049";
+        $empresa->ciudad = "Tuxtla Gutierrez";
+        $empresa->estado = "Chiapas";
         $empresa->telefono = "9679865312";
         $empresa->correo = "ElRancherito@gmail.com";
         $empresa->titular = "Fernando Vazques Sol";
         $empresa->puesto_titular = "Dueño de la marca";
-//        $empresa->asesor_externo = "";
-//        $empresa->puesto_asesor = "";
         $empresa->informacion = "Somos una empresa productora y distribuidora de productos fritos";
         $empresa->save(); 
     }

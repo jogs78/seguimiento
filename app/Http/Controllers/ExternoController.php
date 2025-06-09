@@ -8,6 +8,8 @@ use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Providers\ConfiguracionServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 use App\Models\Externo;
 
@@ -16,10 +18,40 @@ class ExternoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $todos = Externo::all();
-        return view('externo.listar',compact('todos'));
+        $buscar = $request->input('buscar');
+
+        if ($buscar) {
+            $todos = Externo::where(DB::raw("CONCAT('titulo',' ',nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        } else {
+            $todos = Externo::all();
+        }
+
+        return view('externo.listar', compact('todos'));
+    }
+
+     public function buscarExterno(Request $request)
+    {
+        $termino = $request->input('term');
+
+        $resultados = Externo::where('titulo', 'like', '%' . $termino . '%')
+            ->orWhere('nombre', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
+            ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
+            ->select('id', 'titulo', 'nombre', 'apellido_paterno', 'apellido_materno')
+            ->limit(10)
+            ->get();
+
+        // Devuelve el nombre completo como sugerencia
+        $sugerencias = $resultados->map(function ($est) {
+            return [
+                'id' => $est->id,
+                'value' => $est->nombre . ' ' . $est->apellido_paterno . ' ' . $est->apellido_materno,
+            ];
+        });
+
+        return response()->json($sugerencias);
     }
 
     /**

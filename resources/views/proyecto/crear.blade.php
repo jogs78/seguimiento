@@ -22,7 +22,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     
 @endsection
 @section('contenido')
-@if ($errors->any())
+<!--@if ($errors->any())
 <div class="alert alert-danger">
     <ul>
         @foreach ($errors->all() as $error)
@@ -30,7 +30,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         @endforeach
     </ul>
 </div>
-@endif
+@endif-->
 
 
 
@@ -130,12 +130,28 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             
             <label for='rfc'  class="parrafo">RFC</label>
             {{$errors->first("rfc")}}
-            <input type='text' name='rfc' id='rfc' value="{{old('rfc')}}" placeholder="_______" class="llenar"><br>
+            <input type='text' name='rfc' id='rfc' value="{{old('rfc')}}" placeholder="_______" class="llenar"><br><br>
     
-            <label for='direccion'  class="parrafo">Direccion</label>
+            <label class="parrafo">Direccion</label><br>
+            <label for="direccion">Calle:</label>
             {{$errors->first("direccion")}}
-            <input type='text' name='direccion' id='direccion' value="{{old('direccion')}}" class="llenar"><br>
-    
+            <input type='text' name='numero' id='numero' value="{{old('numero')}}" class="llenar">
+            <label for="numero">Numero:</label>
+            {{$errors->first("numero")}}
+            <input type='text' name='numero' id='numero' value="{{old('numero')}}" class="llenar" placeholder="Ej: 123 o S/N">
+            <label for="codigo_postal">Codigo Postal:</label>
+            {{$errors->first("codigo_postal")}}
+            <input type='text' name='codigo_postal' id='codigo_postal' value="{{old('codigo_postal')}}" class="llenar"><br>
+
+            <label for="estado">Estado:</label>
+            {{$errors->first("estado")}}
+            <input type='text' name='estado' id='estado' value="{{old('estado')}}" class="llenar">
+            <label for="ciudad">Ciudad:</label>
+            {{$errors->first("ciudad")}}
+            <input type='text' name='ciudad' id='ciudad' value="{{old('ciudad')}}" class="llenar"><br><br>
+
+            
+
             <label for='telefono'  class="parrafo">Telefono</label>
             {{$errors->first("telefono")}}
             <input type='tel' name='telefono' id='telefono' value="{{old('telefono')}}" class="llenar"><br>

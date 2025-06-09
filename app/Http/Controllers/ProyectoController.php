@@ -180,6 +180,6 @@ class ProyectoController extends Controller
 
     }
 
-    
 
+    
 }
