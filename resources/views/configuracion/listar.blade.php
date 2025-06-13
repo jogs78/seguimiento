@@ -45,7 +45,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <td style="padding:5px;">{{$configuracion->tipo}}</td>
             <td style="padding:8px;">
                 <a href="{{route("configuraciones.edit",$configuracion->id)}}" class="botonEditar">Editar</a>
-                <form action="{{route("configuraciones.destroy",$configuracion->id)}}" method="post">
+                <form action="{{route("configuraciones.destroy",$configuracion->id)}}" method="post" onsubmit="return confirmarEliminacion()">
                 @method('DELETE')
                 @csrf
                 <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
@@ -62,6 +62,11 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     </div>
     <div class="centro"><a href="{{route("configuraciones.create")}}" class="boton" >Agregar una configuracion</a></div>
 
+    <script>
+        function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar esta Configuracion ya no se podrá restaurar.\n¿Seguro que deseas eliminar la Configuracion?");
+    }
+    </script>
   
 
     @endsection

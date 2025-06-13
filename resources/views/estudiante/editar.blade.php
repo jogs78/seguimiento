@@ -17,7 +17,7 @@
 @endsection
 @section('contenido')
 <div style="margin-top:20px;">
-                <div class="horizontal"><p class="subtitulo">Actualiza tus datos</p></div>
+                <div class="horizontal"><p class="subtitulo">Actualizar Estudiante</p></div>
         <div class="centro"; style="margin-top: 60px; ">
         <form action="{{route("estudiantes.update",$estudiante->id)}}" method="POST" enctype="application/x-www-form-urlencoded">
         @csrf

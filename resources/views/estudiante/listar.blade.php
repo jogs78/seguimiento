@@ -53,10 +53,10 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <td style="padding:5px;">{{$estudiante->apellido_paterno}} {{$estudiante->apellido_materno}}</td>
             <td style="padding:8px;">
                 <a href="{{route("estudiantes.edit",$estudiante->id)}}" class="botonEditar">Editar</a>
-                <form action="{{route("estudiantes.destroy",$estudiante->id)}}" method="post">
+                <form action="{{route("estudiantes.destroy",$estudiante->id)}}" method="post" onsubmit="return confirmarEliminacion()">
                 @method('DELETE')
                 @csrf
-                <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
+                <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;" >
 
                 </form>
             
@@ -113,5 +113,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             }
         });
     });
-</script>
+
+    function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar este Estudiante ya no se podrá restaurar.\n¿Seguro que deseas eliminar al Estudiante?");
+    }
+    </script>
     @endsection

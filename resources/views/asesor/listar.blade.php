@@ -51,7 +51,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <td style="padding:8px;">
                 <a href="{{route("asesores.edit",$asesor->id)}}" class="botonEditar">Editar</a>
                 @if (empty($asesor->proyecto?->nombre))
-                <form action="{{route("asesores.destroy",$asesor->id)}}" method="post">
+                <form action="{{route("asesores.destroy",$asesor->id)}}" method="post" onsubmit="return confirmarEliminacion()">
                 @method('DELETE')
                 @csrf
                 <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
@@ -113,5 +113,10 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             }
         });
     });
+    
+    function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar este Asesor Interno ya no se podrá restaurar.\n¿Seguro que deseas eliminar al Asesor Interno?");
+    }
+    
     </script>
     @endsection

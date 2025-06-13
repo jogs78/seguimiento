@@ -30,12 +30,27 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 <div style="margin-top:20px;">
 <div class="horizontal"><p class="subtitulo">Los datos tu proyecto son:</p></div>
     <div class="bodydiv">
-        <div class="horizontal" style="margin-top:30px;"><p class="parrafo">Nombre del proyecto:</p> <p class="llenar">{{$proyecto->nombre}}</p> </div>
-        <div class="horizontal" style="margin-top:15px;"><p class="parrafo">Objetivo General:</p> <p class="llenar">{{$proyecto->objetivo_general}}</p> </div>
-        <div class="horizontal" style="margin-top:15px;"><p class="parrafo">Empresa:</p> <p class="llenar">{{$proyecto->empresa->nombre}}</p> </div>
-        <div class="horizontal" style="margin-top:15px;"><p class="parrafo">Informacion:</p> <p class="llenar">{{$proyecto->informacion}}</p> </div>
-        <div class="horizontal" style="margin-top:15px;"><p class="parrafo">Justificacion:</p> <p class="llenar">{{$proyecto->justificacion}}</p> </div>
-        <div class="horizontal" style="margin-top:15px;"><p class="parrafo">Periodo:</p> <p class="llenar">{{$proyecto->periodo->nombre}}</p> </div>
+        <div class="horizontal" style="margin-top:30px;">
+            <p class="parrafo"> ID:</p> <p class="llenar"  style="margin-right:12px;">{{$proyecto->id}}</p>
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Nombre del proyecto:</p> <p class="llenar">{{$proyecto->nombre}} </p> 
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Objetivo General:</p> <p class="llenar">{{$proyecto->objetivo_general}}</p> 
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Empresa:</p> <p class="llenar">{{$proyecto->empresa->nombre}}</p> 
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Informacion:</p> <p class="llenar">{{$proyecto->informacion}}</p> 
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Justificacion:</p> <p class="llenar">{{$proyecto->justificacion}}</p> 
+        </div>
+        <div class="horizontal" style="margin-top:15px;">
+            <p class="parrafo">Periodo:</p> <p class="llenar">{{$proyecto->periodo->nombre}}</p> 
+        </div>
     </div>
 <div class="horizontal"><p class="subtitulo"  style="margin-top:30px;">y sus Actividades:</p></div>
 <div class="horizontal">
@@ -54,11 +69,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
    <th class="thcontenido">{{$actividad->orden}}</th>
    <th style="padding:8px;">
                 <a href="{{route("proyectos.actividades.edit",[$proyecto->id,$actividad->id])}}" class="botonEditar">Editar</a>
-                <form action="{{route("proyectos.actividades.destroy",[$proyecto->id,$actividad->id])}}" method="POST" onsubmit="return confirmarEliminacion()">
-                @method('DELETE')
-                @csrf
-                <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
-
+                <form id="formEliminar{{ $actividad->id }}" action="{{ route('proyectos.actividades.destroy', [$proyecto->id, $actividad->id]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="botonBorrar" style="margin-top:5px;" onclick="confirmarEliminacion({{ $actividad->id }})">
+                        Borrar
+                    </button>
                 </form>
             
 
@@ -76,11 +92,25 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         <a href="{{route('proyectos.actividades.create', $proyecto->id)}}" class="boton">Agregar Una Actividad</a>
     </div>
 </div>
-
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-function confirmarEliminacion() {
-    return confirm("⚠️ Al eliminar esta actividad ya no se podrá restaurar.\n¿Seguro que deseas eliminarla?");
-}
+    function confirmarEliminacion(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('formEliminar' + id).submit();
+            }
+        });
+    }
 </script>
+@endsection
+

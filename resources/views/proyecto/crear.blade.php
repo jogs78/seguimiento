@@ -17,6 +17,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thcontenido{font-weight: normal;}
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
+.caja{ border: 2px solid rgb(40, 95, 139); border-radius: 10px; padding-bottom: 20px;}
 </style>
 @section('encabezado')
     
@@ -36,9 +37,37 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 
 <div style="margin-top:20px;">
 <div class="horizontal"><p class="subtitulo">Proyecto</p></div><br>
+
+    <div style="width: 99%;">
+    <div class="horizontal caja" style="margin-bottom:30px;">
+        <form action="{{ route('proyectos.unirse') }}" method="POST">
+            @csrf
+            <div class="centro" style="margin-bottom:24px">
+                <label class="parrafo">Unirse a un Proyecto ya registrado</label>
+            </div>
+            <div>
+                <label for="id" class="parrafo" >ID del Proyecto</label>
+                <input type="number" name="id" class="llenar" value="{{old('id')}}" required>
+
+                <label for="nombre" class="parrafo" style="margin-left:24px">Nombre del Proyecto</label>
+                <input type="text" name="nombre" class="llenar" value="{{old('nombre')}}" required>
+            </div>
+
+            <div class="centro">
+                <button type="submit" class="boton">Unirse al Proyecto</button>
+            </div>
+        </form>
+    </div>
+    </div>
+
     <div class="centro">
+    
     <form action="{{route("proyectos.store")}}" method="POST" enctype="application/x-www-form-urlencoded">
         @csrf
+        <div class="centro" style="margin-bottom:24px">
+            <label class="parrafo">Registrar un proyecto</label>
+        </div>
+
         <label for='nombre' class="parrafo">Nombre del proyecto</label>
         {{$errors->first("nombre")}}
         <input type='text' name='nombre' id='nombre' value="{{old('nombre')}}" class="llenar"><br>
@@ -62,12 +91,13 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         <br>
         </div>
 
-        <label for='asesor_id' class="parrafo">Asesor</label>
+        <label for='asesor_id' class="parrafo">Elige a tu Asesor Interno</label>
         <select name="asesor_id" id="asesor_id">
             @foreach ($asesores as $asesor)
-                <option value="{{$asesor->id}}">{{$asesor->nombre}}</option>
+                <option value="{{$asesor->id}}">{{$asesor->nombre}} {{$asesor->apellido_paterno}} {{$asesor->apellido_materno}}</option>
             @endforeach
         </select>
+        <br>
         <br>
         <label for='correo_ae' class="parrafo">Correo del Asesor Externo</label>
         <input type='text' name='correo_ae' id='correo_ae' value="{{old('correo_ae')}}" class="llenar"><br>

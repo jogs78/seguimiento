@@ -60,6 +60,8 @@ Route::put('asignar-asesores/{proyecto_id}',[CoordinadorController::class,'asign
 Route::get('/estudiantes/buscar-estudiante', [EstudianteController::class, 'buscarEstudiante'])->name('estudiantes.buscar-estudiante');
 Route::get('/asesores/buscar-asesor', [AsesorController::class, 'buscarAsesor'])->name('asesores.buscar-asesor');
 Route::get('/externos/buscar-externo', [ExternoController::class, 'buscarExterno'])->name('externos.buscar-externo');
+Route::get('/proyectos/buscar', [ProyectoController::class, 'buscar'])->name('proyectos.buscar');
+
 
 //rutas especificas del estudiante
 Route::get('edit',[EstudianteController::class,'edit'])->middleware('auth')->name('estudiante.editar');
@@ -72,7 +74,7 @@ Route::get('anteproyecto',[EstudianteController::class,'anteproyecto'])->middlew
 Route::get('primer/{estudiante?}',[EstudianteController::class,'primer'])->middleware('auth')->name('estudiante.impresiones.seguimientos.primer');
 Route::get('segundo/{estudiante?}',[EstudianteController::class,'segundo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.segundo');
 Route::get('ultimo/{estudiante?}',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
-//Route::get('/proyecto/crear', [ProyectoController::class, 'registrarProyecto'])->name('proyecto.crear');
+Route::post('/proyectos/unirse', [ProyectoController::class, 'unirse'])->name('proyectos.unirse');
 
 //rutas especificas del asesor interno
 //para que el interno vea sus proyectos

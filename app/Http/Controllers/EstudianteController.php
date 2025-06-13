@@ -202,9 +202,13 @@ class EstudianteController extends Controller
     public function solicitud()
     {   
         $estudiante = Auth::getUser()->usa;
+        if (!$estudiante || !$estudiante->proyecto) {
+        return back()->withErrors(['error' => 'No tienes un proyecto asignado.']);
+        }
         $jefe = ConfiguracionServiceProvider::get('jefe_division');
         $numeroControl = Auth::user()->numero_de_control; 
-        $pdf = Pdf::loadview('estudiante.impresiones.solicitud',compact('jefe','estudiante')); 
+        $cantidadEstudiantes = $estudiante->proyecto->estudiantes()->count();
+        $pdf = Pdf::loadview('estudiante.impresiones.solicitud',compact('jefe','estudiante','cantidadEstudiantes')); 
         $nombreArchivo = 'Solicitud ' . $estudiante->numero_de_control . '.pdf';
         return $pdf->download($nombreArchivo);
     }

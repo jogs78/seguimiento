@@ -22,21 +22,29 @@ class UsuarioSeeder extends Seeder
         $nuevo->save();
 
         $nuevo = new Usuario();
-        $nuevo->nombre_usuario = "JesusCarlos@tuxtla.tecnm.mx"; //los nombre_usuario son los correos de los usuarios
+        $nuevo->nombre_usuario = "JesusCarlos@tuxtla.tecnm.mx";
         $nuevo->contraseña = Hash::make('1234');
         $nuevo->usa_id=2;
         $nuevo->usa_type = "App\Models\Asesor";
         $nuevo->save();
 
         $nuevo = new Usuario();
-        $nuevo->nombre_usuario = "NestorAntonio@tuxtla.tecnm.mx"; //los nombre_usuario son los correos de los usuarios
+        $nuevo->nombre_usuario = "NestorAntonio@tuxtla.tecnm.mx"; 
         $nuevo->contraseña = Hash::make('1234');
         $nuevo->usa_id=3;
         $nuevo->usa_type = "App\Models\Asesor";
         $nuevo->save();
 
         $nuevo = new Usuario();
-        $nuevo->nombre_usuario = "20270264@tuxtla.tecnm.mx";
+        $nuevo->nombre_usuario = "MexicoLed@tuxtla.tecnm.mx"; 
+        $nuevo->contraseña = Hash::make('1234');
+        $nuevo->usa_id=4;
+        $nuevo->usa_type = "App\Models\Asesor";
+        $nuevo->save();
+
+
+        $nuevo = new Usuario();
+        $nuevo->nombre_usuario = "L20270264@tuxtla.tecnm.mx";
         $nuevo->contraseña = Hash::make('1234');
         $nuevo->usa_id=1;
         $nuevo->usa_type = "App\Models\Estudiante";

@@ -65,7 +65,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     <td>{{$periodo->nombre}}</td>
     <td style="padding:8px;">
      <a href="{{route("periodos.edit",$periodo->id)}}" class="botonEditar">EDITAR</a>
-     <form action="{{route("periodos.destroy",$periodo->id)}}" method="post">
+     <form action="{{route("periodos.destroy",$periodo->id)}}" method="post" onsubmit="return confirmarEliminacion()">
       @method('DELETE')
       @csrf
       <input type="submit" value="BORRAR" class="botonBorrar" style="margin-top:5px;">
@@ -78,5 +78,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
  </table>
 </div>
  <div class="centro"><a href="{{route("periodos.create")}}" class="boton" >Agregar un periodo</a></div>
-
+<script>
+  function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar este Periodo ya no se podrá restaurar.\n¿Seguro que deseas eliminar el Periodo?");
+    }
+</script>
 @endsection

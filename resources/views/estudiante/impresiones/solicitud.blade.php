@@ -57,7 +57,11 @@
             </p>    
         </div>
         <div class="horizontal marriba">
-            <p class="bold ">PERIODO PROYECTADO: <span style=" font-weight: normal;"> {{$estudiante->proyecto->periodo->nombre}}</span>  <span style="margin-left:20px;">Número de Residentes: </span><span style=" font-weight: normal;"> <!--Cambiar--></span></p> 
+            <p class="bold ">PERIODO PROYECTADO: 
+                <span style=" font-weight: normal;"> {{$estudiante->proyecto->periodo->nombre}}</span>  
+                <span style="margin-left:20px;">Número de Residentes: </span>
+                <span style=" font-weight: normal;"> {{ $cantidadEstudiantes }}</span>
+            </p> 
         </div>
         <div>
             <p class="bold marriba">Datos de la Empresa: </p>

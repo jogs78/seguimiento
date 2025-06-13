@@ -53,55 +53,87 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          
           @if (is_null($estudiante->primer?->puntualidad_interno))
-          <a href="{{route('realizar-seguimientos',[$estudiante->id,'primer'])}}" class="centro">Realizar</a>
-          @else
-              <div class="centro"> <p>Seguimiento</p></div>
-              <div style="padding-bottom:10px;" class="centro"> <p>Realizado</p></div>
-              @endif
-
-              @if ( is_null($estudiante->primer?->puntualidad_externo) )
-              <div class="centro"> <p>Sin calificaciones</p></div>
-              <div class="centro"> <p> del asesor externo</p></div>
-              @elseif(!is_null($estudiante->primer?->puntualidad_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}">Primer</a></div>
-              @endif
+        <div style="text-align: center;">
+          <a href="{{route('realizar-seguimientos',[$estudiante->id,'primer'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
+        </div>
+        @endif
+         @if(!is_null($estudiante->primer?->puntualidad_interno) && !is_null($estudiante->primer?->puntualidad_externo))
+         <div class="centro" style="margin-bottom:10px;">
+            <a href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}" title="Descargar 1° seguimiento">
+              <img src="{{ asset('images/UnoSegui.png') }}" width="40" height="65">
+            </a>
+          </div>
+          @elseif(!is_null($estudiante->primer?->puntualidad_interno))
+            <img src="{{ asset('images/IntSi.png') }}" width="65" height="70" title="Asesor Interno ya califico">
+          @elseif(!is_null($estudiante->primer?->puntualidad_externo))
+            <img src="{{ asset('images/ExtSi.png') }}" width="65" height="70" title="Asesor Externo ya califico">
+          @endif
+        @if ( is_null($estudiante->primer?->puntualidad_externo) )
+        <div class="centro">
+          <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
+        </div>
+        @endif
           
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
       @if (is_null($estudiante->segundo?->puntualidad_interno))
-          <a href="{{route('realizar-seguimientos',[$estudiante->id,'segundo'])}}" class="centro">Realizar</a>
-          @else
-              <div class="centro"> <p>Seguimiento</p></div>
-              <div style="padding-bottom:10px;" class="centro"> <p>Realizado</p></div>
-              @endif
-
-              @if ( is_null($estudiante->segundo?->puntualidad_externo) )
-              <div class="centro"> <p>Sin calificaciones</p></div>
-              <div class="centro"> <p> del asesor externo</p></div>
-              @elseif(!is_null($estudiante->segundo?->puntualidad_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}">Segundo</a></div>
-              @endif
+        <div style="text-align: center;">
+          <a href="{{route('realizar-seguimientos',[$estudiante->id,'segundo'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
+        </div>
+        @endif
+      @if(!is_null($estudiante->segundo?->puntualidad_interno) && !is_null($estudiante->segundo?->puntualidad_externo))
+          <div class="centro" style="margin-bottom:10px;">
+            <a   href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}" title="Descargar 2° seguimiento">
+              <img src="{{ asset('images/DosSegui.png') }}" width="40" height="65">
+            </a>
+          </div>
+        @elseif(!is_null($estudiante->segundo?->puntualidad_interno))
+        <div class="centro">
+          <img src="{{ asset('images/IntSi.png') }}" width="65" height="70" title="Asesor Interno ya califico">
+        </div>
+        @elseif(!is_null($estudiante->segundo?->puntualidad_externo))
+        <div class="centro">
+          <img src="{{ asset('images/ExtSi.png') }}" width="65" height="70" title="Asesor Externo ya califico">
+        </div>
+        @endif
+      
+        @if ( is_null($estudiante->segundo?->puntualidad_externo) )
+       <div class="centro">
+          <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
+        </div>
+        @endif
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-      @if (is_null($estudiante->ultimo?->promedio_interno))
-          <a href="{{route('realizar-seguimientos',[$estudiante->id,'ultimo'])}}" class="centro">Realizar</a>
-          @else
-              <div class="centro"> <p>Seguimiento</p></div>
-              <div style="padding-bottom:10px;" class="centro"> <p>Realizado</p></div>
-              @endif
-
-              @if ( is_null($estudiante->ultimo?->promedio_externo) )
-              <div class="centro"> <p>Sin calificaciones</p></div>
-                <div class="centro"> <p> del asesor externo</p></div>
-                @elseif(!is_null($estudiante->ultimo?->promedio_interno))
-                <div class="centro" style="margin-bottom:10px;"><a  class="boton" href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}">Ultimo</a></div>
-              @endif
+      @if(is_null($estudiante->ultimo?->promedio_interno))
+        <div style="text-align: center;">
+          <a href="{{route('realizar-seguimientos',[$estudiante->id,'ultimo'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
+        </div>
+        @endif
+      @if(!is_null($estudiante->ultimo?->promedio_interno) && !is_null($estudiante->ultimo?->promedio_externo))
+          <div class="centro" style="margin-bottom:10px;">
+            <a  href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}" title="Descargar 3° seguimiento">
+              <img src="{{ asset('images/TresSegui.png') }}" width="40" height="65">
+            </a>
+          </div>
+          @elseif(!is_null($estudiante->ultimo?->promedio_interno))
+        <div class="centro">
+          <img src="{{ asset('images/IntSi.png') }}" width="65" height="70" title="Asesor Interno ya califico">
+        </div>
+        @elseif(!is_null($estudiante->ultimo?->promedio_externo))
+        <div class="centro">
+          <img src="{{ asset('images/ExtSi.png') }}" width="65" height="70" title="Asesor Externo ya califico">
+        </div>
+        @endif
+        @if ( is_null($estudiante->ultimo?->promedio_externo))
+        <div class="centro">
+          <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
+        </div>
+        @endif
       @endforeach
     </td>
    </tr>

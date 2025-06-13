@@ -55,7 +55,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <td style="padding:8px;">
                 <a href="{{route("externos.edit",$externo->id)}}" class="botonEditar">Editar</a>
                 @if (empty($externo->proyecto->id))
-                <form action="{{route("externos.destroy",$externo->id)}}" method="post">
+                <form action="{{route("externos.destroy",$externo->id)}}" method="post" onsubmit="return confirmarEliminacion()">
                 @method('DELETE')
                 @csrf
                 <input type="submit" value="Borrar" class="botonBorrar" style="margin-top:5px;">
@@ -127,5 +127,9 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             }
         });
     });
+    function confirmarEliminacion() {
+    return confirm("⚠️ Al eliminar este Asesor Externo ya no se podrá restaurar.\n¿Seguro que deseas eliminar al Asesor Externo?");
+    }
+    
     </script>
     @endsection

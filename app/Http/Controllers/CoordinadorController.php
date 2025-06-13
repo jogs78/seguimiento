@@ -156,4 +156,35 @@ class CoordinadorController extends Controller
     public function exportLista(){
         return Excel::download(new ExternosExport, 'Asesores_Externos.xlsx');
     }
+
+    public function buscar(Request $request)
+    {
+        $query = $request->input('query');
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+
+        $proyectos = Proyecto::with([/*'asesor', */'empresa', 'estudiantes'])
+            ->where('periodo_id', $periodo_id)
+            ->where(function ($q) use ($query) {
+                $q->where('nombre', 'like', "%$query%")
+              //     ->orWhereHas('asesor', function ($q2) use ($query) {
+              //    $q2->where('nombre', 'like', "%$query%")
+              //        ->orWhere('apellido_paterno', 'like', "%$query%")
+              //        ->orWhere('apellido_materno', 'like', "%$query%");
+              //})
+                  ->orWhereHas('empresa', fn($q3) => $q3->where('nombre', 'like', "%$query%"))
+                  ->orWhereHas('estudiantes', function ($q4) use ($query) {
+                      $q4->where('nombre', 'like', "%$query%")
+                          ->orWhere('apellido_paterno', 'like', "%$query%")
+                          ->orWhere('apellido_materno', 'like', "%$query%");
+                  });
+            })
+            ->limit(10)
+            ->get();
+
+
+        return response()->json($sugerencias, $proyectos->map(function ($p) {
+            return ['id' => $p->id, 'nombre' => $p->nombre];
+        }));
+    }
+
 }

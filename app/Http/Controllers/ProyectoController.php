@@ -180,6 +180,40 @@ class ProyectoController extends Controller
 
     }
 
+    public function unirse(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'nombre' => 'required|string',
+        ]);
 
+        $proyecto = Proyecto::where('id', $request->id)
+                            ->where('nombre', $request->nombre)
+                            ->first();
+
+        if (!$proyecto) {
+            return back()->withErrors(['error' => 'Proyecto no encontrado. Verifica el ID y el nombre.']);
+        }
+
+        $usuario = auth()->user();
+
+        // Verificamos que el usuario sea un estudiante
+        if (!$usuario->usa instanceof \App\Models\Estudiante) {
+            return back()->withErrors(['error' => 'Solo los estudiantes pueden unirse a proyectos.']);
+        }
+
+        /** @var \App\Models\Estudiante $estudiante */
+        $estudiante = $usuario->usa;
+
+        if ($estudiante->proyecto_id !== null) {
+            return back()->withErrors(['error' => 'Ya estás asignado a un proyecto.']);
+        }
+
+        // Asignamos el proyecto al estudiante
+        $estudiante->proyecto_id = $proyecto->id;
+        $estudiante->save();
+
+        return redirect()->route('proyectos.index')->with('success', 'Te has unido exitosamente al proyecto.');
+    }
     
 }

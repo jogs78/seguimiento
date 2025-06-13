@@ -23,7 +23,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 @endsection
 @section('contenido')
 
-<div class="horizontal" style="margin-top:20px;"><p class="subtitulo">Actualiza los del Asesor </p></div>
+<div class="horizontal" style="margin-top:20px;"><p class="subtitulo">Actualizar Asesor Interno</p></div>
 
 <div class="centro"; style="margin-top: 60px; ">
     <form action="{{route("asesores.update",$asesor->id)}}" method="POST" enctype="application/x-www-form-urlencoded" >
