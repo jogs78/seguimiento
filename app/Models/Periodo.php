@@ -19,7 +19,7 @@ class Periodo extends Model
     }
     public function coordinador()
     {
-        return $this->belongsTo(Cordinador::class)->withDefault(['nombre'=>'No asignado']);
+        return $this->belongsTo(Coordinador::class)->withDefault(['nombre'=>'No asignado']);
     }
 
 

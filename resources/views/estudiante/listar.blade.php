@@ -28,10 +28,10 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 @section('contenido')
 <div style="display: flex; justify-content: flex-end;margin-right: 35px;">
     <form action="{{ route('estudiantes.index') }}" method="GET" id="formBuscar" style="position: relative;">
-        <input type="text" id="buscar" name="buscar" placeholder="Buscar por nombre" autocomplete="off" value="{{ request('buscar') }}">
-        <button type="submit">Buscar</button>
-        <div id="sugerencias" style="background:white; border:1px solid #ccc; width:220px;"></div>
-    </form>
+    <input type="text" id="buscar" name="buscar" placeholder="Buscar por nombre" autocomplete="off" value="{{ request('buscar') }}">
+    <button type="submit">Buscar</button>
+    <div id="sugerencias" style="background:white; border:1px solid #ccc; width:220px;"></div>
+</form>
 </div>
 
 <div class="horizontal" style="margin-top:20px;"><p class="subtitulo">Lista de Estudiantes Registrados</p></div>

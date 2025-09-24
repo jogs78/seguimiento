@@ -18,18 +18,96 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use App\Models\Estudiante;
+
 
 class ProyectoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //Listar
-        $todos = Proyecto::all();
-        return view ('proyecto.mostrar',compact('todos'));
+    $buscarEstudiante = $request->input('buscar');
+    $buscarProyecto = $request->input('buscar_proyecto');
+    $buscarAsesor = $request->input('buscar_asesor');
+    $buscarEmpresa = $request->input('buscar_empresa');
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+
+    $proyectos = Proyecto::with(['empresa', 'asesor', 'externo', 'estudiantes'])
+        ->where('periodo_id', $periodo_id)
+        ->when($buscarEstudiante, function ($query, $buscarEstudiante) {
+            $query->whereHas('estudiantes', function ($q) use ($buscarEstudiante) {
+                $q->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$buscarEstudiante}%"]);
+            });
+        })
+        ->when($buscarProyecto, function ($query, $buscarProyecto) {
+            $query->where('nombre', 'like', "%{$buscarProyecto}%");
+        })
+        ->when($buscarAsesor, function ($query, $buscarAsesor) {
+            $query->whereHas('asesor', function ($q) use ($buscarAsesor) {
+                $q->where('nombre', 'like', "%{$buscarAsesor}%");
+            });
+        })
+        ->when($buscarEmpresa, function ($query, $buscarEmpresa) {
+            $query->whereHas('empresa', function ($q) use ($buscarEmpresa) {
+                $q->where('nombre', 'like', "%{$buscarEmpresa}%");
+            });
+        })
+        ->get();
+
+    $asesores = Asesor::all();
+
+    return view('coordinador.tabla', compact('proyectos', 'asesores'));
+
     }
+
+    public function sugerencias(Request $request) //para buscar por el nombre del estudiante
+    {
+        $query = $request->input('query');
+
+        $estudiantes = Estudiante::whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$query}%"])
+            ->limit(10)
+            ->pluck(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) as nombre_completo"));
+
+        return response()->json($estudiantes);
+    }
+
+    public function sugerenciasEmpresa(Request $request)
+    {
+        $query = $request->input('query');
+
+        $empresas = Empresa::where('nombre', 'like', '%' . $query . '%')
+            ->limit(10)
+            ->pluck('nombre');
+
+        return response()->json($empresas);
+    }
+
+    public function sugerenciasAsesor(Request $request)
+    {
+        $query = $request->input('query');
+
+        $asesores = Asesor::where('nombre', 'like', '%' . $query . '%')
+        ->limit(10)
+        ->pluck('nombre');
+
+        return response()->json($asesores);
+    }
+
+    public function sugerenciasProyecto(Request $request)
+    {
+        $query = $request->input('query');
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+
+        $proyectos = Proyecto::where('periodo_id', $periodo_id)
+            ->where('nombre', 'like', '%' . $query . '%')
+            ->limit(10)
+            ->pluck('nombre');
+
+        return response()->json($proyectos);
+    }
+    
 
 
 
@@ -180,6 +258,16 @@ class ProyectoController extends Controller
 
     }
 
+    public function buscar(Request $request)
+    {
+        $termino = $request->input('q');
+
+        $proyectos = Proyecto::where('nombre', 'like', "%{$termino}%")
+                            ->pluck('nombre');
+
+        return response()->json($proyectos);
+    }
+
     public function unirse(Request $request)
     {
         $request->validate([
@@ -213,7 +301,7 @@ class ProyectoController extends Controller
         $estudiante->proyecto_id = $proyecto->id;
         $estudiante->save();
 
-        return redirect()->route('proyectos.index')->with('success', 'Te has unido exitosamente al proyecto.');
+        return redirect()->route('proyectos.crear')->with('success', 'Te has unido exitosamente al proyecto.');
     }
     
 }

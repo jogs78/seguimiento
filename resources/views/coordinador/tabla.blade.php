@@ -17,15 +17,43 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thcontenido{font-weight: normal;}
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
+.caja{ border: 2px solid rgb(40, 95, 139); border-radius: 10px; text-align: center; }
 </style>
 @section('encabezado')
     
 @endsection
 @section('contenido')
-<div style="margin-right: 35px;">
-<input type="text" id="busqueda" placeholder="Buscar por nombre de proyecto /empresa /estudiante" autocomplete="off" style="width: 100%; padding: 10px; " >
+<div class="horizontal" style="margin-top: 20px; position: relative;">
+    <form action="{{ route('proyectos.index') }}" method="GET" autocomplete="off" style="margin-right:10%;">
+        <input type="text" name="buscar" id="buscar" placeholder="Buscar por estudiante..." value="{{ request('buscar') }}"
+            style="padding: 10px; font-size: 18px; width: 350px; border-radius: 8px; border: 1px solid #ccc;">
+        <button type="submit" class="boton">Buscar</button>
+        <div id="sugerencias" style="position: absolute; top: 45px; background: white; border: 1px solid #ccc; width: 350px; max-height: 200px; overflow-y: auto; z-index: 999;"></div>
+    </form>
+     <form action="{{ route('proyectos.index') }}" method="GET" autocomplete="off">
+        <input type="text" name="buscar_proyecto" id="buscar_proyecto" placeholder="Buscar por nombre del proyecto..."
+            value="{{ request('buscar_proyecto') }}"
+            style="padding: 10px; font-size: 18px; width: 350px; border-radius: 8px; border: 1px solid #ccc;">
+        <button type="submit" class="boton">Buscar</button>
+        <div id="sugerencias_proyecto" style="position: absolute; top: 45px; background: white; border: 1px solid #ccc; width: 350px; max-height: 200px; overflow-y: auto; z-index: 999;"></div>
+    </form>
 </div>
-<div id="sugerencias" style="background: white; border: 1px solid #ccc; display: none; position: absolute; z-index: 999;"></div>
+<div class="horizontal" style="margin-top: 20px; position: relative;">
+    <form action="{{ route('proyectos.index') }}" method="GET" autocomplete="off"  style="margin-right:10%;">
+        <input type="text" name="buscar_asesor" id="buscar_asesor" placeholder="Buscar por asesor interno..."
+            value="{{ request('buscar_asesor') }}"
+            style="padding: 10px; font-size: 18px; width: 350px; border-radius: 8px; border: 1px solid #ccc;">
+        <button type="submit" class="boton">Buscar</button>
+        <div id="sugerencias_asesor" style="position: absolute; top: 45px; background: white; border: 1px solid #ccc; width: 350px; max-height: 200px; overflow-y: auto; z-index: 999;"></div>
+    </form>
+     <form action="{{ route('proyectos.index') }}" method="GET" autocomplete="off">
+        <input type="text" name="buscar_empresa" id="buscar_empresa" placeholder="Buscar por empresa..."
+            value="{{ request('buscar_empresa') }}"
+            style="padding: 10px; font-size: 18px; width: 350px; border-radius: 8px; border: 1px solid #ccc;">
+        <button type="submit" class="boton">Buscar</button>
+        <div id="sugerencias_empresa" style="position: absolute; top: 45px; background: white; border: 1px solid #ccc; width: 350px; max-height: 200px; overflow-y: auto; z-index: 999;"></div>
+    </form>
+</div>
 
  <div class="horizontal" style="margin-top:20px;"><p class="subtitulo">Tabla de proyectos</p></div>
  <table border="1">
@@ -93,6 +121,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 25%; padding-top: 25%;">
           <div style="padding:5px;"> {{ $estudiante->numero_control }} {{ $estudiante->nombre }} {{ $estudiante->apellido_paterno }} {{ $estudiante->apellido_materno }}</div>
           <form action="{{ route('correo.create', ['type' => 'estudiante', 'id' => $estudiante->id]) }}" method="GET">
               <div style="text-align: center;">
@@ -101,12 +130,14 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
              </button>
              </div>
           </form>
+          </div>
       @endforeach
     </td>
 
 
     <td style="text-align: center; vertical-align: middle;">
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 25%; padding-top: 25%;">
       @if(!is_null($estudiante->primer?->puntualidad_interno) && !is_null($estudiante->primer?->puntualidad_externo))
           <div class="centro" style="margin-bottom:10px;">
             <a href="{{route('estudiante.impresiones.seguimientos.primer',$estudiante->id)}}" title="Descargar 1° seguimiento">
@@ -124,11 +155,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         @if ( is_null($estudiante->primer?->puntualidad_externo) )
          <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         @endif
-        
+        </div>
       @endforeach
     </td>
     <td style="text-align: center; vertical-align: middle;">
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 25%; padding-top: 25%;">
        @if(!is_null($estudiante->segundo?->puntualidad_interno) && !is_null($estudiante->segundo?->puntualidad_externo))
           <div class="centro" style="margin-bottom:10px;">
             <a  href="{{route('estudiante.impresiones.seguimientos.segundo',$estudiante->id)}}" title="Descargar 2° seguimiento">
@@ -146,11 +178,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         @if ( is_null($estudiante->segundo?->puntualidad_externo) )
        <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         @endif
-       
+      </div>
       @endforeach
     </td>
     <td style="text-align: center; vertical-align: middle;">
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 25%; padding-top: 25%;">
       @if(!is_null($estudiante->ultimo?->promedio_interno) && !is_null($estudiante->ultimo?->promedio_externo))
           <div class="centro" style="margin-bottom:10px;">
             <a href="{{route('estudiante.impresiones.seguimientos.ultimo',$estudiante->id)}}" title="Descargar 3° seguimiento">
@@ -168,7 +201,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         @if ( is_null($estudiante->ultimo?->promedio_externo))
         <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         @endif
-        
+      </div>
       @endforeach
     </td>
  
@@ -179,61 +212,159 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 </tbody>
 </table>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const inputBusqueda = document.getElementById('busqueda');
-    const sugerenciasDiv = document.getElementById('sugerencias');
-
-    inputBusqueda.addEventListener('input', function () {
-        const query = inputBusqueda.value;
-
-        if (query.length < 2) {
-            sugerenciasDiv.style.display = 'none';
-            return;
-        }
-
-        fetch(`/proyectos/buscar?query=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-                sugerenciasDiv.innerHTML = '';
-                if (data.length > 0) {
-                    sugerenciasDiv.style.display = 'block';
-                    data.forEach(proyecto => {
-                        const div = document.createElement('div');
-                        div.textContent = proyecto.nombre;
-                        div.style.padding = '5px';
-                        div.style.cursor = 'pointer';
-
-                        div.addEventListener('click', function () {
-                            inputBusqueda.value = proyecto.nombre;
-                            sugerenciasDiv.style.display = 'none';
-                            filtrarTabla(proyecto.nombre);
+$(document).ready(function () {
+    $('#buscar').on('keyup', function () {
+        let query = $(this).val();
+        if (query.length >= 2) {
+            $.ajax({
+                url: "{{ route('coordinadores.sugerencias') }}",
+                type: "GET",
+                data: { query: query },
+                success: function (data) {
+                    let sugerencias = '';
+                    if (data.length > 0) {
+                        data.forEach(est => {
+                            sugerencias += `<div class="sugerencia-item" style="padding: 8px; cursor: pointer;">${est}</div>`;
                         });
-
-                        sugerenciasDiv.appendChild(div);
-                    });
-                } else {
-                    sugerenciasDiv.style.display = 'none';
+                    } else {
+                        sugerencias = '<div style="padding: 8px;">Sin resultados</div>';
+                    }
+                    $('#sugerencias').html(sugerencias).show();
                 }
             });
+        } else {
+            $('#sugerencias').hide();
+        }
     });
 
-    function filtrarTabla(valor) {
-        const filas = document.querySelectorAll('table tbody tr');
-        filas.forEach(fila => {
-            const texto = fila.textContent.toLowerCase();
-            if (texto.includes(valor.toLowerCase())) {
-                fila.style.display = '';
-            } else {
-                fila.style.display = 'none';
-            }
-        });
-    }
+    $(document).on('click', '.sugerencia-item', function () {
+        $('#buscar').val($(this).text());
+        $('#sugerencias').hide();
+    });
 
-    inputBusqueda.addEventListener('keyup', function () {
-        filtrarTabla(this.value);
+    $(document).click(function (e) {
+        if (!$(e.target).closest('#buscar, #sugerencias').length) {
+            $('#sugerencias').hide();
+        }
     });
 });
 </script>
 
+<script>
+$(document).ready(function () {
+    $('#buscar_proyecto').on('keyup', function () {
+        let query = $(this).val();
+        if (query.length >= 2) {
+            $.ajax({
+                url: "{{ route('coordinadores.sugerenciasProyecto') }}",
+                type: "GET",
+                data: { query: query },
+                success: function (data) {
+                    let sugerencias = '';
+                    if (data.length > 0) {
+                        data.forEach(p => {
+                            sugerencias += `<div class="sugerencia-item-proyecto" style="padding: 8px; cursor: pointer;">${p}</div>`;
+                        });
+                    } else {
+                        sugerencias = '<div style="padding: 8px;">Sin resultados</div>';
+                    }
+                    $('#sugerencias_proyecto').html(sugerencias).show();
+                }
+            });
+        } else {
+            $('#sugerencias_proyecto').hide();
+        }
+    });
+
+    $(document).on('click', '.sugerencia-item-proyecto', function () {
+        $('#buscar_proyecto').val($(this).text());
+        $('#sugerencias_proyecto').hide();
+    });
+
+    $(document).click(function (e) {
+        if (!$(e.target).closest('#buscar_proyecto, #sugerencias_proyecto').length) {
+            $('#sugerencias_proyecto').hide();
+        }
+    });
+});
+</script>
+
+<script>
+$(document).ready(function () {
+    $('#buscar_asesor').on('keyup', function () {
+        let query = $(this).val();
+        if (query.length >= 2) {
+            $.ajax({
+                url: "{{ route('coordinadores.sugerenciasAsesor') }}",
+                type: "GET",
+                data: { query: query },
+                success: function (data) {
+                    let sugerencias = '';
+                    if (data.length > 0) {
+                        data.forEach(a => {
+                            sugerencias += `<div class="sugerencia-item-asesor" style="padding: 8px; cursor: pointer;">${a}</div>`;
+                        });
+                    } else {
+                        sugerencias = '<div style="padding: 8px;">Sin resultados</div>';
+                    }
+                    $('#sugerencias_asesor').html(sugerencias).show();
+                }
+            });
+        } else {
+            $('#sugerencias_asesor').hide();
+        }
+    });
+
+    $(document).on('click', '.sugerencia-item-asesor', function () {
+        $('#buscar_asesor').val($(this).text());
+        $('#sugerencias_asesor').hide();
+    });
+
+    $(document).click(function (e) {
+        if (!$(e.target).closest('#buscar_asesor, #sugerencias_asesor').length) {
+            $('#sugerencias_asesor').hide();
+        }
+    });
+});
+</script>
+<script>
+$(document).ready(function () {
+    $('#buscar_empresa').on('keyup', function () {
+        let query = $(this).val();
+        if (query.length >= 2) {
+            $.ajax({
+                url: "{{ route('coordinadores.sugerenciasEmpresa') }}",
+                type: "GET",
+                data: { query: query },
+                success: function (data) {
+                    let sugerencias = '';
+                    if (data.length > 0) {
+                        data.forEach(nombre => {
+                            sugerencias += `<div class="sugerencia-item-empresa" style="padding: 8px; cursor: pointer;">${nombre}</div>`;
+                        });
+                    } else {
+                        sugerencias = '<div style="padding: 8px;">Sin resultados</div>';
+                    }
+                    $('#sugerencias_empresa').html(sugerencias).show();
+                }
+            });
+        } else {
+            $('#sugerencias_empresa').hide();
+        }
+    });
+
+    $(document).on('click', '.sugerencia-item-empresa', function () {
+        $('#buscar_empresa').val($(this).text());
+        $('#sugerencias_empresa').hide();
+    });
+
+    $(document).click(function (e) {
+        if (!$(e.target).closest('#buscar_empresa, #sugerencias_empresa').length) {
+            $('#sugerencias_empresa').hide();
+        }
+    });
+});
+</script>
 @endsection

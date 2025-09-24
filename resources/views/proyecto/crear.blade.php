@@ -18,6 +18,26 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
 .caja{ border: 2px solid rgb(40, 95, 139); border-radius: 10px; padding-bottom: 20px;}
+     .sugerencias-box {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        width: 250px;
+        max-height: 200px;
+        overflow-y: auto;
+        right: 0; /* Alineado a la derecha del input */
+        top: 100%; /* Justo debajo del input */
+    }
+
+    .sugerencia-item {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .sugerencia-item:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 @section('encabezado')
     
@@ -45,16 +65,19 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <div class="centro" style="margin-bottom:24px">
                 <label class="parrafo">Unirse a un Proyecto ya registrado</label>
             </div>
-            <div>
-                <label for="id" class="parrafo" >ID del Proyecto</label>
-                <input type="number" name="id" class="llenar" value="{{old('id')}}" required>
+           <div>
+               <label for="id" class="parrafo">ID del Proyecto</label>
+               <input type="number" name="id" class="llenar" value="{{ old('id') }}" required>
 
-                <label for="nombre" class="parrafo" style="margin-left:24px">Nombre del Proyecto</label>
-                <input type="text" name="nombre" class="llenar" value="{{old('nombre')}}" required>
+               <div style="position: relative; display: inline-block;">
+                    <label for="nombre" class="parrafo" style="margin-left:24px">Nombre del Proyecto</label>
+                    <input type="text" name="nombre" id="nombreProyecto" class="llenar" autocomplete="off" required>
+                    <div id="sugerencias" class="sugerencias-box"></div>
+                </div>
             </div>
 
             <div class="centro">
-                <button type="submit" class="boton">Unirse al Proyecto</button>
+                <button type="button" id="btnUnirse" class="boton">Unirse al Proyecto</button>
             </div>
         </form>
     </div>
@@ -225,4 +248,104 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     </form>
     </div>
 </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('nombreProyecto');
+        const contenedor = document.getElementById('sugerencias');
+    
+        input.addEventListener('input', function () {
+            const query = this.value;
+        
+            if (query.length < 2) {
+                contenedor.innerHTML = '';
+                return;
+            }
+        
+            fetch(`/buscar-proyectos?q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    contenedor.innerHTML = '';
+                
+                    data.forEach(nombre => {
+                        const div = document.createElement('div');
+                        div.classList.add('sugerencia-item');
+                        div.textContent = nombre;
+                    
+                        div.addEventListener('click', function () {
+                            input.value = nombre;
+                            contenedor.innerHTML = '';
+                        });
+                    
+                        contenedor.appendChild(div);
+                    });
+                });
+        });
+    
+        // Ocultar sugerencias al perder foco
+        input.addEventListener('blur', () => {
+            setTimeout(() => contenedor.innerHTML = '', 100); // espera para permitir click
+        });
+    });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('btnUnirse');
+    const form = btn.closest('form');
+
+    btn.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevenir envío automático
+
+        const id = form.querySelector('input[name="id"]').value.trim();
+        const nombre = form.querySelector('input[name="nombre"]').value.trim();
+
+        if (!id || !nombre) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al buscar este proyecto',
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Deseas unirte a este proyecto?',
+            html: `Proyecto: <strong>${nombre}</strong><br>ID: <strong>${id}</strong>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Enviar formulario si el usuario acepta
+            }
+        });
+    });
+});
+</script>
+
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '{{ session('success') }}',
+            confirmButtonText: 'Aceptar'
+        });
+    @endif
+
+    @if($errors->has('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ $errors->first('error') }}',
+            confirmButtonText: 'Aceptar'
+        });
+    @endif
+</script>
 @endsection

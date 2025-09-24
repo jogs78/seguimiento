@@ -7,6 +7,7 @@ use App\Models\Usuario;
 use App\Models\Asesor;
 use App\Models\Externo;
 use App\Models\Estudiante;
+use App\Models\Coordinador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Exception;
@@ -21,6 +22,7 @@ class CorreoController extends Controller
         'estudiante' => \App\Models\Estudiante::class,
         'asesor' => \App\Models\Asesor::class,
         'externo' => \App\Models\Externo::class,
+        'coordinador' => \App\Models\Coordinador::class,
     ];
 
     $realType = $typeMap[$type] ?? abort(404);

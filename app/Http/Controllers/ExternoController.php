@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreExternoRequest;
 use App\Http\Requests\UpdateExternoRequest;
 use App\Models\Usuario;
+use App\Models\Coordinador;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Providers\ConfiguracionServiceProvider;
@@ -126,13 +127,14 @@ class ExternoController extends Controller
     {
         $asesor = Auth::getUser()->usa;
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-
         $proyectos= $asesor->proyectos($periodo_id)->get();
+        $coordinador = Coordinador::all();
+
 //        dd(get_class($asesor));
         if(get_class($asesor)=="App\Models\Externo" )
-            return view('externo.listar-proyecto',compact('proyectos')); 
+            return view('externo.listar-proyecto',compact('proyectos','coordinador')); 
         else
-            return view('asesor.lista-de-proyecto',compact('proyectos')); 
+            return view('asesor.lista-de-proyecto',compact('proyectos','coordinador')); 
 
     }
 

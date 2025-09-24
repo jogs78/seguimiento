@@ -75,6 +75,8 @@ Route::get('primer/{estudiante?}',[EstudianteController::class,'primer'])->middl
 Route::get('segundo/{estudiante?}',[EstudianteController::class,'segundo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.segundo');
 Route::get('ultimo/{estudiante?}',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
 Route::post('/proyectos/unirse', [ProyectoController::class, 'unirse'])->name('proyectos.unirse');
+Route::get('/buscar-proyectos', [ProyectoController::class, 'buscar'])->name('proyectos.buscar');
+
 
 //rutas especificas del asesor interno
 //para que el interno vea sus proyectos
@@ -90,7 +92,10 @@ Route::resource('configuraciones',ConfiguracionController::class)->middleware('a
 Route::resource('estudiantes',EstudianteController::class)->only(['create','store']);
 Route::resource('estudiantes',EstudianteController::class)->except(['create','store'])->middleware('auth');
 
-
+Route::get('/coordinador/sugerencias', [ProyectoController::class, 'sugerencias'])->name('coordinadores.sugerencias');
+Route::get('/coordinador/sugerencias-proyecto', [ProyectoController::class, 'sugerenciasProyecto'])->name('coordinadores.sugerenciasProyecto');
+Route::get('/coordinador/sugerencias-asesor', [ProyectoController::class, 'sugerenciasAsesor'])->name('coordinadores.sugerenciasAsesor');
+Route::get('/coordinador/sugerencias-empresa', [ProyectoController::class, 'sugerenciasEmpresa'])->name('coordinadores.sugerenciasEmpresa');
 
 Route::get('listar-estudiantes',[CoordinadorController::class,'estudiante'])->middleware('auth')->name('coordinador.listar-estudiantes');
 Route::get('listar-asesores',[CoordinadorController::class,'asesores'])->middleware('auth')->name('coordinador.listar-asesores');
@@ -131,13 +136,9 @@ Route::get('/generando-excel', [CoordinadorController::class,'exportandoLista'])
 Route::get('/imprimir-excel', [CoordinadorController::class,'exportLista'])->name('imprimir-externos.excel');
 
 //Para enviar correo
-//Route::post('/enviar-correo', [CorreoController::class, 'enviarCorreo'])->name('correo.enviar');
-// Muestra el formulario para redactar el correo
-//Route::get('/redactar-correo/{usuario}', [CorreoController::class, 'mostrarFormulario'])->name('correo.formulario');
-
-//Route::get('/correo/enviar/{id}', [CorreoController::class, 'create'])->name('correo.create');
 Route::get('/correo/{type}/{id}', [CorreoController::class, 'create'])->name('correo.create');
 Route::post('/correo/enviar', [CorreoController::class, 'send'])->name('correo.send');
+
 
 
 

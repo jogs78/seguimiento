@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asesor;
+use App\Models\Proyecto;
+use App\Models\Coordinador;
 use App\Http\Requests\StoreAsesorRequest;
 use App\Http\Requests\UpdateAsesorRequest;
 use App\Providers\ConfiguracionServiceProvider;
@@ -128,13 +130,14 @@ public function mostrar($pagina)
     {
         $asesor = Auth::getUser()->usa;
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-
         $proyectos= $asesor->proyectos($periodo_id)->get();
+        $coordinador = Coordinador::all();
+
 //        dd(get_class($asesor));
         if(get_class($asesor)=="App\Models\Externo" )
-            return view('externo.listar-proyecto',compact('proyectos')); 
+            return view('externo.listar-proyecto',compact('proyectos','coordinador')); 
         else
-            return view('asesor.listar-proyecto',compact('proyectos')); 
+            return view('asesor.listar-proyecto',compact('proyectos','coordinador')); 
 
     }
 

@@ -17,6 +17,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thcontenido{font-weight: normal;}
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
+.caja{ border: 2px solid rgb(40, 95, 139); border-radius: 10px; text-align: center; }
 </style>
 @section('encabezado')
     
@@ -37,22 +38,55 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
  @foreach ($proyectos as $proyecto)
    <tr>
     <td>
-    {{$proyecto->nombre}}
-    </td>
+    {{$proyecto->nombre}} <br> <br>
+    <p>Enviar un correo al coordinador: </p>
+    
+
+    @php
+    $coordinador = optional($proyecto->periodo->coordinador)->id;
+@endphp
+
+@if($coordinador)
+    <form action="{{ route('correo.create', ['type' => 'coordinador', 'id' => $coordinador->id]) }}" method="GET">
+        <div style="text-align: center;">
+            <button type="submit" title="Redactar un correo al coordinador">
+                <img src="{{ asset('images/mail.png') }}" width="50" height="32">
+            </button>
+        </div>
+    </form>
+@else
+    <p>No hay coordinador asignado para este proyecto.</p>
+@endif
     
     <td>
     {{$proyecto->empresa->nombre}}
+    <form action="{{ route('correo.create', ['type' => 'externo', 'id' => $proyecto->externo->id]) }}" method="GET">
+            <div style="text-align: center; padding-top: 8px">
+              <button type="submit" title="Redactar un correo al asesor externo">
+                 <img src="{{ asset('images/mail.png') }}"  width="50" height="32">
+             </button>
+             </div>
+        </form>
     <br>
-    <!--{{$proyecto->periodo_id}}-->
     </td>
 
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
-          <li>{{$estudiante->nombre}}</li>
+        <div class="caja" style="padding-bottom: 25%; padding-top: 25%;">
+          {{$estudiante->nombre}} {{$estudiante->apellido_paterno}} {{$estudiante->apellido_materno}}
+          <form action="{{ route('correo.create', ['type' => 'estudiante', 'id' => $estudiante->id]) }}" method="GET">
+              <div style="text-align: center;">
+              <button type="submit" title="Redactar un correo al estudiante">
+                 <img src="{{ asset('images/mail.png') }}"  width="50" height="32">
+             </button>
+             </div>
+          </form>
+        </div>
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 4%; padding-top: 4%;"> 
           @if (is_null($estudiante->primer?->puntualidad_interno))
         <div style="text-align: center;">
           <a href="{{route('realizar-seguimientos',[$estudiante->id,'primer'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
@@ -74,11 +108,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
           <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         </div>
         @endif
-          
+      </div>
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 4%; padding-top: 4%;"> 
       @if (is_null($estudiante->segundo?->puntualidad_interno))
         <div style="text-align: center;">
           <a href="{{route('realizar-seguimientos',[$estudiante->id,'segundo'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
@@ -105,10 +140,12 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
           <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         </div>
         @endif
+      </div>
       @endforeach
     </td>
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)
+      <div class="caja" style="padding-bottom: 4%; padding-top: 4%;"> 
       @if(is_null($estudiante->ultimo?->promedio_interno))
         <div style="text-align: center;">
           <a href="{{route('realizar-seguimientos',[$estudiante->id,'ultimo'])}}" >Dar Seguimiento a {{$estudiante->nombre}}</a>
@@ -134,6 +171,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
           <img src="{{ asset('images/ExtNo.png') }}" width="65" height="70" title="Asesor Externo no ha calificado">
         </div>
         @endif
+      </div>
       @endforeach
     </td>
    </tr>

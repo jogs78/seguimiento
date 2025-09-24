@@ -25,17 +25,18 @@ class EstudianteController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $buscar = $request->input('buscar');
+{
+    $buscar = $request->input('buscar');
 
-        if ($buscar) {
-            $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
-        } else {
-            $todos = Estudiante::all();
-        }
-
-        return view('estudiante.listar', compact('todos'));
+    if ($buscar) {
+        $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+    } else {
+        $todos = Estudiante::all();
     }
+
+        return view('estudiante.listar', compact('todos')); // vista por defecto
+    
+}
 
     public function buscarEstudiante(Request $request)
     {
@@ -159,8 +160,9 @@ class EstudianteController extends Controller
         $primer = $estudiante->primer;
         $segundo = $estudiante->segundo;
         $ultimo = $estudiante->ultimo;
+        $proyecto= $estudiante->proyecto;
 
-            return view('estudiante.promedio',compact('primer','segundo','ultimo'));
+            return view('estudiante.promedio',compact('primer','segundo','ultimo','proyecto'));
     }
 
     public function mostrar($pagina)
@@ -168,16 +170,7 @@ class EstudianteController extends Controller
         // Logica para determinar qué vista devolver
         if ($pagina == 'alta-proyecto') {
             return view('estudiante.alta-proyecto');
-        }/*
-        elseif ($pagina == 'asignar') {
-            return view('coordinador.asignar-asesor');
-        }
-        elseif ($pagina == 'solicitud') {//imprimir-solicitud
-            return view('estudiante.impresiones.solicitud');
-        }
-        elseif ($pagina == 'imprimir-anteproyecto') {
-            return view('estudiante.impresiones.anteproyecto');
-        }*/ 
+        } 
         elseif ($pagina == 'fuera-periodo') {
             return view('asesor.avisos.fuera-periodo');
         }
@@ -275,10 +268,5 @@ class EstudianteController extends Controller
         return back()->with('error', 'Hubo un problema al subir el archivo.');
     }
     
-    public function mostrarPrimer(){
-        //checas si tiene calificaciones ....
-        
-        //generas el pdf...
-        //$pdf->down()
-    }
+    
 }

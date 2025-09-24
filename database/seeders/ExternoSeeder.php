@@ -29,7 +29,7 @@ class ExternoSeeder extends Seeder
         $asesor->nombre = "Alberto";
         $asesor->apellido_paterno = "Gomez";
         $asesor->apellido_materno = "Gonzales";
-        $asesor->correo_electronico = "alberto.gg@hotmail.com.mx";
+        $asesor->correo_electronico = "alberto_gg@hotmail.com.mx";
         $asesor->puesto = "Secretario Administrativo";
         $asesor->save(); 
 
