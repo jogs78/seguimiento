@@ -44,7 +44,6 @@ class UsuarioController extends Controller
     $request->validate([
         'password_actual' => 'required',
         'password' => 'required|confirmed',
-        'password_confirmation' => 'required|confirmed',
     ]);
 
     $nuevo = Auth::user();
@@ -54,14 +53,13 @@ class UsuarioController extends Controller
         return back()->withErrors([
             'password_actual' => 'Error con la contraseña Actual',
             'password'   => 'Error con la contraseña Nueva.',
-            'password_confirmation'   => 'Error con la contraseña de confirmacion.',
         ]);
     }
 
     // Guardar nueva contraseña
     $nuevo->contraseña = Hash::make($request->password);
     $nuevo->save();
-    return redirect()->back()->with('success', 'Contraseña cambiada con exito');
+    return redirect()->back()->with('success', ' ');
     return redirect()->route('home')
         ->with('success', 'Contraseña actualizada correctamente');
 }
