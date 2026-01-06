@@ -135,6 +135,10 @@ class ProyectoController extends Controller
                 $empresa->giro = $request->giro;
                 $empresa->rfc = $request->rfc;
                 $empresa->direccion = $request->direccion;
+                $empresa->numero = $request->numero;
+                $empresa->codigo_postal = $request->codigo_postal;
+                $empresa->ciudad = $request->ciudad;
+                $empresa->estado = $request->estado;
                 $empresa->telefono = $request->telefono;
                 $empresa->correo = $request->correo;
                 $empresa->titular = $request->titular;

@@ -125,7 +125,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         <label for='correo_ae' class="parrafo">Correo del Asesor Externo</label>
         <input type='text' name='correo_ae' id='correo_ae' value="{{old('correo_ae')}}" class="llenar"><br>
         <br>
-        <label for='titulo_ae' class="parrafo">Titulo del Asesor Externo</label>
+        <label for='titulo_ae' class="parrafo">Titulo del Asesor Externo (abreviatura)</label>
         <input type='text' name='titulo_ae' id='titulo_ae' value="{{old('titulo_ae')}}" class="llenar"><br>
         <br>
         <label for='nombre_ae' class="parrafo">Nombre del Asesor Externo</label>
@@ -188,7 +188,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <label class="parrafo">Direccion</label><br>
             <label for="direccion">Calle:</label>
             {{$errors->first("direccion")}}
-            <input type='text' name='numero' id='numero' value="{{old('numero')}}" class="llenar">
+            <input type='text' name='direccion' id='direccion' value="{{old('direccion')}}" class="llenar">
             <label for="numero">Numero:</label>
             {{$errors->first("numero")}}
             <input type='text' name='numero' id='numero' value="{{old('numero')}}" class="llenar" placeholder="Ej: 123 o S/N">
@@ -213,7 +213,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             {{$errors->first("correo")}}
             <input type='email' name='correo' id='correo' value="{{old('correo')}}" class="llenar"><br>
     
-            <label for='titular'  class="parrafo">Nombre del Titular de la empresa</label>
+            <label for='titular'  class="parrafo">Nombre Completo del Titular de la empresa</label>
             {{$errors->first("titular")}}
             <input type='text' name='titular' id='titular' value="{{old('titular')}}" class="llenar"><br>
     
