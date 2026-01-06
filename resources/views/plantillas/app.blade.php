@@ -49,7 +49,7 @@
                 <div style="width:30%;  margin-top: 15px;">
                     <!-- @yield('encabezado')-->
                     <a class="boton" style="margin-right: 10px; margin-left: 10px; " href="{{route('salida')}}">Salir</a>
-                    <!--<a class="boton" href="{{route('Cambiar_Contraseña')}}">Cambiar la Contraseña</a>-->
+                    <a class="boton" href="{{route('Cambiar_Contraseña')}}">Cambiar la Contraseña</a>
                 </div>
                 <div style="width:70%; margin-right: 10px;" class="hderecho">
                     <p style="margin-right: 10px; margin-bottom: 10px;" class="parrafo">Bienvenido:</p><p class="parrafo">{{Auth::user()->usa->nombre}} {{Auth::user()->usa->apellido_paterno}}  {{Auth::user()->usa->apellido_materno}} ({{ $types[Auth::user()->usa_type] ?? Auth::user()->usa_type }})</p>

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUsuarioRequest;
 use App\Http\Requests\UpdateUsuarioRequest;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
@@ -35,6 +38,33 @@ class UsuarioController extends Controller
         $nuevo->save();
         return redirect()->route("home");
     }
+
+    public function cambiarPassword(Request $request)
+{
+    $request->validate([
+        'password_actual' => 'required',
+        'password' => 'required|confirmed',
+        'password_confirmation' => 'required|confirmed',
+    ]);
+
+    $nuevo = Auth::user();
+
+    // Verificar contraseña actual
+    if (!Hash::check($request->password_actual, $nuevo->contraseña)) {
+        return back()->withErrors([
+            'password_actual' => 'Error con la contraseña Actual',
+            'password'   => 'Error con la contraseña Nueva.',
+            'password_confirmation'   => 'Error con la contraseña de confirmacion.',
+        ]);
+    }
+
+    // Guardar nueva contraseña
+    $nuevo->contraseña = Hash::make($request->password);
+    $nuevo->save();
+    return redirect()->back()->with('success', 'Contraseña cambiada con exito');
+    return redirect()->route('home')
+        ->with('success', 'Contraseña actualizada correctamente');
+}
 
     /**
      * Display the specified resource.

@@ -41,6 +41,7 @@ Route::get('/saludar', function (){
 Route::get('/entrar',[PuertaController::class,'formulario']);
 Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
 Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
+Route::post('/cambiar-password', [UsuarioController::class, 'cambiarPassword'])->name('usuario.cambiar-password');
 Route::post('/adentro',[AccesoController::class,'adentro'])->name('adentro');
 Route::get('home',[AccesoController::class,'home'])->middleware('auth')->name('home');
 Route::get('/login',[AccesoController::class,'login'])->name('login');

@@ -209,6 +209,10 @@ class EstudianteController extends Controller
     public function anteproyecto()
     {
         $estudiante = Auth::getUser()->usa;
+        if (!$estudiante || !$estudiante->proyecto) 
+        {
+        return redirect()->route('home');
+        }
        // $jefe = ConfiguracionServiceProvider::get('jefe_division');
         $pdf = Pdf::loadview('estudiante.impresiones.anteproyecto',compact('estudiante')); 
         return $pdf->download('Anteproyecto ' . $estudiante->numero_de_control . '.pdf');
