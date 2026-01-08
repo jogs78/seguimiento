@@ -150,9 +150,17 @@ class EstudianteController extends Controller
      */
     public function destroy(Estudiante $estudiante)
     {
-        //ELIMINAR AL ESTUDIANTE QUE ME DIGAN
-        $estudiante->delete();
-        return redirect()->route("estudiante.index");
+        if ($estudiante->parciales()->exists()) {
+        return redirect()
+            ->back()
+            ->with('error', 'El estudiante aún está siendo evaluado, así que no se le puede eliminar');
+    }
+
+    $estudiante->delete();
+    return redirect()
+        ->back()
+        ->with('success', 'Estudiante Borrado correctamente');
+
     }
 
     public function promedio(){

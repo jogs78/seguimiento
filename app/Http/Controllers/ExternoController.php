@@ -106,8 +106,20 @@ class ExternoController extends Controller
      */
     public function destroy(Externo $externo)
     {
+        try {
         $externo->delete();
-        return redirect()->route("externos.index");
+
+        return redirect()
+            ->back()
+            ->with('success', 'Asesor eliminado correctamente');
+
+    } catch (\Exception $e) {
+
+        // Cualquier otro error general
+        return redirect()
+            ->back()
+            ->with('error', 'El asesor no se puede eliminar porque tiene proyectos asignados');
+    }
     }
 
     public function crearCuenta(Externo $externo)

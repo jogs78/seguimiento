@@ -103,8 +103,20 @@ class AsesorController extends Controller
      */
     public function destroy(Asesor $asesor)
     {
+         try {
         $asesor->delete();
-        return redirect()->route("asesores.index");
+
+        return redirect()
+            ->back()
+            ->with('success', 'Asesor eliminado correctamente');
+
+    } catch (\Exception $e) {
+
+        // Cualquier otro error general
+        return redirect()
+            ->back()
+            ->with('error', 'El asesor no se puede eliminar porque tiene proyectos asignados');
+    }
     }
 
 public function mostrar($pagina)

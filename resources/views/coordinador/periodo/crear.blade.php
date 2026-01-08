@@ -17,6 +17,27 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 .thcontenido{font-weight: normal;}
 .thfondo{background-color: rgb(204, 216, 228);}
 .bodydiv{margin-left: 20px; margin-right: 20px;}
+.caja{ border: 2px solid rgb(40, 95, 139); border-radius: 10px; padding-top: 20px;padding-bottom: 20px;padding-left: 10px; padding-right: 20px;}
+     .sugerencias-box {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        width: 250px;
+        max-height: 200px;
+        overflow-y: auto;
+        right: 0; /* Alineado a la derecha del input */
+        top: 100%; /* Justo debajo del input */
+    }
+
+    .sugerencia-item {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .sugerencia-item:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 @section('encabezado')
     
@@ -28,17 +49,19 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 <div class="centro"; style="margin-top: 60px; ">
     <form action="{{route("periodos.store")}}" method="POST" enctype="application/x-www-form-urlencoded" >
         @csrf
-        <label for='nombreperiodo' class="parrafo">Nombre del Periodo</label>
-        {{$errors->first("nombre")}}
-        <input type='text' name='nombre' id='nombreperiodo' value="{{old('nombre')}}" class="llenar"><br>
+        <div class="caja" style="margin-bottom:30px;">
+            <label for='nombreperiodo' class="parrafo">Nombre del Periodo</label>
+            {{$errors->first("nombre")}}
+            <input type='text' name='nombre' id='nombreperiodo' value="{{old('nombre')}}" class="llenar"><br>
 
-        <label for='fecha_inicio' class="parrafo">Fecha de Inicio</label>
-        {{$errors->first("fecha_inicio")}}
-        <input type='date' name='fecha_inicio' id='fechainicio' value="{{old('fecha_inicio')}}" class="llenar"><br>
+            <label for='fecha_inicio' class="parrafo">Fecha de Inicio del periodo</label>
+            {{$errors->first("fecha_inicio")}}
+            <input type='date' name='fecha_inicio' id='fechainicio' value="{{old('fecha_inicio')}}" class="llenar"><br>
 
-        <label for='fechaconclucion' class="parrafo">Fecha de Conclusion</label>
-        {{$errors->first("fecha_final")}}
-        <input type='date' name='fecha_final' id='fechaconclusion' value="{{old('fecha_final')}}" class="llenar" style="margin-bottom: 20px;"><br>
+            <label for='fechaconclucion' class="parrafo">Fecha de Conclusion del periodo</label>
+            {{$errors->first("fecha_final")}}
+            <input type='date' name='fecha_final' id='fechaconclusion' value="{{old('fecha_final')}}" class="llenar" style="margin-bottom: 20px;"><br>
+        </div>
 
         <label for="" class="parrafo">Rango de Fechas del 1° Reporte</label> <br>
         <label for="" class="parrafo">Inicia</label>

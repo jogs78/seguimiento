@@ -31,10 +31,10 @@ class CoordinadorSeeder extends Seeder
 
 
         $nueva = new Coordinador();
-        $nueva->nombre = "Juan";
-        $nueva->apellido_paterno = "Almeira";
-        $nueva->apellido_materno = "Perez";
-        $nueva->correo_electronico = "Celectronica@gmail.com";
+        $nueva->nombre = "Teodoro Elmer";
+        $nueva->apellido_paterno = "Solis";
+        $nueva->apellido_materno = "Tercero";
+        $nueva->correo_electronico = "TEST@tuxtla.tecnm.mx";
         $nueva->carrera_id = 3;
         $nueva->save();
 
