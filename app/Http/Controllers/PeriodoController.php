@@ -79,9 +79,20 @@ class PeriodoController extends Controller
      */
     public function destroy(Periodo $periodo)
     {
-        //ELIMINAR EL PERIODO QUE ME DIGAN
+              try {
         $periodo->delete();
-        return redirect()->route("periodos.index");
+
+        return redirect()
+            ->back()
+            ->with('success', 'Periodo eliminado correctamente');
+
+    } catch (\Exception $e) {
+
+        // Cualquier otro error general
+        return redirect()
+            ->back()
+            ->with('error', 'Error al eliminar el periodo');
+    }
 
     }
 }

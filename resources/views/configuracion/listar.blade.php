@@ -67,6 +67,28 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     return confirm("⚠️ Al eliminar esta Configuracion ya no se podrá restaurar.\n¿Seguro que deseas eliminar la Configuracion?");
     }
     </script>
-  
+  @if(session('success'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '{{ session("success") }}',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    @endif
+    {{-- Error general --}}
+@if(session('error'))
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session("error") }}',
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
 
     @endsection

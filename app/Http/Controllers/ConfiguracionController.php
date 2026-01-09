@@ -69,8 +69,20 @@ class ConfiguracionController extends Controller
      */
     public function destroy(Configuracion $configuracion)
     {
+
+              try {
         $configuracion->delete();
-        dd($configuracion);
-        return redirect()->route("configuraciones.index");
+
+        return redirect()
+            ->back()
+            ->with('success', 'Configuracion eliminada correctamente');
+
+    } catch (\Exception $e) {
+
+        // Cualquier otro error general
+        return redirect()
+            ->back()
+            ->with('error', 'Error al tratar de eliminar la configuracion');
+    }
     }
 }
