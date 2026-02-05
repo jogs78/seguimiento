@@ -3,7 +3,7 @@
     .centro{display: flex; justify-content: center;}
 </style>
 @section('encabezado')
-    <a href="{{route('Cambiar_Contraseña')}}">Cambiar la Contraseña</a>
+    <a href="{{route('Cambiar_Contraseña')}}">Cambiar la Clave</a>
 @endsection
 @section('contenido')
     <h1 class="centro">Sistema de seguimiento</h1> <br><br>
