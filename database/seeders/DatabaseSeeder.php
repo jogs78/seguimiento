@@ -21,7 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AsesorSeeder::class,
             ExternoSeeder::class,
+            CoordinadorSeeder::class,
             CarreraSeeder::class,
+            AsesorCarreraSeeder::class,
             ConfiguracionSeeder::class,
             EmpresaSeeder::class,
             //EspecificoSeeder::class,
@@ -34,7 +36,7 @@ class DatabaseSeeder extends Seeder
             //SegundoSeeder::class,
             //UltimoSeeder::class,
             UsuarioSeeder::class,
-            CoordinadorSeeder::class,
+            
             ParcialSeeder::class,
             //finales
         ]);

@@ -11,11 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carreras', function (Blueprint $table) {
+        Schema::create('asesor_carrera', function (Blueprint $table) {
             $table->id();
-            $table->string("nombre");
-            $table->string("clave")->nullable();
-            $table->string("modalidad")->nullable();
+
+            $table->foreignId('asesor_id')
+                ->constrained('asesores')
+                ->onDelete('cascade');
+
+            $table->foreignId('carrera_id')
+                ->constrained('carreras')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -25,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carreras');
+        Schema::dropIfExists('asesor_carrera');
     }
 };

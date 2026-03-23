@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coordinador;
+use App\Models\Carrera;
 use App\Http\Requests\StoreCoordinadorRequest;
 use App\Http\Requests\UpdateCoordinadorRequest;
 use App\Models\Proyecto;
@@ -18,20 +19,56 @@ use App\Exports\AsesoresExport;
 use App\Exports\ExternosExport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 
 class CoordinadorController extends Controller
 {
 
 
+    /*
     public function tabla(){
         $coordinador = Auth::getUser()->usa;
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
         $proyectos = $coordinador->proyectos( $periodo_id);
         $proyectos = Proyecto::where('periodo_id', $periodo_id)->get();
         $asesores = Asesor::all();
-        return view ('coordinador.tabla', compact('proyectos','asesores'));
+        //return view ('coordinador.tabla', compact('proyectos','asesores'));
+        //retornar con inertia
+        return Inertia::render('coordinador/tabla', compact('proyectos','asesores'));
+    } */
+
+public function tabla()
+{
+    $coordinador = Auth::getUser()->usa;
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    
+    // Cargar proyectos con TODAS las relaciones necesarias
+    $proyectosQuery = Proyecto::where('periodo_id', $periodo_id)
+        ->with([
+            'asesor',           // Para tener los datos del asesor interno
+            'externo',          // Para tener los datos del asesor externo
+            'empresa',          // Para tener los datos de la empresa
+            'estudiantes'       // Para tener los estudiantes asignados
+        ]);
+
+     // Aplicar filtro por carrera de la sesión
+    if (session()->has('carrera_id')) {
+        $proyectosQuery->whereHas('estudiantes', function ($q) {
+            $q->where('carrera_id', session('carrera_id'));
+        });
     }
+
+    $proyectos = $proyectosQuery->get();
+
+    //cargar asesores internos de la carrera seleccionada
+    $asesores = Asesor::whereHas('carreras', function ($q) {
+        $q->where('carrera_id', session('carrera_id'));
+    })->get();
+
+    return Inertia::render('coordinador/tabla', compact('proyectos', 'asesores'));
+}
+
     public function asignarAsesor1(){
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
         $proyectos = Proyecto::where('periodo_id', $periodo_id)->get();
@@ -152,5 +189,39 @@ class CoordinadorController extends Controller
         return Excel::download(new ExternosExport, 'Asesores_Externos.xlsx');
     }
 
+    //agregando nuevo
+    /*
+    public function seleccionarCarrera(Request $request)
+    {
+    session(['carrera_id' => $request->carrera_id]);
+    //return view('acceso.adentro');
+    
+     return Inertia::render('acceso/adentro');//ruta para Inertia
+      //return redirect()->route('adentro'); //  ruta para Blade
+
+    }
+
+*/
+public function seleccionarCarrera(Request $request)
+{
+    // Validar que la carrera existe
+    $request->validate([
+        'carrera_id' => 'required|exists:carreras,id'
+    ]);
+    
+    // Obtener la carrera completa
+    $carrera = Carrera::find($request->carrera_id);
+    
+    // Guardar en sesión TANTO el ID como el NOMBRE
+    session(['carrera_id' => $request->carrera_id]);
+    session(['carrera_nombre' => $carrera->nombre]); // ← Esto es crucial
+    
+    // También puedes guardar el objeto completo si prefieres
+    // session(['carrera_actual' => $carrera]);
+    
+    // Redirigir al dashboard
+    //return redirect()->route('welcome'); // o 'adentro'
+    return Inertia::render('acceso/adentro');//ruta para Inertia
+}
 
 }

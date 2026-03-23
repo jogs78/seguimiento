@@ -18,37 +18,62 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Parcial;
 use App\Models\Ultimo;
+use Inertia\Inertia;
 
 class EstudianteController extends Controller
 {
     /**
      * Display a listing of the resource.
+    
+    
      */
+    /*
+    public function index(Request $request)
+    {
+        $buscar = $request->input('buscar');
+
+        if ($buscar) {
+            $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        } else {
+            $todos = Estudiante::all();
+        }
+
+            return view('estudiante.listar', compact('todos')); // vista por defecto
+        
+    }*/
+    
     public function index(Request $request)
 {
     $buscar = $request->input('buscar');
-
+    $carrera_id = session('carrera_id'); // Obtener la carrera de la sesión
+    
     if ($buscar) {
-        $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        $todos = Estudiante::where('carrera_id', $carrera_id) // Filtro por carrera
+            ->where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')
+            ->get();
     } else {
-        $todos = Estudiante::all();
+        $todos = Estudiante::where('carrera_id', $carrera_id)->get(); // Solo filtro por carrera
     }
 
-        return view('estudiante.listar', compact('todos')); // vista por defecto
-    
+    return view('estudiante.listar', compact('todos'));
 }
 
     public function buscarEstudiante(Request $request)
     {
         $termino = $request->input('term');
 
-        $resultados = Estudiante::where('nombre', 'like', '%' . $termino . '%')
+        //Obtenemos los estudiantes que coincidan con el término de búsqueda en nombre o apellidos
+         //agregar el filtro por carrera de la sesión
+                
+        $resultados = Estudiante::where('carrera_id', session('carrera_id')) // Filtro por carrera
+            ->where('nombre', 'like', '%' . $termino . '%')
             ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
             ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
             ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
             ->limit(10)
             ->get();
 
+        
         // Devuelve el nombre completo como sugerencia
         $sugerencias = $resultados->map(function ($est) {
             return [
@@ -65,6 +90,20 @@ class EstudianteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
+     public function create()
+    {
+        //MOSTRAR FORMULARIO PARA CREAR
+        $carreras = Carrera::all();
+      //return view('estudiante.crear',compact('carreras'));
+       return Inertia::render('estudiante/crear', [
+        'carreras' => $carreras,
+    ]);
+        
+    }
+    /*
+   
+
     public function create()
     {
         //MOSTRAR FORMULARIO PARA CREAR
@@ -72,7 +111,8 @@ class EstudianteController extends Controller
         return view('estudiante.crear',compact('carreras'));
         
     }
-
+*/
+    
     /**
      * Store a newly created resource in storage.
      */

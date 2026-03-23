@@ -54,5 +54,5 @@ class Proyecto extends Model
         return $this->belongsTo(Externo::class);
     }
 
-
+    
 }

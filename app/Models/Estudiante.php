@@ -19,6 +19,14 @@ class Estudiante extends Model
         return $this->belongsTo(Proyecto::class);
     }
 
+    // Estudiante.php
+    public function tieneProyecto()
+    {
+        return \App\Models\Proyecto::whereHas('estudiantes', function ($q) {
+            $q->where('id', $this->id);
+        })->exists();
+    }
+    
     public function usuario(){
         return $this->belongsTo(Usuario::class);
     }

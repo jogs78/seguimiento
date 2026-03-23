@@ -3,95 +3,137 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Usuario;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Usuario;
+use Inertia\Inertia;
 
 class AccesoController extends Controller
 {
+    //  Login - minúsculas (acceso/formulario)
     public function login(){
-        return view('acceso.formulario');
+        return Inertia::render('acceso/Formulario', [
+            'logoUrl' => asset('images/logo.png')
+        ]);
     }
 
+    //  Logout
     public function salida(){
         Auth::logout();
         return redirect('/');
-//        return view('acceso.adios');
     }
 
+    //  Cambiar contraseña
     public function cambio(){
-        return view('acceso.cambiar-contraseña');
+        return Inertia::render('acceso/cambiar-contrasena'); // ← minúsculas, con guiones
     }
+
+    //  Home después del login
+    public function home(){
+
+    $usuario = Auth::user();
+
+    if($usuario->usa_type == "App\Models\Coordinador"){
+
+        $coordinador = $usuario->usa;
+
+        $carreras = $coordinador->carrera;
+
+        if($carreras->count() > 1){
+
+            return Inertia::render('coordinador/SeleccionarCarrera', [
+                'carreras' => $carreras
+            ]);
+
+        }
+
+        if($carreras->count() == 1){
+           // echo "Solo hay una carrera, se seleccionará automáticamente: " . $carreras->first()->nombre;
+            session(['carrera_id' => $carreras->first()->id]);
+            session(['carrera_nombre' => $carreras->first()->nombre]);
+        }
+    }
+
+    
+   
+
+    //para en caso de que sea estudiante, aparte de la vista enviar una variable que diga si tiene proyecto asignado
+     
+    /*if($usuario->usa_type == "App\Models\Estudiante"){
+        $tieneProyecto = false;
+
+         $estudiante = $usuario->usa;
+     
+        // Verifica si tiene proyecto
+        $tieneProyecto = $estudiante->proyecto ? true : false;
+         return view('acceso.adentro', compact('tieneProyecto'));
+     }
+*/
+    return view('acceso.adentro');
+    }
+
+    /*
     public function home(){
         return view('acceso.adentro');
-    }
-    public function adentro(Request $peticion){
+    }*/
 
+    //  Procesar login (NO CAMBIA NADA)
+    public function adentro(Request $peticion){
         $peticion->validate([
             'nombre' => 'required',
-            'contra' => 'required', // o la longitud que desees para la contraseña
+            'contra' => 'required',
         ], [
             'nombre.required' => 'Ingrese su correo.',
             'contra.required' => 'La contraseña es obligatoria.',
         ]);
-/*
-        echo "<br>N:" . $peticion->input("nombre");
-        echo "<br>C:" . $peticion->input("contra");
-*/      
-        $datos = $peticion->all();
-//        echo "<br>N" . $datos["nombre"];
-//        echo "<br>C" . $datos["contra"];
 
+        $datos = $peticion->all();
         $nombre = $datos["nombre"];
         $contraseña_dada =  $datos["contra"];
-        $encontrado = Usuario::where('nombre_usuario',$nombre)->first();
+        $encontrado = Usuario::where('nombre_usuario', $nombre)->first();
 
         if (is_null($encontrado)){
-            return redirect()->back()->with('errorsesion', 'Correo no encontrado');
-        }else{
-            //echo "si hay resultados entonces ahora checar la contraseña";
+            echo 'Contraseña correcta';
+            return back()->with('errorsesion', 'Correo no encontrado');
+        } else {
             $contraseña_encriptada = $encontrado->contraseña;
             $comparacion = Hash::check($contraseña_dada, $contraseña_encriptada);
-            if($comparacion ){
-                //IGUALES
-                //guardar el usuario
+            
+            if($comparacion){
+                echo 'Contraseña correcta';
                 Auth::login($encontrado);
-                return redirect(route('home'));
-            }else{
-                //DIFIERENTES
-                return redirect()->back()->with('errorcontra', 'Contraseña no encontrado');
+                return redirect()->intended(route('home'))->with('success', '¡Bienvenido!');
+            } else {
+                return back()->with('errorcontra', 'Contraseña incorrecta');
             }
-
-
-        } 
-
-//        return view('acceso.adentro');
+        }
     }
 
-
+    // Registro alumno
     public function registro(){
-        return view('alumno.registro');
+        return Inertia::render('alumno/Registro');
     }
 
+    // Crear período (coordinador)
     public function periodo(){
-        return view('coordinador.crear-periodo');
+        return Inertia::render('coordinador/crear-periodo');
     }
 
+    // Reporte proyecto
     public function reporte(){
-        //puedo saber quie es el usuario que entro
         $usuario = Auth::getUser();
-        dd($usuario);
-        echo "bienvenido " . $usuario->usa->nombre;
-
-//        return view('alumno.reporte-proyecto');
+        return Inertia::render('alumno/reporte-proyecto', [
+            'usuario' => $usuario
+        ]);
     }
 
+    // Estatus alumno
     public function estatus(){
-        return view('coordinador.estatus-alumno');
+        return Inertia::render('coordinador/estatus-alumno');
     }
 
+    // Layout app
     public function plantilla(){
-        return view('layouts.app');
+        return Inertia::render('layouts/app');
     }
-
 }

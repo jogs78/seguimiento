@@ -20,32 +20,58 @@ class AsesorController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->input('buscar');
-
-        if ($buscar) {
-            $todos = Asesor::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
-        } else {
-            $todos = Asesor::all();
+        $carrera_id = session('carrera_id'); // Obtener carrera de la sesión
+        
+        // Si no hay carrera seleccionada, redirigir o mostrar mensaje
+        if (!$carrera_id) {
+            return redirect()->route('seleccionar.carrera')
+                ->with('error', 'Debes seleccionar una carrera primero');
         }
-
+        
+        $query = Asesor::whereHas('carreras', function($q) use ($carrera_id) {
+            $q->where('carrera_id', $carrera_id); // Solo asesores de esta carrera
+        });
+        
+        if ($buscar) {
+            $query->where(function($q) use ($buscar) {
+                $q->where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')
+                ->orWhere('nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('apellido_paterno', 'like', '%' . $buscar . '%')
+                ->orWhere('apellido_materno', 'like', '%' . $buscar . '%');
+            });
+        }
+        
+        $todos = $query->get();
+        
         return view('asesor.listar', compact('todos'));
     }
 
     public function buscarAsesor(Request $request)
     {
         $termino = $request->input('term');
-
-        $resultados = Asesor::where('nombre', 'like', '%' . $termino . '%')
-            ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
-            ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
+        $carrera_id = session('carrera_id');
+        
+        if (!$carrera_id) {
+            return response()->json([]);
+        }
+        
+        $resultados = Asesor::whereHas('carreras', function($q) use ($carrera_id) {
+                $q->where('carrera_id', $carrera_id); // ← FILTRO POR CARRERA EN LA TABLA PIVOTE
+            })
+            ->where(function($q) use ($termino) {
+                $q->where('nombre', 'like', '%' . $termino . '%')
+                ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
+                ->orWhere('apellido_materno', 'like', '%' . $termino . '%');
+            })
             ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
             ->limit(10)
             ->get();
 
-        // Devuelve el nombre completo como sugerencia
-        $sugerencias = $resultados->map(function ($est) {
+        // Formatear resultados para autocompletado
+        $sugerencias = $resultados->map(function ($asesor) {
             return [
-                'id' => $est->id,
-                'value' => $est->nombre . ' ' . $est->apellido_paterno . ' ' . $est->apellido_materno,
+                'id' => $asesor->id,
+                'value' => $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
             ];
         });
 

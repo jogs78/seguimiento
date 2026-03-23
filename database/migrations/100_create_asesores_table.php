@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('apellido_materno');
             $table->string('correo_electronico');
             $table->string('profesion');
+            //recordar que se creara una tabla pivote para la relacion entre asesores y carreras, por lo que no es necesario agregar la carrera como un campo en esta tabla
             $table->string('carrera');
             $table->bigInteger('numero_cedula');
             $table->timestamps();

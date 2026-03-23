@@ -49,11 +49,25 @@ class ProyectoPolicy
             return true;
         } 
 
+        /*
         if($actual->usa_type == "App\Models\Coordinador" && $usuario_actual->carrera_id == $proyecto->estudiantes[0]->carrera->id ){
             Log::channel('debug')->info("es un Coordiandor y es su proyecto");
             return true;
-        } 
+        } */
 
+        //nuevo por lo que la llave ahora es coordinador_id en la tabla carrera
+        $estudiante = $proyecto->estudiantes->first();
+
+        if(
+            $actual->usa_type == "App\Models\Coordinador" &&
+            $estudiante &&
+            $estudiante->carrera->coordinador_id == $actual->usa_id
+        ){
+            Log::channel('debug')->info("es un coordinador y es su proyecto");
+            return true;
+        }
+        //
+        
         Log::channel('debug')->info("regresar falso porque no entro en ninguno");
         return false;
 

@@ -52,7 +52,10 @@
                     <a class="boton" href="{{route('Cambiar_Contraseña')}}">Cambiar la Contraseña</a>
                 </div>
                 <div style="width:70%; margin-right: 10px;" class="hderecho">
-                    <p style="margin-right: 10px; margin-bottom: 10px;" class="parrafo">Bienvenido:</p><p class="parrafo">{{Auth::user()->usa->nombre}} {{Auth::user()->usa->apellido_paterno}}  {{Auth::user()->usa->apellido_materno}} ({{ $types[Auth::user()->usa_type] ?? Auth::user()->usa_type }})</p>
+                    <p style="margin-right: 10px; margin-bottom: 10px;" class="parrafo">
+                        Bienvenido:</p><p class="parrafo">{{Auth::user()->usa->nombre}} {{Auth::user()->usa->apellido_paterno}}  {{Auth::user()->usa->apellido_materno}} ({{ $types[Auth::user()->usa_type] ?? Auth::user()->usa_type }})
+                    
+                    </p>
                     <!--<div class="parrafo" style="text-align: right; margin-right: 10px;"><p>Bienvenido:</p>{{Auth::user()->usa->nombre}}</div>-->
                 </div>
             </div>
@@ -84,12 +87,27 @@
                     @case("App\Models\Estudiante")
                     <div>
                             
-                            <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('estudiantes.edit',Auth::user()->usa_id)}}">ACTULIALIZA TUS DATOS</a></div>
+                            <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('estudiantes.edit',Auth::user()->usa_id)}}">ACTUALIZA TUS DATOS</a></div>
                             <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('proyectos.create')}}">PROYECTO</a></div>
-                            <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('estudiante.impresiones.solicitud')}}">IMPRIMIR SOLICITUD</a></div>
-                            <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('estudiante.impresiones.anteproyecto')}}">IMPRIMIR ANTEPROYECTO</a></div>
-                            <!--<li><a style="text-decoration: none;" href="#">CAPTURAS LAS ACTIVIDADES DE TU PROYECTO</a></li>-->
-                            <div style="margin-top: 25px;"><a style="text-decoration: none;" class="opcion" href="{{route('estudiante.promedio')}}">VERIFICA TUS SEGUIMIENTOS</a></div>
+                            @if(Auth::user()->usa->tieneProyecto())
+                                <div style="margin-top: 25px;">
+                                    <a class="opcion" href="{{route('estudiante.impresiones.solicitud')}}">
+                                        IMPRIMIR SOLICITUD
+                                    </a>
+                                </div>
+
+                                <div style="margin-top: 25px;">
+                                    <a class="opcion" href="{{route('estudiante.impresiones.anteproyecto')}}">
+                                        IMPRIMIR ANTEPROYECTO
+                                    </a>
+                                </div>
+
+                                <div style="margin-top: 25px;">
+                                    <a class="opcion" href="{{route('estudiante.promedio')}}">
+                                        VERIFICA TUS SEGUIMIENTOS
+                                    </a>
+                                </div>
+                            @endif
                     </div>
                     @break
                         

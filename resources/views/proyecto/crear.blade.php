@@ -114,7 +114,7 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         <br>
         </div>
 
-        <label for='asesor_id' class="parrafo">Elige a tu Asesor Interno</label>
+        <label for='asesor_id' class="parrafo">Propón a tu Asesor Interno</label>
         <select name="asesor_id" id="asesor_id">
             @foreach ($asesores as $asesor)
                 <option value="{{$asesor->id}}">{{$asesor->nombre}} {{$asesor->apellido_paterno}} {{$asesor->apellido_materno}}</option>

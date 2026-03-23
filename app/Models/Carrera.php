@@ -9,6 +9,9 @@ class Carrera extends Model
 {
     use HasFactory;
 
+    protected $table = "carreras";
+    protected $fillable = ["nombre", "coordinador_id"];
+
     public function estudiantes(){
         return $this->hasMany(Estudiante::class);
     }
@@ -20,6 +23,13 @@ class Carrera extends Model
 
     public function coordinador()
     {
-        return $this->hasOne(Coordinador::class);
+        return $this->belongsTo(Coordinador::class);
+        //return $this->hasOne(Coordinador::class);
+    }
+
+    //nuevo por lo de la tabla pivote
+    public function asesores()
+    {
+        return $this->belongsToMany(Asesor::class, 'asesor_carrera', 'carrera_id', 'asesor_id');
     }
 }

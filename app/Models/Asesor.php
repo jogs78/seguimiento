@@ -15,4 +15,8 @@ class Asesor extends Model
     {
         return $this->hasMany(Proyecto::class)->where('periodo_id', $periodo_id);
     }
+    //nuevo por lo de la tabla pivote
+    public function carreras(){
+        return $this->belongsToMany(Carrera::class, 'asesor_carrera', 'asesor_id', 'carrera_id');
+    }
 }

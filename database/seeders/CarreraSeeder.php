@@ -15,23 +15,34 @@ class CarreraSeeder extends Seeder
     {
         $nueva = new Carrera();
         $nueva->nombre = "Ingenierias";
+        $nueva->coordinador_id = 2;
         $nueva->save();
 
         $nueva = new Carrera();
         $nueva->nombre = "Mecanica";
+        $nueva->coordinador_id = 1;
         $nueva->save();
 
         $nueva = new Carrera();
         $nueva->nombre = "Electronica";
+        $nueva->coordinador_id = 3;
         $nueva->save();
 
         $nueva = new Carrera();
         $nueva->nombre = "Industrial";
+        $nueva->coordinador_id = 4;
         $nueva->save();
 
         $nueva = new Carrera();
         $nueva->nombre = "Electrica";
+        $nueva->coordinador_id = 5;
         $nueva->save();
+
+        $nueva = new Carrera();
+        $nueva->nombre = "Ciberseguridad";
+        $nueva->coordinador_id = 2;
+        $nueva->save();
+        
     }
 
     

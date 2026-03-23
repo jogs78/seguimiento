@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('apellido_paterno');
             $table->string('apellido_materno');
             $table->string('correo_electronico');
-            $table->foreignId('carrera_id')->nullable()->default(null)->constrained('carreras');
+            //pendiente quitar la relación con carrera, ya que se va a manejar desde la tabla de carreras
+            //$table->foreignId('carrera_id')->nullable()->default(null)->constrained('carreras');
             $table->timestamps();
         });
     }

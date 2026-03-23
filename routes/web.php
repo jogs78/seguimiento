@@ -29,9 +29,32 @@ use App\Http\Controllers\CorreoController;
 |
 */
 
+use Inertia\Inertia;
+
+Route::get('/ejemplo',function(){
+    return Inertia::render('acceso/formulario');
+});
+
+Route::get('/ejemplodos',function(){
+    return Inertia::render('estudiante/crear');
+});
+
+
+Route::post('/seleccionar-carrera',[CoordinadorController::class,'seleccionarCarrera'])->name('coordinadores.seleccionarCarrera');
+// Ruta para la página de bienvenida (adentro)
+Route::get('/adentro', function () {
+    return Inertia::render('acceso/adentro');
+})->name('adentro')->middleware('auth');
+
+/*
 Route::get('/', function () {
     return view('welcome');
 });
+*/
+
+Route::get('/', function () {
+    return Inertia::render('welcome');
+})->name('welcome');
 
 Route::get('/saludar', function (){
     return view('saludo');
@@ -43,6 +66,13 @@ Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
 Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
 Route::post('/cambiar-password', [UsuarioController::class, 'cambiarPassword'])->name('usuario.cambiar-password');
 Route::post('/adentro',[AccesoController::class,'adentro'])->name('adentro');
+
+//temporal para probar la vista de adentro, ya que no se ha implementado el proceso de seleccion de carrera
+/* Route::get('/adentro', function () {
+    return view('acceso.adentro');
+})->name('adentro');
+*/
+
 Route::get('home',[AccesoController::class,'home'])->middleware('auth')->name('home');
 Route::get('/login',[AccesoController::class,'login'])->name('login');
 //Route::get('/registro',[AccesoController::class,'registro'])->name('registro');
@@ -53,6 +83,10 @@ Route::get('/plantilla',[AccesoController::class,'plantilla'])->name('plantilla'
 
 //rutas especificas del coordinador
 Route::get('tabla',[CoordinadorController::class,'tabla'])->middleware('auth')->name('coordinadores.tabla');
+//con inertia lo de tabla
+
+
+
 Route::get('asignar-asesores',[CoordinadorController::class,'asignarAsesor1'])->middleware('auth')->name('coordinadores.asignarAsesor1');
 Route::post('asignar-asesores',[CoordinadorController::class,'asignarAsesor2'])->middleware('auth')->name('coordinadores.asignarAsesor2');
 Route::put('asignar-asesores/{proyecto_id}',[CoordinadorController::class,'asignarAsesor3'])->middleware('auth')->name('coordinadores.asignarAsesor3');
