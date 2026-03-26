@@ -155,43 +155,42 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
         </select>
         <br><br>
         <div id="datos_empresa" style="display: none;">
-            <!-- Contenido adicional para datos de la empresa -->
-            
-            <label for='nombre_e' class="parrafo">Nombre de la Empresa</label>
+            <label for='nombre_e' class="parrafo">Nombre de la Empresa <span class="required" style="color: red;">*</span></label>
             {{$errors->first("nombre_e")}}
             <input type='text' name='nombre_e' id='nombre_e' value="{{old('nombre_e')}}" class="llenar"><br><br>
             
-            <label class="parrafo">Escoge el Giro, Ramo o Sector</label> <br>
+            <label class="parrafo">Escoge el Giro, Ramo o Sector <span class="required" style="color: red;">*</span></label> <br>
             {{$errors->first("giro")}}    
             <div style="margin-top:5px;">
+                <input type='radio' name='giro' id='industrial' value='industrial'>
+                <label for="industrial" class="giro">Industrial</label>
 
-            <input type='radio' name='giro' id='industrial' value='industrial' >
-            <label for="industrial" class="giro">Industrial</label>
+                <input type='radio' name='giro' id='servicios' value='servicios' style="margin-left:12px;">
+                <label for="servicios" class="giro2">Servicios</label> <br>
 
-            <input type='radio' name='giro' id='servicios' value='servicios'style="margin-left:12px;">
-            <label for="servicios" class="giro2">Servicios</label> <br>
+                <input type='radio' name='giro' id='publico' value='publico'>
+                <label for="publico" class="giro">Publico</label>
 
-            <input type='radio' name='giro' id='publico' value='publico' >
-            <label for="publico" class="giro">Publico</label>
+                <input type='radio' name='giro' id='privado' value='privado' style="margin-left:12px;" checked>
+                <label for="privado" class="giro">Privado</label>
 
-            <input type='radio' name='giro' id='privado' value='privado' style="margin-left:12px;" checked>
-            <label for="privado" class="giro">Privado</label>
-
-            <input type='radio' name='giro' id='otro' value='otro' style="margin-left:12px;">
-            <label for="otro" class="giro5">Otro</label><br>
+                <input type='radio' name='giro' id='otro' value='otro' style="margin-left:12px;">
+                <label for="otro" class="giro5">Otro</label><br>
             </div>
             
-            <label for='rfc'  class="parrafo">RFC</label>
+            <label for='rfc' class="parrafo">RFC <span class="required" style="color: red;">*</span></label>
             {{$errors->first("rfc")}}
             <input type='text' name='rfc' id='rfc' value="{{old('rfc')}}" placeholder="_______" class="llenar"><br><br>
-    
-            <label class="parrafo">Direccion</label><br>
+
+            <label class="parrafo">Direccion <span class="required" style="color: red;">*</span></label><br>
             <label for="direccion">Calle:</label>
             {{$errors->first("direccion")}}
             <input type='text' name='direccion' id='direccion' value="{{old('direccion')}}" class="llenar">
+            
             <label for="numero">Numero:</label>
             {{$errors->first("numero")}}
             <input type='text' name='numero' id='numero' value="{{old('numero')}}" class="llenar" placeholder="Ej: 123 o S/N">
+            
             <label for="codigo_postal">Codigo Postal:</label>
             {{$errors->first("codigo_postal")}}
             <input type='text' name='codigo_postal' id='codigo_postal' value="{{old('codigo_postal')}}" class="llenar"><br>
@@ -199,42 +198,84 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
             <label for="estado">Estado:</label>
             {{$errors->first("estado")}}
             <input type='text' name='estado' id='estado' value="{{old('estado')}}" class="llenar">
+            
             <label for="ciudad">Ciudad:</label>
             {{$errors->first("ciudad")}}
             <input type='text' name='ciudad' id='ciudad' value="{{old('ciudad')}}" class="llenar"><br><br>
 
-            
-
-            <label for='telefono'  class="parrafo">Telefono</label>
+            <label for='telefono' class="parrafo">Telefono <span class="required" style="color: red;">*</span></label>
             {{$errors->first("telefono")}}
             <input type='tel' name='telefono' id='telefono' value="{{old('telefono')}}" class="llenar"><br>
-    
-            <label for='correo'  class="parrafo">Correo Electronico</label>
+
+            <label for='correo' class="parrafo">Correo Electronico <span class="required" style="color: red;">*</span></label>
             {{$errors->first("correo")}}
             <input type='email' name='correo' id='correo' value="{{old('correo')}}" class="llenar"><br>
-    
-            <label for='titular'  class="parrafo">Nombre Completo del Titular de la empresa</label>
+
+            <label for='titular' class="parrafo">Nombre Completo del Titular de la empresa <span class="required" style="color: red;">*</span></label>
             {{$errors->first("titular")}}
             <input type='text' name='titular' id='titular' value="{{old('titular')}}" class="llenar"><br>
-    
-            <label for='puesto_titular'  class="parrafo">Puesto del Titular</label>
+
+            <label for='puesto_titular' class="parrafo">Puesto del Titular <span class="required" style="color: red;">*</span></label>
             {{$errors->first("puesto_titular")}}
             <input type='text' name='puesto_titular' id='puesto_titular' value="{{old('puesto_titular')}}" class="llenar"><br>
-    
-            <label for='informacion_e'  class="parrafo">Informacion adicional de la empresa: </label>
-            {{$errors->first("informacion")}}
+
+            <label for='informacion_e' class="parrafo">Informacion adicional de la empresa: </label>
+            {{$errors->first("informacion_e")}}
             <input type='text' name='informacion_e' id='informacion_e' value="{{old('informacion_e')}}" class="llenar"><br>
-
-
         </div>
         <script>
-            function mostrarDatosEmpresa() {
-                const selectElement = document.getElementById('empresa_id');
-                if (selectElement.value === '-1') {
-                    selectElement.style.display = 'none';
-                    document.getElementById('datos_empresa').style.display = 'block';
-                }
+        function mostrarDatosEmpresa() {
+            const selectElement = document.getElementById('empresa_id');
+            const datosEmpresa = document.getElementById('datos_empresa');
+            
+            // Lista de campos de empresa que serán requeridos cuando sea nueva
+            const camposRequeridos = [
+                'nombre_e', 'giro', 'rfc', 'direccion', 'numero', 
+                'codigo_postal', 'ciudad', 'estado', 'telefono', 
+                'correo', 'titular', 'puesto_titular', 'informacion_e'
+            ];
+            
+            if (selectElement.value === '-1') {
+                // Si es nueva empresa, mostrar el div y hacer campos requeridos
+                datosEmpresa.style.display = 'block';
+                
+                // Hacer todos los campos requeridos
+                camposRequeridos.forEach(function(campoId) {
+                    const campo = document.getElementById(campoId);
+                    if (campo) {
+                        campo.required = true;
+                        // Agregar un asterisco visual al label
+                        /*
+                        const label = document.querySelector(`label[for="${campoId}"]`);
+                        if (label && !label.innerHTML.includes('<span class="required">*</span>')) {
+                            label.innerHTML = label.innerHTML + ' <span class="required" style="color: red;">*</span>';
+                        }*/
+                    }
+                });
+            } else {
+                // Si es empresa existente, ocultar el div y quitar requeridos
+                datosEmpresa.style.display = 'none';
+                
+                // Quitar required de todos los campos
+                camposRequeridos.forEach(function(campoId) {
+                    const campo = document.getElementById(campoId);
+                    if (campo) {
+                        campo.required = false;
+                    }
+                });
             }
+        }
+
+        // Ejecutar al cargar la página (para mantener el estado si hay errores de validación)
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectElement = document.getElementById('empresa_id');
+            if (selectElement.value === '-1') {
+                mostrarDatosEmpresa();
+            }
+            
+            // También agregar evento para cuando el select cambie
+            selectElement.addEventListener('change', mostrarDatosEmpresa);
+        });
         </script>
         <br><br>
 

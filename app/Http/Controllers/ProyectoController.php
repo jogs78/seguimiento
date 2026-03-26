@@ -180,107 +180,124 @@ class ProyectoController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreProyectoRequest $request)
-    {
-
-        //\Log::info('=== INICIO STORE PROYECTO ===');
-        //\Log::info('Datos recibidos:', $request->all());
+{
+    \Log::info('=== INICIO STORE PROYECTO ===');
+    \Log::info('Datos recibidos:', $request->all());
+    
+    DB::beginTransaction();
+    
+    try {
+        // 🔹 1. Manejar empresa
+        $empresaId = $request->empresa_id;
         
-        DB::beginTransaction();
-        try {
-           // \Log::info('1. Creando proyecto...');
-            $proyecto = new Proyecto;
+        // Si es nueva empresa (valor -1)
+        if ($empresaId == -1) {
+            //\Log::info('1. Creando nueva empresa...');
             
-            // Guardamos el valor de empresa_id antes de eliminarlo
-            $empresaId = $request->empresa_id;
-            
-            // Preparamos los datos SIN empresa_id para el primer guardado
-            $datos = $request->all();
-            unset($datos['empresa_id']); // ← QUITAMOS empresa_id temporalmente
-            
-            $proyecto->fill($datos);
-            $proyecto->save();
-           // \Log::info('2. Proyecto guardado con ID: ' . $proyecto->id);
-            
-            // Manejar empresa según el caso
-            if($empresaId == -1) {
-               // \Log::info('3. Creando nueva empresa...');
-                $empresa = new Empresa();
-                $empresa->nombre = $request->nombre_e;
-                $empresa->giro = $request->giro;
-                $empresa->rfc = $request->rfc;
-                $empresa->direccion = $request->direccion;
-                $empresa->numero = $request->numero;
-                $empresa->codigo_postal = $request->codigo_postal;
-                $empresa->ciudad = $request->ciudad;
-                $empresa->estado = $request->estado;
-                $empresa->telefono = $request->telefono;
-                $empresa->correo = $request->correo;
-                $empresa->titular = $request->titular;
-                $empresa->puesto_titular = $request->puesto_titular;
-                $empresa->informacion = $request->informacion_e;
-                $empresa->save();
-               // \Log::info('4. Empresa creada con ID: ' . $empresa->id);
-                $proyecto->empresa_id = $empresa->id;
-            } else {
-                // Si seleccionó una empresa existente, asignar ese ID
-                $proyecto->empresa_id = $empresaId;
-             //   \Log::info('3. Usando empresa existente ID: ' . $empresaId);
-            }
-
-            // Resto del código...
-            $estudiante = Auth::user()->usa;
-            $estudiante->proyecto_id = $proyecto->id;
-            $estudiante->save();
-          //  \Log::info('5. Estudiante actualizado');
-
-            // CREAR USUARIO PARA EL ASESOR EXTERNO
-           // \Log::info('6. Procesando asesor externo...');
-            
-            if ($request->filled('correo_ae')) {
-                $ae = Externo::firstOrCreate(
-                    ['correo_electronico' => $request->correo_ae],
-                    [
-                        'titulo' => $request->titulo_ae,
-                        'nombre' => $request->nombre_ae,
-                        'apellido_paterno' => $request->apellido_paterno_ae,
-                        'apellido_materno' => $request->apellido_materno_ae,
-                        'puesto' => $request->puesto_ae
-                    ]
-                );
-             //   \Log::info('7. Asesor externo ID: ' . $ae->id);
-                
-                Usuario::firstOrCreate(
-                    ['nombre_usuario' => $ae->correo_electronico],
-                    [
-                        'usa_id' => $ae->id,
-                        'usa_type' => get_class($ae),
-                        'contraseña' => Hash::make($ae->correo_electronico),
-                    ]
-                );
-              //  \Log::info('8. Usuario creado para asesor externo');
-                
-                $proyecto->externo_id = $ae->id;
-            } else {
-              //  \Log::info('7. No se proporcionó asesor externo');
+            // Validar que los campos requeridos no estén vacíos
+            if (empty($request->nombre_e)) {
+                throw new \Exception('El nombre de la empresa es requerido');
             }
             
-            $proyecto->periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-            $proyecto->save(); // ← Segundo save con todos los datos correctos
-           // \Log::info('9. Proyecto finalizado con empresa_id: ' . $proyecto->empresa_id);
-
-            DB::commit();
-           // \Log::info('10. TRANSACCIÓN COMPLETADA');
+            // Crear la empresa
+            $empresa = Empresa::create([
+                'nombre' => $request->nombre_e,
+                'giro' => $request->giro,
+                'rfc' => $request->rfc,
+                'direccion' => $request->direccion,
+                'numero' => $request->numero,
+                'codigo_postal' => $request->codigo_postal,
+                'ciudad' => $request->ciudad,
+                'estado' => $request->estado,
+                'telefono' => $request->telefono,
+                'correo' => $request->correo,
+                'titular' => $request->titular,
+                'puesto_titular' => $request->puesto_titular,
+                'informacion' => $request->informacion_e,
+            ]);
             
-            return redirect()->route("home")->with('success', 'Proyecto registrado correctamente');
-            
-        } catch (\Throwable $th) {
-            DB::rollBack();
-           // \Log::error('ERROR EN STORE: ' . $th->getMessage());
-          //  \Log::error($th->getTraceAsString());
-            
-            return back()->withErrors(['error' => 'Error al guardar: ' . $th->getMessage()])->withInput();
+            $empresaId = $empresa->id;
+           // \Log::info('2. Empresa creada con ID: ' . $empresaId);
+        } else {
+          //  \Log::info('1. Usando empresa existente ID: ' . $empresaId);
         }
+        
+        // 🔹 2. Crear proyecto
+        // \Log::info('3. Creando proyecto...');
+        
+        $proyecto = Proyecto::create([
+            'nombre' => $request->nombre,
+            'objetivo_general' => $request->objetivo_general,
+            'lugar' => $request->lugar,
+            'informacion' => $request->informacion,
+            'justificacion' => $request->justificacion,
+            'asesor_id' => $request->asesor_id,
+            'empresa_id' => $empresaId,
+            'periodo_id' => ConfiguracionServiceProvider::get('periodo_id'),
+        ]);
+        
+        // \Log::info('4. Proyecto creado con ID: ' . $proyecto->id);
+        
+        // 🔹 3. Asignar proyecto al estudiante
+        $estudiante = Auth::user()->usa;
+        $estudiante->proyecto_id = $proyecto->id;
+        $estudiante->save();
+        
+        // \Log::info('5. Estudiante actualizado');
+        
+        // 🔹 4. Procesar asesor externo (si se proporcionó)
+        // \Log::info('6. Procesando asesor externo...');
+        
+        if ($request->filled('correo_ae') && $request->filled('nombre_ae')) {
+            // Buscar o crear asesor externo
+            $ae = Externo::firstOrCreate(
+                ['correo_electronico' => $request->correo_ae],
+                [
+                    'titulo' => $request->titulo_ae,
+                    'nombre' => $request->nombre_ae,
+                    'apellido_paterno' => $request->apellido_paterno_ae,
+                    'apellido_materno' => $request->apellido_materno_ae,
+                    'puesto' => $request->puesto_ae
+                ]
+            );
+            
+            // \Log::info('7. Asesor externo ID: ' . $ae->id);
+            
+            // Crear usuario para el asesor externo
+            Usuario::firstOrCreate(
+                ['nombre_usuario' => $ae->correo_electronico],
+                [
+                    'usa_id' => $ae->id,
+                    'usa_type' => get_class($ae),
+                    'contraseña' => Hash::make($ae->correo_electronico),
+                ]
+            );
+            
+            // Asignar asesor externo al proyecto
+            $proyecto->externo_id = $ae->id;
+            $proyecto->save();
+            
+            // \Log::info('8. Asesor externo asignado al proyecto');
+        } else {
+            // \Log::info('7. No se proporcionó asesor externo');
+        }
+        
+        DB::commit();
+        // \Log::info('9. TRANSACCIÓN COMPLETADA');
+        
+        return redirect()->route("home")
+            ->with('success', 'Proyecto registrado correctamente');
+        
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        // \Log::error('ERROR EN STORE: ' . $th->getMessage());
+        // \Log::error($th->getTraceAsString());
+        
+        return back()
+            ->withErrors(['error' => 'Error al guardar: ' . $th->getMessage()])
+            ->withInput();
     }
+}
 
     /**
      * Display the specified resource.

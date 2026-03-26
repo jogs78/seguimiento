@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Providers\ConfiguracionServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\Estudiante;
+use App\Models\Proyecto;
 
 use App\Models\Externo;
 
@@ -19,18 +21,47 @@ class ExternoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $buscar = $request->input('buscar');
-
-        if ($buscar) {
-            $todos = Externo::where(DB::raw("CONCAT('titulo',' ',nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
-        } else {
-            $todos = Externo::all();
-        }
-
-        return view('externo.listar', compact('todos'));
+   public function index(Request $request)
+{
+    $buscar = $request->input('buscar');
+    $carrera_id = session('carrera_id'); // Obtener carrera de la sesión
+    
+    if (!$carrera_id) {
+        return redirect()->route('seleccionar.carrera')
+            ->with('error', 'Debes seleccionar una carrera primero');
     }
+    
+    // 1. Primero, obtener los IDs de proyectos que tienen estudiantes con la carrera seleccionada
+    $proyectosIds = Estudiante::where('carrera_id', $carrera_id)
+        ->whereNotNull('proyecto_id')
+        ->pluck('proyecto_id')
+        ->unique();
+    
+    // 2. Obtener los IDs de asesores externos que están en esos proyectos
+    $externosIds = Proyecto::whereIn('id', $proyectosIds)
+        ->whereNotNull('externo_id')
+        ->pluck('externo_id')
+        ->unique();
+    
+    // 3. Construir la consulta base para asesores externos
+    $query = Externo::whereIn('id', $externosIds);
+    
+    // 4. Aplicar búsqueda si existe
+    if ($buscar) {
+        $query->where(function($q) use ($buscar) {
+            $q->where('nombre', 'like', '%' . $buscar . '%')
+              ->orWhere('apellido_paterno', 'like', '%' . $buscar . '%')
+              ->orWhere('apellido_materno', 'like', '%' . $buscar . '%')
+              ->orWhere('correo_electronico', 'like', '%' . $buscar . '%')
+              ->orWhere('puesto', 'like', '%' . $buscar . '%')
+              ->orWhere(DB::raw("CONCAT(titulo, ' ', nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%');
+        });
+    }
+    
+    $todos = $query->get();
+    
+    return view('externo.listar', compact('todos'));
+}
 
      public function buscarExterno(Request $request)
     {
