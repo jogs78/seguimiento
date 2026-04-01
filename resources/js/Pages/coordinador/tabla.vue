@@ -342,7 +342,6 @@ import { ref, reactive, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 import axios from 'axios'
-// Si necesitas inicializar los filtros con valores de la URL
 import { usePage } from '@inertiajs/vue3'
 
 // Inicializar asesor_seleccionado para cada proyecto con el asesor actual
@@ -573,7 +572,7 @@ export default {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #ffffff; /* 🔥 FONDO BLANCO */
+    background: #ffffff; 
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -582,7 +581,7 @@ export default {
 /* HEADER */
 .modern-table thead tr {
     background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
-    color: white;
+    color: #b30e08;
 }
 
 .modern-table th {

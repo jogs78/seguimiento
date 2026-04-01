@@ -53,5 +53,13 @@ class CoordinadorSeeder extends Seeder
         $nueva->correo_electronico = "CElectrica@gmail.com";
         //$nueva->carrera_id = 5;
         $nueva->save();
+        
+        $nueva = new Coordinador();
+        $nueva->nombre = "Alexander";
+        $nueva->apellido_paterno = "Rincon";
+        $nueva->apellido_materno = "Molina";
+        $nueva->correo_electronico = "francisco.rm@tuxtla.tecnm.mx";
+        //$nueva->carrera_id = 1;
+        $nueva->save();
     }
 }

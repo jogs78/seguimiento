@@ -29,6 +29,14 @@ class UsuarioSeeder extends Seeder
         $nuevo->save();
 
         $nuevo = new Usuario();
+        $nuevo->nombre_usuario = "francisco.rm@tuxtla.tecnm.mx";
+        $nuevo->contraseña = Hash::make('1234');
+        $nuevo->usa_id=6;
+        $nuevo->usa_type = "App\Models\Coordinador";
+        $nuevo->save();
+
+
+        $nuevo = new Usuario();
         $nuevo->nombre_usuario = "NestorAntonio@tuxtla.tecnm.mx"; 
         $nuevo->contraseña = Hash::make('1234');
         $nuevo->usa_id=3;

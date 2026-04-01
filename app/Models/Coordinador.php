@@ -53,5 +53,26 @@ class Coordinador extends Model
 
         return Proyecto::hydrate($resultados->toArray());
     }
-    
+     
+    /**
+     * Verificar si este coordinador es el Jefe de División
+     */
+    public function esJefeDivision()
+    {
+        //  Por correo específico
+        $email = $this->correo_electronico ?? $this->user->email ?? null;
+        
+        $jefesEmails = [
+            'maria.cf@tuxtla.tecnm.mx',
+            'francisco.rm@tuxtla.tecnm.mx',
+            'nestor.mn@tuxtla.tecnm.mx',
+        ];
+        
+        if ($email && in_array($email, $jefesEmails)) {
+            return true;
+        }
+        
+        
+        return false;
+    }
 }

@@ -181,8 +181,15 @@ public function tabla()
         return Excel::download(new UsersExport, 'Estudiantes.xlsx');
     }
 
-    public function exportandoLista(){
-        return Excel::download(new AsesoresExport, 'Asesores_Internos.xlsx');
+    public function exportandoLista()
+    {
+        $carrera_id = session('carrera_id');
+        
+        if (!$carrera_id) {
+            return redirect()->back()->with('error', 'Debes seleccionar una carrera primero');
+        }
+        
+        return Excel::download(new AsesoresExport($carrera_id), 'Asesores_Internos.xlsx');
     }
 
     public function exportLista(){

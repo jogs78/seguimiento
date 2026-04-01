@@ -16,7 +16,7 @@
           <Link href="/" class="header-link home-link">
             <i class="fas fa-home"></i> Inicio
           </Link>
-          <Link href="/salida" method="post" as="button" class="header-link logout-link">
+          <Link class="header-link logout-link" :href="route('salida')" >
             <i class="fas fa-sign-out-alt"></i> Salir
           </Link>
         </div>

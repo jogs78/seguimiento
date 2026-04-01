@@ -47,6 +47,9 @@ class HandleInertiaRequests extends Middleware
                         'apellido_paterno' => $request->user()->usa->apellido_paterno,
                         'apellido_materno' => $request->user()->usa->apellido_materno,
                     ] : null,
+                    'es_jefe_division' => $request->user()->usa && method_exists($request->user()->usa, 'esJefeDivision') 
+                    ? $request->user()->usa->esJefeDivision() 
+                    : false,
                 ] : null,
             ],
         'carrera_actual' => $request->session()->has('carrera_id') ? [

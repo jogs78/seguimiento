@@ -42,8 +42,28 @@
       <!-- Menú lateral según el rol -->
       <div class="menu">
         <!-- Opciones para Coordinador -->
-        <div v-if="user.usa_type === 'App\\Models\\Coordinador'">
-          <div style="margin-top: 25px;">
+        
+
+              <!-- Menú para Coordinador -->
+    <div v-if="user.usa_type === 'App\\Models\\Coordinador'">
+      <!-- Jefe de División -->
+      <div v-if="esJefeDivision">
+        <div style="margin-top: 25px;">
+          <Link class="opcion" :href="route('periodos.index')">
+            GESTIONAR PERIODO
+          </Link>
+        </div>
+        <div style="margin-top: 25px;">
+          <Link class="opcion" :href="route('configuraciones.index')">
+            CONFIGURACIONES
+          </Link>
+        </div>
+      </div>
+      
+      <!-- Coordinador normal -->
+      <div v-else>
+        
+         <div style="margin-top: 25px;">
             <Link style="text-decoration: none;" class="opcion" :href="route('coordinadores.tabla')">
               TABLA DE PROYECTOS
             </Link>
@@ -53,11 +73,7 @@
               LISTA DE ESTUDIANTES
             </Link>
           </div>
-          <div style="margin-top: 25px;">
-            <Link style="text-decoration: none;" class="opcion" :href="route('periodos.index')">
-              GESTIONAR PERIODO
-            </Link>
-          </div>
+          
           <div style="margin-top: 25px;">
             <Link style="text-decoration: none;" class="opcion" :href="route('asesores.index')">
               ASESORES INTERNOS
@@ -68,12 +84,9 @@
               ASESORES EXTERNOS
             </Link>
           </div>
-          <div style="margin-top: 25px;">
-            <Link style="text-decoration: none;" class="opcion" :href="route('configuraciones.index')">
-              CONFIGURACIONES
-            </Link>
-          </div>
-        </div>
+          
+      </div>
+    </div>
 
         <!-- Opciones para Estudiante -->
         <div v-else-if="user.usa_type === 'App\\Models\\Estudiante'">

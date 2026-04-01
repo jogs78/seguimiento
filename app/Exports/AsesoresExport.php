@@ -16,15 +16,38 @@ class AsesoresExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     /**
     * @return \Illuminate\Support\Collection
     */
+    protected $carrera_id;
+
+    public function __construct($carrera_id = null)
+    {
+        $this->carrera_id = $carrera_id;
+    }
+
     public function collection()
     {
-        return Asesor::select('nombre','apellido_paterno','apellido_materno','correo_electronico','profesion','carrera','numero_cedula')->get();
+        $query = Asesor::select(
+            'nombre', 
+            'apellido_paterno', 
+            'apellido_materno', 
+            'correo_electronico', 
+            'profesion', 
+            'carrera', 
+            'numero_cedula'
+        );
+
+        // Aplicar filtro por carrera si existe
+        if ($this->carrera_id) {
+            $query->whereHas('carreras', function($q) {
+                $q->where('carrera_id', $this->carrera_id);
+            });
+        }
+
+        return $query->get();
     }
 
     public function headings(): array
     {
         return [
-            //'ID',
             'Nombre Completo',
             'Correo Electrónico',
             'Profesion',
@@ -36,7 +59,6 @@ class AsesoresExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     public function map($asesor): array
     {
         return [
-            //$asesor->id,
             $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
             $asesor->correo_electronico,
             $asesor->profesion,
