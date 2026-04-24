@@ -42,14 +42,20 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
     <p>Enviar un correo al coordinador: </p>
     
 
-    @php
-    $coordinador = optional($proyecto->periodo->coordinador)->id;
+@php
+    $estudiante = optional($proyecto->estudiantes)->first();
+
+    $coordinador = optional(
+        optional(
+            optional($estudiante)->carrera
+        )->coordinador
+    )->id;
 @endphp
 
 @if($coordinador)
-    <form action="{{ route('correo.create', ['type' => 'coordinador', 'id' => $coordinador->id]) }}" method="GET">
+    <form action="{{ route('correo.create', ['type' => 'coordinador', 'id' => $coordinador]) }}" method="GET">
         <div style="text-align: center;">
-            <button type="submit" title="Redactar un correo al coordinador">
+            <button type="submit">
                 <img src="{{ asset('images/mail.png') }}" width="50" height="32">
             </button>
         </div>
@@ -59,16 +65,26 @@ th{border: 1px solid rgb(40, 95, 139);padding: 8px; }
 @endif
     
     <td>
-    {{$proyecto->empresa->nombre}}
-    <form action="{{ route('correo.create', ['type' => 'externo', 'id' => $proyecto->externo->id]) }}" method="GET">
+    {{ $proyecto->empresa->nombre }}
+
+    @php
+        $externoId = optional($proyecto->externo)->id;
+    @endphp
+
+    @if($externoId)
+        <form action="{{ route('correo.create', ['type' => 'externo', 'id' => $externoId]) }}" method="GET">
             <div style="text-align: center; padding-top: 8px">
-              <button type="submit" title="Redactar un correo al asesor externo">
-                 <img src="{{ asset('images/mail.png') }}"  width="50" height="32">
-             </button>
-             </div>
+                <button type="submit" title="Redactar un correo al asesor externo">
+                    <img src="{{ asset('images/mail.png') }}" width="50" height="32">
+                </button>
+            </div>
         </form>
+    @else
+        <p>No hay asesor externo asignado.</p>
+    @endif
+
     <br>
-    </td>
+</td>
 
     <td>
       @foreach ($proyecto->estudiantes as $estudiante)

@@ -115,19 +115,16 @@
 
     <!-- Título -->
     <div class="section-title">
-        <h2>Tabla de Proyectos</h2>
+        <h2>Tabla de Proyectos 
+            <span v-if="periodoActual" class="periodo-badge">
+            {{ periodoActual.nombre }}
+        </span>
+
+        </h2>
         <div class="title-underline"></div>
     </div>
 
-        <!-- Panel de debug - ahora visible cuando mostrarDebug es true 
-         
-        <div v-if="mostrarDebug" class="debug-panel">
-      <h4>🔍 Debug: Datos recibidos</h4>
-      <button @click="mostrarDebug = false" class="debug-close">✕</button>
-      <pre>{{ JSON.stringify(proyectos, null, 2) }}</pre>
-    </div>
-        -->
-    
+      
 
     <!-- Tabla -->
     <div class="table-responsive">
@@ -191,7 +188,7 @@
 
                     <!-- Empresa / Asesor externo -->
                     <td class="company-cell">
-                        <div class="company-name">{{ proyecto.empresa?.nombre }}</div>
+                        <div class="company-name">{{ proyecto.empresa?.nombre }}/  {{ proyecto.externo.nombre }}</div>
                         
                         <div v-if="proyecto.externo" class="email-section">
                             <button 
@@ -228,7 +225,7 @@
                     <td class="status-cell">
                         <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
                             <div class="status-icons">
-                                <template v-if="estudiante.primer?.puntualidad_interno && estudiante.primer?.puntualidad_externo">
+                                <template v-if="estudiante.primer?.puntualidad_interno != null && estudiante.primer?.puntualidad_externo != null">
                                     <button @click="descargarSeguimiento(estudiante.id, 'primer')" class="btn-download">
                                         <!-- CORREGIDO: Ruta absoluta -->
                                         <img src="/images/UnoSegui.png" alt="Descargar" class="status-icon">
@@ -236,7 +233,7 @@
                                 </template>
                                 <template v-else>
                                     <!--  -->
-                                    <img v-if="estudiante.primer?.puntualidad_interno" 
+                                    <img v-if="estudiante.primer?.puntualidad_interno != null"
                                         src="/images/IntSi.png" 
                                         alt="Interno OK" 
                                         class="status-icon"
@@ -247,7 +244,7 @@
                                         class="status-icon"
                                         title="Asesor Interno no ha calificado">
                                     
-                                    <img v-if="estudiante.primer?.puntualidad_externo" 
+                                    <img v-if="estudiante.primer?.puntualidad_externo != null" 
                                         src="/images/ExtSi.png" 
                                         alt="Externo OK" 
                                         class="status-icon"
@@ -266,7 +263,7 @@
                     <td class="status-cell">
                         <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
                             <div class="status-icons">
-                                <template v-if="estudiante.segundo?.puntualidad_interno && estudiante.segundo?.puntualidad_externo">
+                                <template v-if="estudiante.segundo?.puntualidad_interno != null && estudiante.segundo?.puntualidad_externo != null">
                                     <button @click="descargarSeguimiento(estudiante.id, 'segundo')" class="btn-download">
                                         <!-- CORREGIDO -->
                                         <img src="/images/DosSegui.png" alt="Descargar" class="status-icon">
@@ -274,7 +271,7 @@
                                 </template>
                                 <template v-else>
                                     <!-- CORREGIDO -->
-                                    <img v-if="estudiante.segundo?.puntualidad_interno" 
+                                    <img v-if="estudiante.segundo?.puntualidad_interno != null" 
                                         src="/images/IntSi.png" 
                                         alt="Interno OK" 
                                         class="status-icon">
@@ -283,7 +280,7 @@
                                         alt="Interno pendiente" 
                                         class="status-icon">
                                     
-                                    <img v-if="estudiante.segundo?.puntualidad_externo" 
+                                    <img v-if="estudiante.segundo?.puntualidad_externo != null" 
                                         src="/images/ExtSi.png" 
                                         alt="Externo OK" 
                                         class="status-icon">
@@ -300,7 +297,7 @@
                     <td class="status-cell">
                         <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
                             <div class="status-icons">
-                                <template v-if="estudiante.ultimo?.promedio_interno && estudiante.ultimo?.promedio_externo">
+                                <template v-if="estudiante.ultimo?.promedio_interno != null && estudiante.ultimo?.promedio_externo != null">
                                     <button @click="descargarSeguimiento(estudiante.id, 'ultimo')" class="btn-download">
                                         <!-- CORREGIDO -->
                                         <img src="/images/TresSegui.png" alt="Descargar" class="status-icon">
@@ -308,7 +305,7 @@
                                 </template>
                                 <template v-else>
                                     <!-- CORREGIDO -->
-                                    <img v-if="estudiante.ultimo?.promedio_interno" 
+                                    <img v-if="estudiante.ultimo?.promedio_interno != null" 
                                         src="/images/IntSi.png" 
                                         alt="Interno OK" 
                                         class="status-icon">
@@ -317,7 +314,7 @@
                                         alt="Interno pendiente" 
                                         class="status-icon">
                                     
-                                    <img v-if="estudiante.ultimo?.promedio_externo" 
+                                    <img v-if="estudiante.ultimo?.promedio_externo != null" 
                                         src="/images/ExtSi.png" 
                                         alt="Externo OK" 
                                         class="status-icon">
@@ -362,7 +359,8 @@ const mostrarDebug = ref(true) // o true si quieres ver los datos
 
 const props = defineProps({
     proyectos: Array,
-    asesores: Array
+    asesores: Array,
+    periodoActual: Object
 })
 
 // Filtros de búsqueda

@@ -1,14 +1,9 @@
-<!-- resources/js/Pages/acceso/Adentro.vue -->
 <template>
   <div>
     <h1 class="centro">Sistema de seguimiento</h1>
     <br><br>
     <div style="text-align: center;">
-      <img 
-        :src="logoUrl" 
-        alt="Logo"
-        style="width: 25%; height: auto;"
-      >
+      <img id="logo" src="/images/logo_tecnm_tuxtla.png"  alt="Logo" >
     </div>
   </div>
 </template>
@@ -19,10 +14,7 @@ import { usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 
 const page = usePage()
-const logoUrl = computed(() => {
-  // Usa la URL base desde las props o construye la ruta
-  return '/storage/img/logo.png'
-})
+
 </script>
 
 <script>

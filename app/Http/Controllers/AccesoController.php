@@ -46,6 +46,9 @@ class AccesoController extends Controller
             ]);
 
         }
+        else{
+              return Inertia::render('acceso/adentro');//ruta para Inertia
+        }
 
         if($carreras->count() == 1){
            // echo "Solo hay una carrera, se seleccionará automáticamente: " . $carreras->first()->nombre;
@@ -69,7 +72,8 @@ class AccesoController extends Controller
          return view('acceso.adentro', compact('tieneProyecto'));
      }
 */
-    return view('acceso.adentro');
+    //return view('acceso.adentro');
+    return Inertia::render('acceso/adentro');
     }
 
     /*

@@ -43,47 +43,88 @@ class EstudianteController extends Controller
     }*/
     
     public function index(Request $request)
-{
-    $buscar = $request->input('buscar');
-    $carrera_id = session('carrera_id'); // Obtener la carrera de la sesión
-    
-    if ($buscar) {
-        $todos = Estudiante::where('carrera_id', $carrera_id) // Filtro por carrera
-            ->where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')
-            ->get();
-    } else {
-        $todos = Estudiante::where('carrera_id', $carrera_id)->get(); // Solo filtro por carrera
-    }
-
-    return view('estudiante.listar', compact('todos'));
-}
-
-    public function buscarEstudiante(Request $request)
     {
-        $termino = $request->input('term');
-
-        //Obtenemos los estudiantes que coincidan con el término de búsqueda en nombre o apellidos
-         //agregar el filtro por carrera de la sesión
-                
-        $resultados = Estudiante::where('carrera_id', session('carrera_id')) // Filtro por carrera
-            ->where('nombre', 'like', '%' . $termino . '%')
-            ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
-            ->orWhere('apellido_materno', 'like', '%' . $termino . '%')
-            ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
-            ->limit(10)
-            ->get();
-
+        $buscar = $request->input('buscar');
+        $carrera_id = session('carrera_id');
         
-        // Devuelve el nombre completo como sugerencia
-        $sugerencias = $resultados->map(function ($est) {
-            return [
-                'id' => $est->id,
-                'value' => $est->nombre . ' ' . $est->apellido_paterno . ' ' . $est->apellido_materno,
-            ];
-        });
-
-        return response()->json($sugerencias);
+        // Validaciones
+        if (!$carrera_id) {
+            return redirect()->route('seleccionar.carrera')
+                ->with('error', 'Debes seleccionar una carrera primero');
+        }
+        
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+        
+        if (!$periodo_id) {
+            return redirect()->back()
+                ->with('error', 'No hay un período configurado');
+        }
+        
+        // Obtener período actual para mostrar en la vista
+        $periodoActual = Periodo::find($periodo_id);
+        
+        // Consulta principal
+        $query = Estudiante::select('estudiantes.*')
+            ->join('proyectos', 'estudiantes.proyecto_id', '=', 'proyectos.id')
+            ->where('proyectos.periodo_id', $periodo_id)
+            ->where('estudiantes.carrera_id', $carrera_id);
+        
+        // Búsqueda
+        if ($buscar) {
+            $query->where(function($q) use ($buscar) {
+                $q->where('estudiantes.nombre', 'like', '%' . $buscar . '%')
+                  ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $buscar . '%')
+                  ->orWhere('estudiantes.apellido_materno', 'like', '%' . $buscar . '%')
+                  ->orWhere(DB::raw("CONCAT(estudiantes.nombre, ' ', estudiantes.apellido_paterno, ' ', estudiantes.apellido_materno)"), 'like', '%' . $buscar . '%');
+            });
+        }
+        
+        // Ordenamiento
+        $query->orderBy('estudiantes.apellido_paterno')
+              ->orderBy('estudiantes.apellido_materno')
+              ->orderBy('estudiantes.nombre');
+        
+        $todos = $query->get();
+        
+        return Inertia::render('estudiante/listar', [
+            'todos' => $todos,
+            'periodoActual' => $periodoActual,
+            'filtroBuscar' => $buscar
+        ]);
     }
+
+   public function buscarEstudiante(Request $request)
+{
+    $termino = $request->input('term');
+    $carrera_id = session('carrera_id');
+    
+    // Obtener el período actual
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    
+    // Consulta con filtro de período actual (unir con proyectos)
+    $resultados = Estudiante::select('estudiantes.id', 'estudiantes.nombre', 'estudiantes.apellido_paterno', 'estudiantes.apellido_materno')
+        ->join('proyectos', 'estudiantes.proyecto_id', '=', 'proyectos.id')
+        ->where('proyectos.periodo_id', $periodo_id)  // ← FILTRO DE PERÍODO ACTUAL
+        ->where('estudiantes.carrera_id', $carrera_id)
+        ->where(function($q) use ($termino) {
+            $q->where('estudiantes.nombre', 'like', '%' . $termino . '%')
+              ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $termino . '%')
+              ->orWhere('estudiantes.apellido_materno', 'like', '%' . $termino . '%');
+        })
+        ->limit(10)
+        ->get();
+    
+    // Devuelve el nombre completo como sugerencia
+    $sugerencias = $resultados->map(function ($est) {
+        return [
+            'id' => $est->id,
+            'value' =>  $est->nombre . ' ' . $est->apellido_paterno .
+             ' ' . $est->apellido_materno,
+        ];
+    });
+    
+    return response()->json($sugerencias);
+}
 
 
 
@@ -157,7 +198,11 @@ class EstudianteController extends Controller
             return view('estudiante.aviso.no-autorizado');
         }
 
-        return view('estudiante.editar',compact("estudiante"));
+        //return view('estudiante.editar',compact("estudiante"));
+        //con inertia
+        return Inertia::render('estudiante/editar', [
+            'estudiante' => $estudiante
+        ]);
     }
 
     /**
@@ -203,15 +248,32 @@ class EstudianteController extends Controller
 
     }
 
-    public function promedio(){
-        $estudiante = Auth::getUser()->usa;
-        $primer = $estudiante->primer;
-        $segundo = $estudiante->segundo;
-        $ultimo = $estudiante->ultimo;
-        $proyecto= $estudiante->proyecto;
-
-            return view('estudiante.promedio',compact('primer','segundo','ultimo','proyecto'));
+   public function promedio()
+{
+    $estudiante = Auth::getUser()->usa;
+    $primer = $estudiante->primer;
+    $segundo = $estudiante->segundo;
+    $ultimo = $estudiante->ultimo;
+    
+    
+    $proyecto = $estudiante->proyecto;
+    
+    if ($proyecto) {
+        // Cargar las relaciones anidadas
+        $proyecto->load([
+            'asesor',
+            'externo',
+            'estudiantes.carrera.coordinador'  // estudiantes → carrera → coordinador
+        ]);
     }
+
+    return Inertia::render('estudiante/promedio', [
+        'primer' => $primer,
+        'segundo' => $segundo,
+        'ultimo' => $ultimo,
+        'proyecto' => $proyecto
+    ]);
+}
 
     public function mostrar($pagina)
     {

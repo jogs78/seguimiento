@@ -38,7 +38,6 @@
       </div>
     </header>
 
-    <!-- Contenido principal (scrollable) -->
     <main class="main-content">
       <div class="container">
         <h1 class="titulo">Registro de Estudiante</h1>

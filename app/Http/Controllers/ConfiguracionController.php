@@ -5,17 +5,31 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreConfiguracionRequest;
 use App\Http\Requests\UpdateConfiguracionRequest;
 use App\Models\Configuracion;
+use Inertia\Inertia;
 
 class ConfiguracionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    
+public function index()
+{
+    $todos = Configuracion::all();
+    
+    return Inertia::render('configuracion/listar', [
+        'configuraciones' => $todos
+    ]);
+}
+
+
+    /*public function index()
     {
         $todos = Configuracion::all();
         return view('configuracion.listar',compact('todos'));
     }
+    
+    */
 
     /**
      * Show the form for creating a new resource.

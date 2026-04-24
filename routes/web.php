@@ -117,6 +117,8 @@ Route::get('/buscar-proyectos', [ProyectoController::class, 'buscar'])->name('pr
 //para que el interno vea sus proyectos
 Route::get('listar-proyectos',[AsesorController::class,'proyecto'])->middleware('auth')->name('asesor.listar-proyectos');
 
+Route::get('historico', [AsesorController::class, 'historico'])->name('asesor.historico');
+
 //rutas especificas del asesor Externo
 Route::get('lista-de-proyectos',[ExternoController::class,'proyecto'])->middleware('auth')->name('externo.lista-de-proyectos');
 

@@ -38,21 +38,49 @@ class CoordinadorController extends Controller
         return Inertia::render('coordinador/tabla', compact('proyectos','asesores'));
     } */
 
-public function tabla()
+
+    private function getPeriodoActual()
+    {
+        // Obtener el periodo_id de configuraciones
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+        
+        // Si no hay periodo_id configurado, retornar null
+        if (!$periodo_id) {
+            return null;
+        }
+        
+        // Buscar el período en la tabla periodos
+        $periodo = Periodo::find($periodo_id);
+        
+        // Retornar el período completo o solo el nombre
+        return $periodo;
+    }
+    
+    public function tabla()
 {
     $coordinador = Auth::getUser()->usa;
     $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
     
+    // Obtener el período actual
+    $periodoActual = Periodo::find($periodo_id);
+    
     // Cargar proyectos con TODAS las relaciones necesarias
     $proyectosQuery = Proyecto::where('periodo_id', $periodo_id)
         ->with([
-            'asesor',           // Para tener los datos del asesor interno
-            'externo',          // Para tener los datos del asesor externo
-            'empresa',          // Para tener los datos de la empresa
-            'estudiantes'       // Para tener los estudiantes asignados
+            'asesor',
+            'externo',
+            'empresa',
+            'estudiantes' => function($query) {
+                // Cargar los seguimientos para cada estudiante
+                $query->with([
+                    'primer',   // ← Relación del primer seguimiento
+                    'segundo',  // ← Relación del segundo seguimiento
+                    'ultimo'    // ← Relación del seguimiento final
+                ]);
+            }
         ]);
 
-     // Aplicar filtro por carrera de la sesión
+    // Aplicar filtro por carrera de la sesión
     if (session()->has('carrera_id')) {
         $proyectosQuery->whereHas('estudiantes', function ($q) {
             $q->where('carrera_id', session('carrera_id'));
@@ -61,12 +89,12 @@ public function tabla()
 
     $proyectos = $proyectosQuery->get();
 
-    //cargar asesores internos de la carrera seleccionada
+    // Cargar asesores
     $asesores = Asesor::whereHas('carreras', function ($q) {
         $q->where('carrera_id', session('carrera_id'));
     })->get();
 
-    return Inertia::render('coordinador/tabla', compact('proyectos', 'asesores'));
+    return Inertia::render('coordinador/tabla', compact('proyectos', 'asesores', 'periodoActual'));
 }
 
     public function asignarAsesor1(){

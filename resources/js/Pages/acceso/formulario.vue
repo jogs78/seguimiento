@@ -2,8 +2,6 @@
   <div class="inicio">
     <div class="container" id="container">
     
-
-      <!-- Panel de inicio de sesión (sign-in) - Aquí va tu lógica -->
       <div class="form-container sign-in">
         <form @submit.prevent="submit">
           <h1 id="titulo">Inicia Sesión</h1>
@@ -45,7 +43,7 @@
         </form>
       </div>
 
-      <!-- Panel de toggle (parte azul) -->
+      <!-- Panel (parte azul) -->
       <div class="toggle-container">
         <div class="toggle">
         

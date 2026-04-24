@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Models\Estudiante;
+use Inertia\Inertia;
 
 
 class ProyectoController extends Controller
@@ -183,7 +184,7 @@ class ProyectoController extends Controller
 {
     \Log::info('=== INICIO STORE PROYECTO ===');
     \Log::info('Datos recibidos:', $request->all());
-    
+    echo 'Datos recibidos: ' . json_encode($request->all()) . "\n";
     DB::beginTransaction();
     
     try {
@@ -192,6 +193,7 @@ class ProyectoController extends Controller
         
         // Si es nueva empresa (valor -1)
         if ($empresaId == -1) {
+            echo 'creando nueva empresa';
             //\Log::info('1. Creando nueva empresa...');
             
             // Validar que los campos requeridos no estén vacíos
@@ -219,6 +221,7 @@ class ProyectoController extends Controller
             $empresaId = $empresa->id;
            // \Log::info('2. Empresa creada con ID: ' . $empresaId);
         } else {
+            echo 'usando empresa existente';
           //  \Log::info('1. Usando empresa existente ID: ' . $empresaId);
         }
         
@@ -349,11 +352,22 @@ class ProyectoController extends Controller
 
 
 
-        //debe verificar si tiene un proyecto ya creado 
-        if(! is_null( $proyecto )){
-            return view ('proyecto.mostrar',compact('proyecto'));
-
-        } 
+         // Verificar si ya tiene un proyecto
+    if (!is_null($proyecto)) {
+        
+        $proyecto->load([
+            'empresa',
+            'periodo',
+            'actividades',
+            'asesor',
+            'externo',
+            'estudiantes'
+        ]);
+        
+        return Inertia::render('proyecto/mostrar', [
+            'proyecto' => $proyecto
+        ]);
+    } 
         
         //return view (vista que muestra el proyecto y con el enlace de "actividades del proyecto")
         //si no entonces que cargue el registro
@@ -373,30 +387,30 @@ class ProyectoController extends Controller
     }
 
     public function buscar(Request $request) 
-{
-    $termino = $request->input('q');
-    
-    // Obtener el estudiante autenticado
-    $estudiante = auth()->user()->usa;
-    
-    // Verificar que sea estudiante y tenga carrera
-    if (!$estudiante instanceof \App\Models\Estudiante || !$estudiante->carrera_id) {
-        return response()->json([]);
+    {
+        $termino = $request->input('q');
+        
+        // Obtener el estudiante autenticado
+        $estudiante = auth()->user()->usa;
+        
+        // Verificar que sea estudiante y tenga carrera
+        if (!$estudiante instanceof \App\Models\Estudiante || !$estudiante->carrera_id) {
+            return response()->json([]);
+        }
+        
+        // Buscar proyectos que:
+        // 1. Tengan nombre similar a la búsqueda
+        // 2. TENGAN ESTUDIANTES DE LA MISMA CARRERA
+        $proyectos = Proyecto::where('nombre', 'like', "%{$termino}%")
+            ->whereHas('estudiantes', function($query) use ($estudiante) {
+                // Buscar estudiantes que tengan la misma carrera que el estudiante actual
+                $query->where('carrera_id', $estudiante->carrera_id);
+            })
+            ->limit(10)
+            ->pluck('nombre');
+        
+        return response()->json($proyectos);
     }
-    
-    // Buscar proyectos que:
-    // 1. Tengan nombre similar a la búsqueda
-    // 2. TENGAN ESTUDIANTES DE LA MISMA CARRERA
-    $proyectos = Proyecto::where('nombre', 'like', "%{$termino}%")
-        ->whereHas('estudiantes', function($query) use ($estudiante) {
-            // Buscar estudiantes que tengan la misma carrera que el estudiante actual
-            $query->where('carrera_id', $estudiante->carrera_id);
-        })
-        ->limit(10)
-        ->pluck('nombre');
-    
-    return response()->json($proyectos);
-}
 
      public function unirse(Request $request)
     {

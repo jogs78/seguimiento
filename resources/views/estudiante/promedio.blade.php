@@ -115,11 +115,19 @@ table {
         <td>
             Coordinador
     @php
-    $coordinador = optional($proyecto->periodo->coordinador)->id;
+    $estudiante = $proyecto->estudiantes->first();
+    $coordinador = optional(
+        optional(
+            optional($estudiante)->carrera
+        )->coordinador
+    )->id;
+    /*optional($proyecto->periodo->coordinador)->id;*/
     @endphp
+    
+    
 
 @if($coordinador)
-    <form action="{{ route('correo.create', ['type' => 'coordinador', 'id' => $coordinador->id]) }}" method="GET">
+    <form action="{{ route('correo.create', ['type' => 'coordinador', 'id' => $coordinador]) }}" method="GET">
         <div style="text-align: center;">
             <button type="submit" title="Redactar un correo al coordinador">
                 <img src="{{ asset('images/mail.png') }}" width="50" height="32">
@@ -130,16 +138,26 @@ table {
     <p>No hay coordinador asignado para este proyecto.</p>
 @endif
         </td>
-        <td>
-            Asesor Interno
-            <form action="{{ route('correo.create', ['type' => 'asesor', 'id' => $proyecto->asesor->id]) }}" method="GET">
+
+@if(optional($proyecto->asesor)->id)
+    <td>
+        Asesor Interno
+        <form action="{{ route('correo.create', ['type' => 'asesor', 'id' => $proyecto->asesor->id]) }}" method="GET">
             <div style="text-align: center; padding-top: 8px">
-              <button type="submit" title="Redactar un correo al asesor externo">
-                 <img src="{{ asset('images/mail.png') }}"  width="50" height="32">
-             </button>
-             </div>
+                <button type="submit" title="Redactar un correo al asesor externo">
+                    <img src="{{ asset('images/mail.png') }}"  width="50" height="32">
+                </button>
+            </div>
         </form>
-        </td>
+    </td>
+@else
+    <td>
+        Asesor Interno
+        <p>No hay asesor interno asignado.</p>
+    </td>
+@endif
+
+
         <td>
             Asesor Externo
             <form action="{{ route('correo.create', ['type' => 'externo', 'id' => $proyecto->externo->id]) }}" method="GET">

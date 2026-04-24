@@ -8,19 +8,39 @@ use App\Models\Configuracion;
 use App\Models\Periodo;
 use App\Providers\ConfiguracionServiceProvider;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
 class PeriodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    /*public function index()
     {
         //LISTAR
         $periodos = Periodo::all();
         $actual = ConfiguracionServiceProvider::get('periodo_id');
         $configuracion = Configuracion::where('variable','periodo_id')->first();
         return view('coordinador.periodo.listar',compact('periodos','actual','configuracion')); // return view('coordinador.periodo.listar', ['todos' => $todos]);
-    }
+    }*/
+
+    public function index()
+{
+    // LISTAR
+    $periodos = Periodo::all();
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    
+    // Envía SOLO el ID, no el objeto completo
+    $actual = $periodo_id;  // ← Esto es un número o null
+    
+    $configuracion = Configuracion::where('variable', 'periodo_id')->first();
+    
+    return Inertia::render('coordinador/periodo/listar', [
+        'periodos' => $periodos,
+        'actual' => $actual,  // ← Ahora es un número
+        'configuracion' => $configuracion
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.
@@ -28,7 +48,9 @@ class PeriodoController extends Controller
     public function create()
     {
         //MOSTRAR FORMULARIO PARA CREAR
-        return view('coordinador.periodo.crear');
+        //return view('coordinador.periodo.crear');
+        //con inertia
+        return Inertia::render('coordinador/periodo/crear');
     }
 
     /**
