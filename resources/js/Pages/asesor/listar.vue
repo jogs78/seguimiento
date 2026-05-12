@@ -61,7 +61,12 @@
       </div>
 
       <!-- Botones de acción -->
-      <div class="acciones"><!-- ... --></div>
+      <div class="acciones">
+        
+        <a :href="route('generar-asesores.excel')" class="btn-descargar">
+          Descargar lista
+        </a>
+      </div>
     </div>
 
     <!-- MODAL para ver proyectos -->

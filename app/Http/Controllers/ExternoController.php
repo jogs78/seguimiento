@@ -126,6 +126,11 @@ foreach ($todos as $externo) {
     public function create()
     {
         $externos = Externo::all();
+        //con inertia
+        /*return Inertia::render('externo/crear', [
+            'externos' => $externos
+        ]);*/
+        
         return view('externo.crear',compact('externos'));
     }
 

@@ -105,7 +105,11 @@ class AsesorController extends Controller
     public function create()
     {
         $asesores = Asesor::all();
-        return view('asesor.crear',compact('asesores'));
+        //con inertia
+        return Inertia::render('asesor/crear', [
+            'asesores' => $asesores
+        ]);
+        //return view('asesor.crear',compact('asesores'));
     }
 
     /**

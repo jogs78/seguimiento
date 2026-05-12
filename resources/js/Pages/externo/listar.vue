@@ -102,9 +102,12 @@
 
       <!-- Botones de acción -->
       <div class="acciones">
+        
         <a :href="route('imprimir-externos.excel')" class="btn-descargar">
           Descargar lista
         </a>
+
+        
       </div>
     </div>
   </AppLayout>
