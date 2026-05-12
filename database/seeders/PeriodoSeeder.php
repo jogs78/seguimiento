@@ -132,6 +132,30 @@ class PeriodoSeeder extends Seeder
         $periodo->fecha_inicio_reporte_final = "2020-04-26";
         $periodo->fecha_final_reporte_final = "2020-06-11";
         $periodo->save();
+
+        $periodo = new Periodo();
+        $periodo->nombre = "Enero – Junio 2026";
+        $periodo->fecha_inicio = "2026-01-26";
+        $periodo->fecha_final = "2026-06-05";
+        $periodo->fecha_inicio_1er_reporte = "2026-03-26";
+        $periodo->fecha_final_1er_reporte = "2026-03-28";
+        $periodo->fecha_inicio_2do_reporte = "2026-05-04";
+        $periodo->fecha_final_2do_reporte = "2026-05-08";
+        $periodo->fecha_inicio_reporte_final = "2026-05-27";
+        $periodo->fecha_final_reporte_final = "2026-05-28";
+        $periodo->save();
+
+        $periodo = new Periodo();
+        $periodo->nombre = "Agosto – Diciembre 2026";
+        $periodo->fecha_inicio = "2026-08-24";
+        $periodo->fecha_final = "2026-12-18";
+        $periodo->fecha_inicio_1er_reporte = "2026-09-23";
+        $periodo->fecha_final_1er_reporte = "2026-09-25";
+        $periodo->fecha_inicio_2do_reporte = "2026-10-28";
+        $periodo->fecha_final_2do_reporte = "2026-10-30";
+        $periodo->fecha_inicio_reporte_final = "2026-12-02";
+        $periodo->fecha_final_reporte_final = "2026-12-05";
+        $periodo->save();
     }
     
 }

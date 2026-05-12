@@ -8,9 +8,11 @@ use App\Http\Requests\SeguimientoRequest;
 use App\Models\Estudiante;
 use App\Models\Parcial;
 use App\Models\Ultimo;
+use App\Models\Configuracion;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class SeguimientoController extends Controller
 {
@@ -34,7 +36,9 @@ class SeguimientoController extends Controller
         Log::channel('debug')->info('checar');
         if( ! $decision->allowed() ){
             $razon = $decision->message();
-            return view('estudiante.aviso.no-autorizado', compact('razon'));
+            //con inertia
+            //return view('estudiante.aviso.no-autorizado', compact('razon'));
+            return Inertia::render('estudiante/avisos/no-autorizado', compact('razon'));
         }
         $usuario = Auth::getUser();
         //dd($usuario->usa_type);
@@ -44,12 +48,17 @@ class SeguimientoController extends Controller
                 if($consecutivo == 'primer' or $consecutivo == 'segundo'){
                     
                     $segui = Parcial::firstOrCreate(
-                        ['estudiante_id' => $estudiante->id,'consecutivo' => $consecutivo ], 
+                        ['estudiante_id' => $estudiante->id, 'consecutivo' => $consecutivo],
                     );
-                    $segui->califico_interno=Carbon::now();
+                    $segui->califico_interno = Carbon::now();
                     $segui->save();
 
-                    return view('seguimientos.parcial.calificar-interno',compact('estudiante','consecutivo','segui'));                    
+                    return Inertia::render('seguimientos/parcial/calificar-interno', [
+                        'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
+                        'consecutivo' => $consecutivo,
+                        'segui' => $segui
+                    ]);    
+                
                 }
                 
                 if($consecutivo == 'ultimo' ){
@@ -98,6 +107,11 @@ class SeguimientoController extends Controller
     {
         $usuario = Auth::getUser();
         $tipo = $usuario->usa_type;
+
+         // Verificar si la delegación está activa
+        $delegadoConfig = Configuracion::where('variable', 'delegado')->first();
+        $delegadoActivo = $delegadoConfig && $delegadoConfig->valor === 'si';
+        
         switch ($tipo) {
             case 'App\Models\Asesor':
                     $campos = [
@@ -206,6 +220,13 @@ class SeguimientoController extends Controller
                     break;
             }
 
+            // Si está activa la delegación y está calificando el asesor interno,
+        // copiar automáticamente las calificaciones al asesor externo
+        if ($delegadoActivo && $tipo === 'App\Models\Asesor') {
+            $segui->promedio_externo = $segui->promedio_interno;
+            $segui->califico_externo = $segui->califico_interno;
+            $segui->comentarios_externo = "*Nota: Proyecto interno - Calificación delegada al asesor interno.*";
+        }
             $segui->save();
         
         return redirect()->route("home");

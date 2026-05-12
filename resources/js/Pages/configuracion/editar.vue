@@ -3,20 +3,20 @@
     <div class="bodydiv">
       <div class="horizontal">
         <p class="subtitulo">
-          <i class="fas fa-plus-circle"></i>
-          Crear Nueva Configuración
+          <i class="fas fa-cogs"></i>
+          Actualizar Configuración
         </p>
       </div>
 
       <div class="centro">
         <div class="form-card">
-          <form @submit.prevent="crearConfiguracion" class="formulario">
+          <form @submit.prevent="actualizarConfiguracion" class="formulario">
             
             <!-- Campo: Variable -->
             <div class="form-group">
               <label class="parrafo">
                 <i class="fas fa-tag"></i>
-                Variable <span class="required">*</span>
+                Variable
               </label>
               <div class="input-group">
                 <i class="fas fa-code-branch input-icon"></i>
@@ -25,7 +25,7 @@
                   v-model="form.variable"
                   class="input-text"
                   :class="{ 'error': errores.variable }"
-                  placeholder="Ej: periodo_id, max_estudiantes, correo_admin"
+                  placeholder="Ej: periodo_id, max_estudiantes, etc."
                   required
                 />
               </div>
@@ -33,17 +33,13 @@
                 <i class="fas fa-exclamation-circle"></i>
                 {{ errores.variable }}
               </span>
-              <small class="help-text">
-                <i class="fas fa-info-circle"></i>
-                Identificador único de la configuración (ej: nombre_variable)
-              </small>
             </div>
 
             <!-- Campo: Valor -->
             <div class="form-group">
               <label class="parrafo">
                 <i class="fas fa-dollar-sign"></i>
-                Valor <span class="required">*</span>
+                Valor
               </label>
               <div class="input-group">
                 <i class="fas fa-value input-icon"></i>
@@ -52,7 +48,7 @@
                   v-model="form.valor"
                   class="input-text"
                   :class="{ 'error': errores.valor }"
-                  placeholder="Ej: 2024, 'activo', 'configuracion.json'"
+                  placeholder="Ej: 2024, true, configuracion.json"
                   required
                 />
               </div>
@@ -66,15 +62,14 @@
             <div class="form-group">
               <label class="parrafo">
                 <i class="fas fa-database"></i>
-                Tipo <span class="required">*</span>
+                Tipo
               </label>
               <div class="input-group">
                 <i class="fas fa-type input-icon"></i>
                 <select v-model="form.tipo" class="select" :class="{ 'error': errores.tipo }">
-                  <option value="" disabled selected>Selecciona un tipo</option>
                   <option value="Numero">🔢 Número</option>
-                  <option value="Cadena">📝 Cadena (Texto)</option>
-                  <option value="Bd">🗄️ Base de Datos (Referencia)</option>
+                  <option value="Cadena">📝 Cadena</option>
+                  <option value="Bd">🗄️ Base de Datos</option>
                 </select>
               </div>
               <span v-if="errores.tipo" class="error-mensaje">
@@ -83,11 +78,11 @@
               </span>
               <small class="help-text">
                 <i class="fas fa-info-circle"></i>
-                Define cómo se interpretará el valor almacenado
+                Selecciona "Base de Datos" si el valor se obtiene de una tabla/campo específico
               </small>
             </div>
 
-            <!-- Campos adicionales para tipo BD (se muestran solo si tipo == 'Bd') -->
+            <!-- Campos adicionales para tipo BD -->
             <div v-if="form.tipo === 'Bd'" class="campos-bd">
               <div class="section-divider">
                 <hr>
@@ -98,7 +93,7 @@
               <div class="form-group">
                 <label class="parrafo">
                   <i class="fas fa-table"></i>
-                  Tabla <span class="required">*</span>
+                  Tabla
                 </label>
                 <div class="input-group">
                   <i class="fas fa-database input-icon"></i>
@@ -107,7 +102,7 @@
                     v-model="form.tabla"
                     class="input-text"
                     :class="{ 'error': errores.tabla }"
-                    placeholder="Ej: periodos, usuarios, carreras"
+                    placeholder="Ej: periodos, usuarios, configuraciones"
                   />
                 </div>
                 <span v-if="errores.tabla" class="error-mensaje">
@@ -120,7 +115,7 @@
               <div class="form-group">
                 <label class="parrafo">
                   <i class="fas fa-columns"></i>
-                  Campo <span class="required">*</span>
+                  Campo
                 </label>
                 <div class="input-group">
                   <i class="fas fa-field input-icon"></i>
@@ -129,7 +124,7 @@
                     v-model="form.campo"
                     class="input-text"
                     :class="{ 'error': errores.campo }"
-                    placeholder="Ej: nombre, id, valor, estatus"
+                    placeholder="Ej: nombre, id, valor"
                   />
                 </div>
                 <span v-if="errores.campo" class="error-mensaje">
@@ -140,32 +135,20 @@
               </div>
             </div>
 
-            <!-- Información adicional según el tipo seleccionado -->
-            <div class="info-card" v-if="form.tipo && form.tipo !== ''">
+            <!-- Información adicional según el tipo -->
+            <div class="info-card" v-if="form.tipo">
               <i class="fas fa-lightbulb"></i>
               <div class="info-text">
-                <strong>Información del tipo seleccionado:</strong>
+                <strong>Información:</strong>
                 <template v-if="form.tipo === 'Numero'">
-                  <ul>
-                    <li>El valor se almacenará como número entero o decimal</li>
-                    <li>Se puede usar para cálculos matemáticos</li>
-                    <li>Ejemplo: 10, 3.1416, 2024</li>
-                  </ul>
+                  Este valor será tratado como número entero o decimal.
                 </template>
                 <template v-else-if="form.tipo === 'Cadena'">
-                  <ul>
-                    <li>El valor se almacenará como texto plano</li>
-                    <li>Acepta letras, números y caracteres especiales</li>
-                    <li>Ejemplo: "Periodo actual", "Configuración activa"</li>
-                  </ul>
+                  Este valor será tratado como texto plano.
                 </template>
                 <template v-else-if="form.tipo === 'Bd'">
-                  <ul>
-                    <li>El valor se obtendrá dinámicamente desde la base de datos</li>
-                    <li>Tabla: <strong>{{ form.tabla || '(por definir)' }}</strong></li>
-                    <li>Campo: <strong>{{ form.campo || '(por definir)' }}</strong></li>
-                    <li>Útil para referencias a otras tablas del sistema</li>
-                  </ul>
+                  Este valor se obtendrá dinámicamente desde la tabla <strong>{{ form.tabla || '?' }}</strong> 
+                  en el campo <strong>{{ form.campo || '?' }}</strong>.
                 </template>
               </div>
             </div>
@@ -174,11 +157,11 @@
             <div class="botones-container">
               <button 
                 type="submit" 
-                class="btn-crear"
+                class="btn-actualizar"
                 :disabled="cargando"
               >
                 <i class="fas" :class="cargando ? 'fa-spinner fa-pulse' : 'fa-save'"></i>
-                {{ cargando ? 'Creando...' : 'Crear Configuración' }}
+                {{ cargando ? 'Actualizando...' : 'Actualizar Configuración' }}
               </button>
               
               <Link :href="route('configuraciones.index')" class="btn-cancelar">
@@ -200,16 +183,20 @@ import AppLayout from '@/Layouts/appLayout.vue'
 
 
 const props = defineProps({
+  configuracion: {
+    type: Object,
+    required: true
+  },
   flash: Object
 })
 
-// Formulario reactivo
+// Formulario reactivo con los datos de la configuración
 const form = ref({
-  variable: '',
-  valor: '',
-  tipo: '',
-  tabla: '',
-  campo: ''
+  variable: props.configuracion.variable || '',
+  valor: props.configuracion.valor || '',
+  tipo: props.configuracion.tipo || 'Cadena',
+  tabla: props.configuracion.tabla || '',
+  campo: props.configuracion.campo || ''
 })
 
 const cargando = ref(false)
@@ -221,8 +208,6 @@ const validarFormulario = () => {
   
   if (!form.value.variable.trim()) {
     nuevosErrores.variable = 'La variable es requerida'
-  } else if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(form.value.variable)) {
-    nuevosErrores.variable = 'La variable solo puede contener letras, números y guiones bajos'
   }
   
   if (!form.value.valor.toString().trim()) {
@@ -246,16 +231,8 @@ const validarFormulario = () => {
   return Object.keys(nuevosErrores).length === 0
 }
 
-// Resetear campos BD cuando el tipo no es Bd
-watch(() => form.value.tipo, (nuevoTipo) => {
-  if (nuevoTipo !== 'Bd') {
-    form.value.tabla = ''
-    form.value.campo = ''
-  }
-})
-
-// Crear configuración
-const crearConfiguracion = () => {
+// Actualizar configuración
+const actualizarConfiguracion = () => {
   if (!validarFormulario()) {
     Swal.fire({
       icon: 'error',
@@ -269,21 +246,21 @@ const crearConfiguracion = () => {
   }
   
   cargando.value = true
-  errores.value = {}
   
-  router.post(route('configuraciones.store'), form.value, {
+  router.put(route('configuraciones.update', props.configuracion.id), form.value, {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
         icon: 'success',
-        title: '¡Creada!',
-        text: 'La configuración ha sido creada correctamente',
+        title: '¡Actualizado!',
+        text: 'La configuración ha sido actualizada correctamente',
         confirmButtonText: 'OK'
       }).then(() => {
         router.visit(route('configuraciones.index'))
       })
     },
     onError: (errors) => {
+      // Procesar errores del backend
       const nuevosErrores = {}
       if (errors.variable) nuevosErrores.variable = errors.variable
       if (errors.valor) nuevosErrores.valor = errors.valor
@@ -296,7 +273,7 @@ const crearConfiguracion = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: Object.values(errors)[0] || 'No se pudo crear la configuración. Verifica los campos.',
+        text: 'No se pudo actualizar la configuración. Verifica los campos.',
         confirmButtonText: 'OK'
       })
     },
@@ -344,7 +321,7 @@ const crearConfiguracion = () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 40px;
   width: 100%;
-  max-width: 650px;
+  max-width: 600px;
   margin: 20px 0;
 }
 
@@ -368,11 +345,6 @@ const crearConfiguracion = () => {
 .parrafo i {
   margin-right: 8px;
   color: #050E3C;
-}
-
-.required {
-  color: #dc3545;
-  margin-left: 4px;
 }
 
 /* Inputs */
@@ -498,17 +470,8 @@ const crearConfiguracion = () => {
 
 .info-text strong {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   color: #050E3C;
-}
-
-.info-text ul {
-  margin: 5px 0 0 20px;
-  padding: 0;
-}
-
-.info-text li {
-  margin-bottom: 4px;
 }
 
 /* Botones */
@@ -518,7 +481,7 @@ const crearConfiguracion = () => {
   margin-top: 30px;
 }
 
-.btn-crear {
+.btn-actualizar {
   flex: 1;
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   color: white;
@@ -535,12 +498,12 @@ const crearConfiguracion = () => {
   gap: 10px;
 }
 
-.btn-crear:hover:not(:disabled) {
+.btn-actualizar:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-.btn-crear:disabled {
+.btn-actualizar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -584,10 +547,6 @@ const crearConfiguracion = () => {
   
   .section-divider span {
     font-size: 11px;
-  }
-  
-  .info-card {
-    flex-direction: column;
   }
 }
 </style>

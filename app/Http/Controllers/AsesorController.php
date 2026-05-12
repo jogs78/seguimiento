@@ -132,7 +132,9 @@ class AsesorController extends Controller
      */
     public function edit(Asesor $asesor)
     {
-        return view('asesor.editar',compact("asesor"));
+         return Inertia::render('asesor/editar', [
+            'asesor' => $asesor
+        ]);
     }
 
     /**
@@ -142,7 +144,8 @@ class AsesorController extends Controller
     {
         $asesor->fill($request->all());
         $asesor->save();
-        return redirect()->route("asesores.index");
+        
+        return redirect()->route("asesores.index")->with('success', 'Asesor actualizado correctamente');
     }
 
     /**
@@ -166,22 +169,28 @@ class AsesorController extends Controller
     }
     }
 
-public function mostrar($pagina)
+
+
+    public function mostrar($pagina)
     {
-        // Logica para determinar qué vista devolver
-        if ($pagina == 'no-calificaciones') {
-            return view('asesor.avisos.no-calificacion');
-        } elseif ($pagina == 'calificaciones') {
-            return view('asesor.calificacion');
-        } elseif ($pagina == 'proyectos-asignados') {
-            return view('asesor.listar-proyecto');
-        } elseif ($pagina == 'promedio') {
-            return view('asesor.promedio');
-        } elseif ($pagina == 'fuera-periodo') {
-        return view('asesor.avisos.fuera-periodo');
-        }
-        else {
-            return abort(404); // Si la página no existe, lanzamos un 404
+        switch ($pagina) {
+            case 'no-calificaciones':
+                return Inertia::render('asesor/avisos/no-calificacion');
+                
+            case 'calificaciones':
+                return Inertia::render('asesor/calificacion');
+                
+            case 'proyectos-asignados':
+                return redirect()->route('asesor.listar-proyectos');
+                
+            case 'promedio':
+                return Inertia::render('asesor/promedio');
+                
+            case 'fuera-periodo':
+                return Inertia::render('asesor/avisos/fuera-periodo');
+                
+            default:
+                abort(404, 'Página no encontrada');
         }
     }
 
@@ -254,7 +263,7 @@ public function mostrar($pagina)
     
     $tipo = get_class($asesor) == "App\Models\Externo" ? 'externo' : 'asesor';
     
-    return Inertia::render($tipo === 'externo' ? 'externo/HistoricoProyectos' : 'asesor/historico', [
+    return Inertia::render($tipo === 'externo' ? 'externo/historico' : 'asesor/historico', [
         'proyectos' => $proyectos,
         'periodos' => $listaPeriodos,
         'periodoSeleccionado' => $periodoSeleccionado,

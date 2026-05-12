@@ -83,28 +83,28 @@
                             <!-- Estado de calificaciones -->
                             <div class="estado-icons">
                             <!-- Ambos calificaron -->
-                            <template v-if="estudiante.primer?.puntualidad_interno && estudiante.primer?.puntualidad_externo">
+                            <template v-if="estudiante.primer?.promedio_interno && estudiante.primer?.promedio_externo">
                                 <a :href="route('estudiante.impresiones.seguimientos.primer', estudiante.id)" class="download-link" title="Descargar 1° seguimiento">
                                 <img src="/images/UnoSegui.png" width="40" height="65" alt="Descargar">
                                 </a>
                             </template>
                             <template v-else>
                                 <!-- Solo interno calificó -->
-                                <img v-if="estudiante.primer?.puntualidad_interno" 
+                                <img v-if="estudiante.primer?.promedio_interno" 
                                     src="/images/IntSi.png" 
                                     width="65" height="70" 
                                     title="Asesor Interno ya calificó"
                                     class="status-img">
                                 
                                 <!-- Solo externo calificó -->
-                                <img v-if="estudiante.primer?.puntualidad_externo" 
+                                <img v-if="estudiante.primer?.promedio_externo" 
                                     src="/images/ExtSi.png" 
                                     width="65" height="70" 
                                     title="Asesor Externo ya calificó"
                                     class="status-img">
                                 
                                 <!-- Externo pendiente -->
-                                <img v-if="!estudiante.primer?.puntualidad_externo" 
+                                <img v-if="!estudiante.primer?.promedio_externo" 
                                     src="/images/ExtNo.png" 
                                     width="65" height="70" 
                                     title="Asesor Externo no ha calificado"
@@ -117,32 +117,32 @@
                         <!-- Columna: Segundo Seguimiento -->
                         <td class="seguimiento-cell">
                         <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="seguimiento-card">
-                            <div v-if="!estudiante.segundo?.puntualidad_interno" class="seguimiento-action">
+                            <div v-if="!estudiante.segundo?.promedio_interno" class="seguimiento-action">
                             <Link :href="route('realizar-seguimientos', [estudiante.id, 'segundo'])" class="btn-seguimiento">
                                 Dar Seguimiento a {{ estudiante.nombre }}
                             </Link>
                             </div>
                             
                             <div class="estado-icons">
-                            <template v-if="estudiante.segundo?.puntualidad_interno && estudiante.segundo?.puntualidad_externo">
+                            <template v-if="estudiante.segundo?.promedio_interno && estudiante.segundo?.promedio_externo">
                                 <a :href="route('estudiante.impresiones.seguimientos.segundo', estudiante.id)" class="download-link" title="Descargar 2° seguimiento">
                                 <img src="/images/DosSegui.png" width="40" height="65" alt="Descargar">
                                 </a>
                             </template>
                             <template v-else>
-                                <img v-if="estudiante.segundo?.puntualidad_interno" 
+                                <img v-if="estudiante.segundo?.promedio_interno" 
                                     src="/images/IntSi.png" 
                                     width="65" height="70" 
                                     title="Asesor Interno ya calificó"
                                     class="status-img">
                                 
-                                <img v-if="estudiante.segundo?.puntualidad_externo" 
+                                <img v-if="estudiante.segundo?.promedio_externo" 
                                     src="/images/ExtSi.png" 
                                     width="65" height="70" 
                                     title="Asesor Externo ya calificó"
                                     class="status-img">
                                 
-                                <img v-if="!estudiante.segundo?.puntualidad_externo" 
+                                <img v-if="!estudiante.segundo?.promedio_externo" 
                                     src="/images/ExtNo.png" 
                                     width="65" height="70" 
                                     title="Asesor Externo no ha calificado"

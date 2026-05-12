@@ -144,7 +144,41 @@ class ParcialSeeder extends Seeder
 
         $parcial->save(); 
 
-         
+        //nuevo parcial para el estudiante 10
+        $parcial = new Parcial();
+        
+        $parcial->estudiante_id = 10;
+        $parcial->promedio_parcial = 100;
+        $parcial->consecutivo = 1;
+
+
+        $parcial->puntualidad_interno = 10;
+        $parcial->conocimiento_interno = 20;
+        $parcial->equipo_interno = 15;
+        $parcial->dedicado_interno = 20;
+        $parcial->orden_interno = 20;
+        $parcial->mejoras_interno = 15;
+        $parcial->promedio_interno = 100;  
+        $parcial->comentarios_interno = "primer seguimiento asesor interno";   
+        $parcial->califico_interno = '2025-03-27 11:30:00';     
+   
+
+        $parcial->puntualidad_externo = 5;
+        $parcial->equipo_externo = 10;
+        $parcial->iniciativa_externo = 5;
+        $parcial->mejoras_externo = 10;
+        $parcial->objetivos_externo = 15;
+        $parcial->orden_externo = 15;
+        $parcial->liderazgo_externo = 10;  
+        $parcial->conocimiento_externo = 20;
+        $parcial->etico_externo = 10;
+        $parcial->promedio_externo = 100;
+        $parcial->comentarios_externo = "primer seguimiento asesor externo";
+        $parcial->califico_externo = '2025-03-27 11:30:00';  
+
+
+
+        $parcial->save();
 ////////////////
      }
 }

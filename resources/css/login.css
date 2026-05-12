@@ -26,6 +26,43 @@
     max-width: 100%;
     min-height: 450px;
 }
+/* ===== HEADER ===== */
+.app-header {
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-bars {
+  display: flex;
+  height: 6px;
+}
+
+.bar-blue {
+  width: 20%;
+  background-color: var(--primary-medium);
+}
+
+.bar-dark {
+  width: 80%;
+  background-color: var(--primary-dark);
+}
+
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
 /* ===== TEXTO GENERAL DEL CONTENEDOR ===== */
 .container p {

@@ -192,6 +192,61 @@ class CoordinadorController extends Controller
         return view('coordinador.periodo.listar',compact('periodo_id')); 
     }
 
+    public function historico(Request $request)
+    {
+        $coordinador = Auth::getUser()->usa;
+        $carrera_id = session('carrera_id');
+        
+        // Obtener el periodo seleccionado (por defecto null para mostrar todos)
+        $periodoSeleccionado = $request->input('periodo_id');
+        
+        // Construir consulta base
+        $proyectosQuery = Proyecto::with([
+            'asesor',
+            'externo',
+            'empresa',
+            'periodo',
+            'estudiantes' => function($query) {
+                $query->with([
+                    'primer',
+                    'segundo',
+                    'ultimo'
+                ]);
+            }
+        ]);
+        
+        // Aplicar filtro por carrera de la sesión (si existe)
+        if ($carrera_id) {
+            $proyectosQuery->whereHas('estudiantes', function ($q) use ($carrera_id) {
+                $q->where('carrera_id', $carrera_id);
+            });
+        }
+        
+        // Aplicar filtro de periodo si se seleccionó uno
+        if ($periodoSeleccionado) {
+            $proyectosQuery->where('periodo_id', $periodoSeleccionado);
+        }
+        
+        $proyectos = $proyectosQuery->get();
+        
+        // Obtener lista de todos los periodos para el selector
+        $listaPeriodos = Periodo::orderBy('id', 'desc')->get();
+        
+        // Obtener periodo actual para referencia
+        $periodoActual = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'));
+        
+        return Inertia::render('coordinador/historico', [
+            'proyectos' => $proyectos,
+            'periodos' => $listaPeriodos,
+            'periodoSeleccionado' => $periodoSeleccionado,
+            'periodoActual' => $periodoActual,
+            'carreraActual' => session('carrera_id') ? [
+                'id' => session('carrera_id'),
+                'nombre' => session('carrera_nombre')
+            ] : null
+        ]);
+    }
+
     public function estudiante()
     {
         $coordinador = Auth::getUser()->usa;

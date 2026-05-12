@@ -26,12 +26,17 @@ class ConfiguracionSeeder extends Seeder
 
         $nueva = new Configuracion();
         $nueva->variable = "año";
-        $nueva->valor = "2024";
+        $nueva->valor = "2026";
         $nueva->save();
 
         $nueva = new Configuracion();
         $nueva->variable = "periodo_id";
-        $nueva->valor = "2";
+        $nueva->valor = "11";
+        $nueva->save();
+
+        $nueva = new Configuracion();
+        $nueva->variable = "delegado";
+        $nueva->valor = "si";
         $nueva->save();
 
     }

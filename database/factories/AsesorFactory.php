@@ -17,7 +17,13 @@ class AsesorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nombre' => fake()->firstName(),
+            'apellido_paterno' => fake()->lastName(),
+            'apellido_materno' => fake()->lastName(),
+            'correo_electronico' => fake()->unique()->safeEmail(),
+            'profesion' => fake()->jobTitle(),
+            'carrera' => 'Sistemas',
+            'numero_cedula' => fake()->numberBetween(1000000,9999999),
         ];
     }
 }

@@ -14,7 +14,7 @@ class CarreraSeeder extends Seeder
     public function run(): void
     {
         $nueva = new Carrera();
-        $nueva->nombre = "Ingenierias";
+        $nueva->nombre = "Sistemas";
         $nueva->coordinador_id = 2;
         $nueva->save();
 

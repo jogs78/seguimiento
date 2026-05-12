@@ -210,7 +210,7 @@ foreach ($todos as $externo) {
         ->with([
             'empresa',
             'asesor',
-            'estudiantes.carrera.coordinador',  // ← ¡ESTO ES LO QUE FALTA!
+            'estudiantes.carrera.coordinador', 
             'estudiantes.primer',
             'estudiantes.segundo',
             'estudiantes.ultimo'
@@ -235,6 +235,57 @@ foreach ($todos as $externo) {
         'periodo_id' => $periodo_id
     ]);
 }
+
+ public function historico(Request $request)
+    {
+        $externo = Auth::getUser()->usa;
+        
+        // Obtener el periodo seleccionado (por defecto null para mostrar todos)
+        $periodoSeleccionado = $request->input('periodo_id');
+        
+        // Construir consulta base usando whereHas
+        $proyectosQuery = \App\Models\Proyecto::whereHas('externo', function($q) use ($externo) {
+            $q->where('id', $externo->id);
+        });
+        
+        // Aplicar filtro de periodo solo si se seleccionó uno
+        if ($periodoSeleccionado) {
+            $proyectosQuery->where('periodo_id', $periodoSeleccionado);
+        }
+        
+        $proyectos = $proyectosQuery
+            ->with([
+                'empresa',
+                'asesor',
+                'periodo',
+                'estudiantes.carrera.coordinador', 
+                'estudiantes.primer',
+                'estudiantes.segundo',
+                'estudiantes.ultimo'
+            ])
+            ->get();
+        
+        // Procesar coordinadores para cada proyecto
+        foreach ($proyectos as $proyecto) {
+            $coordinadores = [];
+            foreach ($proyecto->estudiantes as $estudiante) {
+                if ($estudiante->carrera && $estudiante->carrera->coordinador) {
+                    $coordinador = $estudiante->carrera->coordinador;
+                    $coordinadores[$coordinador->id] = $coordinador;
+                }
+            }
+            $proyecto->coordinador = !empty($coordinadores) ? reset($coordinadores) : null;
+        }
+        
+        // Obtener lista de todos los periodos para el selector
+        $listaPeriodos = Periodo::orderBy('id', 'desc')->get();
+        
+        return Inertia::render('externo/historico', [
+            'proyectos' => $proyectos,
+            'periodos' => $listaPeriodos,
+            'periodoSeleccionado' => $periodoSeleccionado,
+        ]);
+    }
 
     public function proyecto2()
     {

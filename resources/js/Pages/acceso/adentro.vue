@@ -25,6 +25,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .centro {
   display: flex;
   justify-content: center;

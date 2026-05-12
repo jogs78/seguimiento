@@ -121,6 +121,12 @@ class UsuarioSeeder extends Seeder
         $nuevo->usa_type = "App\Models\Externo";
         $nuevo->save();
 
+        $nuevo = new Usuario();
+        $nuevo->nombre_usuario = "L21270659@tuxtla.tecnm.mx";
+        $nuevo->contraseña = Hash::make('1234');
+        $nuevo->usa_id=10;
+        $nuevo->usa_type = "App\Models\Estudiante";
+        $nuevo->save();
 
     }
 }

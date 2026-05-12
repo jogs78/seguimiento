@@ -78,6 +78,10 @@
                 <i class="fas fa-table"></i>
                 <span>Tabla de Proyectos</span>
               </Link>
+              <Link :href="route('coordinadores.historico')" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Histórico de proyectos</span>
+              </Link>
               <Link :href="route('estudiantes.index')" class="nav-item">
                 <i class="fas fa-users"></i>
                 <span>Lista de Estudiantes</span>
@@ -147,6 +151,10 @@
                 <i class="fas fa-folder-open"></i>
                 <span>Proyectos Asignados</span>
               </Link>
+              <Link :href="route('externo.historico')" class="nav-item">
+              <i class="fas fa-history"></i> 
+              <span>Histórico de Proyectos</span>
+            </Link>
             </div>
           </template>
         </nav>
@@ -247,43 +255,6 @@ const userType = computed(() => {
   background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
 }
 
-/* ===== HEADER ===== */
-.app-header {
-  background: var(--white);
-  box-shadow: var(--shadow-md);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-bars {
-  display: flex;
-  height: 6px;
-}
-
-.bar-blue {
-  width: 20%;
-  background-color: var(--primary-medium);
-}
-
-.bar-dark {
-  width: 80%;
-  background-color: var(--primary-dark);
-}
-
-.header-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
 
 #logo_1 {
   width: 40px;  
@@ -433,8 +404,9 @@ const userType = computed(() => {
 /* ===== SIDEBAR ===== */
 .sidebar {
   width: 280px;
+  
   background: var(--danger-light);
-  min-height: calc(100vh - 140px);
+  min-height: calc(150vh - 140px);
   transition: all var(--transition-normal);
   box-shadow: var(--shadow-md);
   overflow-x: hidden;
@@ -510,6 +482,7 @@ const userType = computed(() => {
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
   min-height: calc(100vh - 200px);
+ 
 }
 
 /* ===== LOADING ===== */

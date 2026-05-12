@@ -1,42 +1,39 @@
 <template>
   <div class="registro-page">
-    <!-- Header fijo -->
-    <header class="header-fixed">
+    <header class="app-header">
       <!-- Barra superior de colores -->
-      <div class="hderecho" style="width: 100%; height: 20px;">
-        <div class="cmenor" style="width: 20%;"></div>
-        <div class="cmayor" style="width: 80%;"></div>
+      <div class="header-bars">
+        <div class="bar-blue"></div>
+        <div class="bar-dark"></div>
       </div>
-
+      
       <!-- Contenido del header -->
-      <div class="header-content">
+      <div class="header-main">
         <div class="header-left">
-          <img 
-            id="logo" 
-            src="../../../../storage/app/public/img/logo.png"
-            alt="Logo"
-            class="logo-img"
-          >
-          <h1 class="header-title">Sistema de Seguimiento</h1>
+    
+          
+          <div class="logo-area">
+            <img id="logo_1" src="/images/logo_tecnm_tuxtla.png"  alt="Logo" >
+            <h2 class="logo-text">Sistema de Seguimiento</h2>
+          </div>
         </div>
         
-        <div class="header-right">
-          <Link href="/" class="nav-link home">
+          <div class="header-actions">
+          <Link :href="route('welcome')" class="nav-link home">
             <i class="fas fa-home"></i>
             <span>Inicio</span>
           </Link>
-          <Link href="/ejemplo" class="nav-link login">
+          <Link :href="route('Inicio_Sesion')" class="nav-link login">
             <i class="fas fa-sign-in-alt"></i>
             <span>Iniciar Sesión</span>
           </Link>
         </div>
+      
       </div>
-
-      <!-- Línea decorativa -->
-      <div class="horizontal">
-        <div class="linea"></div>
-      </div>
+      
+      <div class="header-line"></div>
     </header>
+   
 
     <main class="main-content">
       <div class="container">

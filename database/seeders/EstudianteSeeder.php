@@ -124,6 +124,34 @@ class EstudianteSeeder extends Seeder
         $estudiante->proyecto_id=5;
         $estudiante->carrera_id = 2;
         $estudiante->save(); 
+
+        $estudiante = new Estudiante();
+        $estudiante->nombre = "Jesus Emmanuel"; 
+        $estudiante->apellido_paterno = "Barrios";
+        $estudiante->apellido_materno = "Gutiérrez";
+        $estudiante->correo_electronico = "L20270794@tuxtla.tecnm.mx";
+        $estudiante->numero_de_control = "20270794";
+        $estudiante->telefono = "9614958222";
+        $estudiante->direccion = "2da norte y 2da poniente";
+        $estudiante->institucion_seguridad_social = "IMSS";
+        $estudiante->numero_de_seguridad_social = "2020";
+        $estudiante->proyecto_id=5;
+        $estudiante->carrera_id = 2;
+        $estudiante->save(); 
+
+        $estudiante = new Estudiante();
+        $estudiante->nombre = "Cintia Kimberly"; 
+        $estudiante->apellido_paterno = "Altamirano";
+        $estudiante->apellido_materno = "Cundapi";
+        $estudiante->correo_electronico = "L21270659@tuxtla.tecnm.mx";
+        $estudiante->numero_de_control = "21270659";
+        $estudiante->telefono = "9611951215";//ficticio
+        $estudiante->direccion = "Patria nueva";
+        $estudiante->institucion_seguridad_social = "IMSS";
+        $estudiante->numero_de_seguridad_social = "11234";
+        $estudiante->proyecto_id=12;
+        $estudiante->carrera_id = 1;
+        $estudiante->save();
     }
 
 }

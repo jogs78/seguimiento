@@ -36,8 +36,14 @@ public function index()
      */
     public function create()
     {
+        /*
         $configuraciones = Configuracion::all();
-        return view('configuracion.crear',compact('configuraciones'));
+        return view('configuracion.crear',compact('configuraciones'));*/
+        //con inertia
+        $configuraciones = Configuracion::all();
+        return Inertia::render('configuracion/crear', [
+            'configuraciones' => $configuraciones
+        ]);
     }
 
     /**
@@ -65,7 +71,9 @@ public function index()
      */
     public function edit(Configuracion $configuracion)
     {
-        return view('configuracion.editar',compact("configuracion"));
+        return Inertia::render('configuracion/editar', [
+            'configuracion' => $configuracion
+        ]);
     }
 
     /**

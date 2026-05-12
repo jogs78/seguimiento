@@ -43,55 +43,67 @@ class EstudianteController extends Controller
     }*/
     
     public function index(Request $request)
-    {
-        $buscar = $request->input('buscar');
+{
+    $buscar = $request->input('buscar');
+    $usuario = Auth::user();
+    
+    // Determinar la carrera según el rol del usuario
+    if ($usuario->usa_type === 'App\\Models\\Coordinador') {
+        // Para coordinadores: usar la carrera de la sesión
         $carrera_id = session('carrera_id');
         
-        // Validaciones
         if (!$carrera_id) {
             return redirect()->route('seleccionar.carrera')
                 ->with('error', 'Debes seleccionar una carrera primero');
         }
+    } elseif ($usuario->usa_type === 'App\\Models\\Estudiante') {
+        // Para estudiantes: usar su carrera directamente
+        $estudiante = $usuario->usa;
+        $carrera_id = $estudiante->carrera_id;
         
-        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-        
-        if (!$periodo_id) {
-            return redirect()->back()
-                ->with('error', 'No hay un período configurado');
+        if (!$carrera_id) {
+            return redirect()->route('home')->with('error', 'Tu perfil no tiene una carrera asignada');
         }
-        
-        // Obtener período actual para mostrar en la vista
-        $periodoActual = Periodo::find($periodo_id);
-        
-        // Consulta principal
-        $query = Estudiante::select('estudiantes.*')
-            ->join('proyectos', 'estudiantes.proyecto_id', '=', 'proyectos.id')
-            ->where('proyectos.periodo_id', $periodo_id)
-            ->where('estudiantes.carrera_id', $carrera_id);
-        
-        // Búsqueda
-        if ($buscar) {
-            $query->where(function($q) use ($buscar) {
-                $q->where('estudiantes.nombre', 'like', '%' . $buscar . '%')
-                  ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $buscar . '%')
-                  ->orWhere('estudiantes.apellido_materno', 'like', '%' . $buscar . '%')
-                  ->orWhere(DB::raw("CONCAT(estudiantes.nombre, ' ', estudiantes.apellido_paterno, ' ', estudiantes.apellido_materno)"), 'like', '%' . $buscar . '%');
-            });
-        }
-        
-        // Ordenamiento
-        $query->orderBy('estudiantes.apellido_paterno')
-              ->orderBy('estudiantes.apellido_materno')
-              ->orderBy('estudiantes.nombre');
-        
-        $todos = $query->get();
-        
-        return Inertia::render('estudiante/listar', [
-            'todos' => $todos,
-            'periodoActual' => $periodoActual,
-            'filtroBuscar' => $buscar
-        ]);
+    } else {
+        return redirect()->route('home')->with('error', 'Acceso no autorizado');
     }
+    
+    // Resto del código igual...
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    
+    if (!$periodo_id) {
+        return redirect()->back()->with('error', 'No hay un período configurado');
+    }
+    
+    $periodoActual = Periodo::find($periodo_id);
+    
+    $query = Estudiante::select('estudiantes.*')
+        ->join('proyectos', 'estudiantes.proyecto_id', '=', 'proyectos.id')
+        ->where('proyectos.periodo_id', $periodo_id)
+        ->where('estudiantes.carrera_id', $carrera_id);
+    
+    // Búsqueda
+    if ($buscar) {
+        $query->where(function($q) use ($buscar) {
+            $q->where('estudiantes.nombre', 'like', '%' . $buscar . '%')
+              ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $buscar . '%')
+              ->orWhere('estudiantes.apellido_materno', 'like', '%' . $buscar . '%')
+              ->orWhere(DB::raw("CONCAT(estudiantes.nombre, ' ', estudiantes.apellido_paterno, ' ', estudiantes.apellido_materno)"), 'like', '%' . $buscar . '%');
+        });
+    }
+    
+    $query->orderBy('estudiantes.apellido_paterno')
+          ->orderBy('estudiantes.apellido_materno')
+          ->orderBy('estudiantes.nombre');
+    
+    $todos = $query->get();
+    
+    return Inertia::render('estudiante/listar', [
+        'todos' => $todos,
+        'periodoActual' => $periodoActual,
+        'filtroBuscar' => $buscar
+    ]);
+}
 
    public function buscarEstudiante(Request $request)
 {
@@ -195,7 +207,9 @@ class EstudianteController extends Controller
     {
         //MOSTRAR EL FORMULARIO PARA EDITAR UN ESTUDIANTE
         if( ! Gate::allows('update',$estudiante)){
-            return view('estudiante.aviso.no-autorizado');
+            //con inertia
+            return Inertia::render('estudiante/avisos/no-autorizado');
+            //return view('estudiante.aviso.no-autorizado');
         }
 
         //return view('estudiante.editar',compact("estudiante"));
@@ -212,7 +226,9 @@ class EstudianteController extends Controller
     {
     
         if( ! Gate::allows('update',$estudiante)){
-            return view('estudiante.aviso.no-autorizado');
+            //con inertia
+            return Inertia::render('estudiante/avisos/no-autorizado');
+            //return view('estudiante.aviso.no-autorizado');
         }
         //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
         $estudiante->fill($request->all());
@@ -282,16 +298,26 @@ class EstudianteController extends Controller
             return view('estudiante.alta-proyecto');
         } 
         elseif ($pagina == 'fuera-periodo') {
-            return view('asesor.avisos.fuera-periodo');
+            //con inertia            
+            return Inertia::render('asesor/avisos/fuera-periodo');
+            
         }
         elseif ($pagina == 'no-calificacion') {
-            return view('estudiante.avisos.no-calificacion');
+            //con inertia
+            return Inertia::render('asesor/avisos/no-calificacion');
+           
         }
         elseif ($pagina == 'calificacion') {
-            return view('estudiante.calificacion');
+            //con inertia
+             return Inertia::render('asesor/calificacion');
+            
+            
         }
         elseif ($pagina == 'no-promedio') {
-            return view('estudiante.avisos.no-promedio');
+            //con inertia
+             return Inertia::render('estudiante/avisos/no-promedio');
+            //return view('estudiante.avisos.no-promedio');
+          
         }
         elseif ($pagina == 'si-promedio') {
             return view('estudiante.avisos.si-promedio');

@@ -164,6 +164,20 @@ principal optimizar y agilizar los trámites necesarios";
         $proyecto->periodo_id = 1;
         $proyecto->save(); 
 
+        $proyecto = new Proyecto();
+        $proyecto->id = 12;
+        $proyecto->nombre = "Sistema Para el Seguimiento de Residencias";
+        $proyecto->objetivo_general = "Desarrollar e implementar un sistema web integral para el seguimiento y gestión de residencias profesionales de la institución.";
+        $proyecto->lugar = "Tecnológico Nacional de México Campus Tuxtla Gutiérrez";
+        $proyecto->informacion = "contacto@ittg.edu.mx";
+        $proyecto->justificacion = "Continuación y mejora del desarrollo del sistema para el control del proceso administrativo de seguimiento a las 
+residencias en el Instituto Tecnológico de Tuxtla Gutiérrez";
+        $proyecto->origen = "Propuesta propia";
+        $proyecto->asesor_id = 1;
+        $proyecto->empresa_id = 1;
+        $proyecto->externo_id = 1;
+        $proyecto->periodo_id = 11;
+        $proyecto->save(); 
 
     }
 }

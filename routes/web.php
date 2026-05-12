@@ -33,7 +33,7 @@ use Inertia\Inertia;
 
 Route::get('/ejemplo',function(){
     return Inertia::render('acceso/formulario');
-});
+})->name('Inicio_Sesion');
 
 Route::get('/ejemplodos',function(){
     return Inertia::render('estudiante/crear');
@@ -118,6 +118,8 @@ Route::get('/buscar-proyectos', [ProyectoController::class, 'buscar'])->name('pr
 Route::get('listar-proyectos',[AsesorController::class,'proyecto'])->middleware('auth')->name('asesor.listar-proyectos');
 
 Route::get('historico', [AsesorController::class, 'historico'])->name('asesor.historico');
+Route::get('historico-externo', [ExternoController::class, 'historico'])->name('externo.historico');
+Route::get('/coordinador/historico', [CoordinadorController::class, 'historico'])->name('coordinadores.historico');
 
 //rutas especificas del asesor Externo
 Route::get('lista-de-proyectos',[ExternoController::class,'proyecto'])->middleware('auth')->name('externo.lista-de-proyectos');

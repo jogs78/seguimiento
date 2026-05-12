@@ -25,7 +25,7 @@ class AccesoController extends Controller
 
     //  Cambiar contraseña
     public function cambio(){
-        return Inertia::render('acceso/cambiar-contrasena'); // ← minúsculas, con guiones
+        return Inertia::render('acceso/cambiar-contrasenia'); 
     }
 
     //  Home después del login
@@ -72,7 +72,7 @@ class AccesoController extends Controller
          return view('acceso.adentro', compact('tieneProyecto'));
      }
 */
-    //return view('acceso.adentro');
+    //return view('acceso.adentro');  return Inertia::render('acceso/adentro');//ruta para Inertia
     return Inertia::render('acceso/adentro');
     }
 

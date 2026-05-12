@@ -85,26 +85,39 @@ class ProyectoController extends Controller
             ->get();
 
         $asesores = Asesor::all();
+        //con inertia
+        return Inertia::render('coordinador/tabla', [
+            'proyectos' => $proyectos,
+            'asesores' => $asesores,
+            'filtroBuscarEstudiante' => $buscarEstudiante,
+            'filtroBuscarProyecto' => $buscarProyecto,
+            'filtroBuscarAsesor' => $buscarAsesor,
+            'filtroBuscarEmpresa' => $buscarEmpresa
+        ]);
 
-        return view('coordinador.tabla', compact('proyectos', 'asesores'));
+        //return view('coordinador.tabla', compact('proyectos', 'asesores'));
     }
 
     public function sugerencias(Request $request)
-    {
-        $query = $request->input('query');
-        $carrera_id = session('carrera_id');
-        
-        if (!$carrera_id) {
-            return response()->json([]);
-        }
-
-        $estudiantes = Estudiante::where('carrera_id', $carrera_id)
-            ->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$query}%"])
-            ->limit(10)
-            ->pluck(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) as nombre_completo"));
-
-        return response()->json($estudiantes);
+{
+    $query = $request->input('query');
+    $carrera_id = session('carrera_id');
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    
+    if (!$carrera_id) {
+        return response()->json([]);
     }
+
+    $estudiantes = Estudiante::where('carrera_id', $carrera_id)
+        ->whereHas('proyecto', function($q) use ($periodo_id) {  // ← Opcional: filtrar por periodo
+            $q->where('periodo_id', $periodo_id);
+        })
+        ->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$query}%"])
+        ->limit(10)
+        ->pluck(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) as nombre_completo"));
+
+    return response()->json($estudiantes);
+}
 
     public function sugerenciasEmpresa(Request $request)
     {
@@ -315,7 +328,11 @@ class ProyectoController extends Controller
      */
     public function edit(Proyecto $proyecto)
     {
-        return view('proyecto.editar',compact("proyecto"));
+        //con inertia
+        return Inertia::render('proyecto/editar', [
+            'proyecto' => $proyecto
+        ]);
+        //return view('proyecto.editar',compact("proyecto"));
     }
 
     /**
@@ -325,7 +342,9 @@ class ProyectoController extends Controller
     {
         Log::channel('debug')->info('checar');
         if (! Gate::allows('update',$proyecto)){
-            return view('estudiante.aviso.no-autorizado');
+            //con inertia
+            return Inertia::render('estudiante/avisos/no-autorizado');
+            //return view('estudiante.aviso.no-autorizado');
 
         }
         //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
@@ -382,7 +401,14 @@ class ProyectoController extends Controller
         $empresas = Empresa::all();
         $externos = Externo::all();
         $periodo = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'));
-        return view('proyecto.crear', compact('asesores','empresas','periodo','externos'));
+        //con inertia
+        //return view('proyecto.crear', compact('asesores','empresas','periodo','externos'));
+        return Inertia::render('proyecto/crear', [
+            'asesores' => $asesores,
+            'empresas' => $empresas,
+            'periodo' => $periodo,
+            'externos' => $externos
+        ]);
 
     }
 

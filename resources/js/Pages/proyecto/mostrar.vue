@@ -43,6 +43,12 @@
             <p class="parrafo">Periodo:</p>
             <p class="llenar">{{ proyecto.periodo?.nombre || 'Sin periodo' }}</p>
           </div>
+           
+          <div class="horizontal">
+          <Link :href="route('proyectos.edit', proyecto.id)" class="boton">
+            Editar proyecto
+          </Link>
+        </div>
         </div>
 
         <!-- Actividades -->

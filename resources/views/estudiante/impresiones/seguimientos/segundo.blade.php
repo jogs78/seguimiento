@@ -14,6 +14,10 @@
 </head>
 <body>
     <table style="justify-content: center; width: 100%;">
+        @php
+        $delegado = App\Models\Configuracion::where('variable', 'delegado')->first();
+        $delegadoActivo = $delegado && $delegado->valor === 'si';
+        @endphp
         <thead>
             <th>
                 <img src="img/logo.png" style="width: 40px; height: 35px;"/>
@@ -139,11 +143,38 @@
     </div>
     <p>Observaciones: </p><p>{{$segundo->comentarios_externo}}</p>
     <table class="tabla">
+      
+        <!--  en caso de que el asesor externo sea delegado a el interno, se puede omitir los datos del asesor externo y colocar solo el sello de la empresa, organismo o dependencia. -->
+        @if($delegadoActivo)
         <tr>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{$estudiante->proyecto->externo->nombre}} {{$estudiante->proyecto->externo->apellido_paterno}} {{$estudiante->proyecto->externo->apellido_materno}} <br> Nombre y firma asesor externo</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">Sello de la empresa, organismo o dependencia</th>
-            <th style="width: 33.33%; height: 30px;  vertical-align: bottom;" class="cuadro dato">{{ \Carbon\Carbon::parse($segundo->califico_externo)->format('Y-m-d') }}  <br> Fecha de Evaluación</th>
+            <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                <br> Nombre y firma asesor externo
+            </th>
+            <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                Sello de la empresa, organismo o dependencia
+            </th>
+            <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                {{ $segundo->califico_externo ? \Carbon\Carbon::parse($segundo->califico_externo)->format('Y-m-d') : 'No fechado' }}  
+                <br> Fecha de Evaluación
+            </th>
         </tr>
+        @else
+            <tr>
+                <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                    {{ $estudiante->proyecto->externo->nombre ?? 'N/A' }} 
+                    {{ $estudiante->proyecto->externo->apellido_paterno ?? '' }} 
+                    {{ $estudiante->proyecto->externo->apellido_materno ?? '' }} 
+                    <br> Nombre y firma asesor externo
+                </th>
+                <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                    Sello de la empresa, organismo o dependencia
+                </th>
+                <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
+                    {{ $segundo->califico_externo ? \Carbon\Carbon::parse($segundo->califico_externo)->format('Y-m-d') : 'No fechado' }}  
+                    <br> Fecha de Evaluación
+                </th>
+            </tr>
+        @endif
     </table>
     <p>Evaluación por el Asesor Interno:</p>
     <div class="cuadro">
