@@ -158,7 +158,11 @@ foreach ($todos as $externo) {
      */
     public function edit(Externo $externo)
     {
-        return view('externo.editar',compact("externo"));
+
+        //return view('externo.editar',compact("externo"));
+        return Inertia::render('externo/editar', [
+            'externo' => $externo
+        ]);
     }
 
     /**
