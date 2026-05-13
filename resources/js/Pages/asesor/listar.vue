@@ -2,10 +2,36 @@
   <AppLayout>
     <div class="bodydiv">
       <!-- Barra de búsqueda -->
-      <div class="search-container"><!-- ... --></div>
+      <div class="search-container">
+        <form @submit.prevent="buscarAsesores" class="search-form">
+          <input
+            type="text"
+            v-model="terminoBusqueda"
+            placeholder="Buscar por nombre, apellidos o correo"
+            class="input-buscar"
+            autocomplete="off"
+            @input="onSearchInput"
+          />
+          <button type="submit" class="btn-buscar">Buscar</button>
+        </form>
+        
+        <!-- Sugerencias -->
+        <div v-if="sugerencias.length > 0" class="sugerencias">
+          <div
+            v-for="sugerencia in sugerencias"
+            :key="sugerencia.id"
+            class="sugerencia-item"
+            @click="seleccionarSugerencia(sugerencia.value)"
+          >
+            {{ sugerencia.value }}
+          </div>
+        </div>
+      </div>
 
       <!-- Título -->
-      <div class="horizontal"><p class="subtitulo">Asesores Internos Registrados</p></div>
+      <div class="horizontal">
+        <p class="subtitulo">Asesores Internos Registrados</p>
+      </div>
 
       <!-- Tabla -->
       <div style="margin-bottom: 40px" class="centro">
@@ -56,14 +82,21 @@
                 </div>
               </td>
             </tr>
+            <tr v-if="todos.length === 0">
+              <td colspan="5" class="sin-datos">No hay asesores registrados</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Botones de acción -->
       <div class="acciones">
-        
+        <Link :href="route('asesores.create')" class="btn-agregar">
+          <i class="fas fa-plus"></i>
+          Agregar Asesor
+        </Link>
         <a :href="route('generar-asesores.excel')" class="btn-descargar">
+          <i class="fas fa-download"></i>
           Descargar lista
         </a>
       </div>
@@ -85,7 +118,6 @@
                 <th>Nombre del Proyecto</th>
                 <th>Empresa</th>
                 <th>Estudiantes</th>
-               
               </tr>
             </thead>
             <tbody>
@@ -99,7 +131,6 @@
                   </div>
                   <span v-if="!proyecto.estudiantes?.length" class="sin-datos">Sin estudiantes</span>
                 </td>
-                
               </tr>
             </tbody>
           </table>
@@ -118,14 +149,19 @@ import { ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 import axios from 'axios'
-
-
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   todos: Array,
   filtroBuscar: String,
   flash: Object
 })
+
+// Estado reactivo
+const terminoBusqueda = ref(props.filtroBuscar || '')
+const sugerencias = ref([])
+const eliminando = ref(null)
+let timeoutSugerencias = null
 
 // Estado para el modal
 const modalVisible = ref(false)
@@ -142,12 +178,6 @@ const cerrarModal = () => {
   modalVisible.value = false
   asesorSeleccionado.value = null
 }
-
-// Estado reactivo
-const terminoBusqueda = ref(props.filtroBuscar || '')
-const sugerencias = ref([])
-const eliminando = ref(null)
-let timeoutSugerencias = null
 
 // Método para buscar asesores
 const buscarAsesores = () => {
@@ -231,144 +261,10 @@ if (props.flash?.error) {
 </script>
 
 <style scoped>
-
-.btn-ver-proyectos {
-  background-color: #050E3C;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.btn-ver-proyectos:hover {
-  background-color: #0a1a6e;
-}
-
-.sin-proyectos {
-  color: #999;
-  font-style: italic;
-  font-size: 12px;
-}
-
-/* MODAL */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-container {
-  background-color: white;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 900px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #ddd;
-  background-color: #050E3C;
-  color: white;
-  border-radius: 8px 8px 0 0;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.modal-close:hover {
-  color: #ffd700;
-}
-
-.modal-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.modal-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.modal-table th,
-.modal-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-}
-
-.modal-table th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.estudiante-item {
-  font-size: 12px;
-  margin-bottom: 3px;
-}
-
-.btn-ver-proyecto {
-  background-color: rgb(25, 118, 210);
-  color: white;
-  text-decoration: none;
-  padding: 4px 8px;
-  border-radius: 3px;
-  font-size: 12px;
-}
-
-.btn-ver-proyecto:hover {
-  background-color: rgb(74, 139, 204);
-}
-
-.modal-footer {
-  padding: 15px 20px;
-  border-top: 1px solid #ddd;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.btn-cerrar {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-cerrar:hover {
-  background-color: #5a6268;
-}
-
 .bodydiv {
   margin-left: 20px;
   margin-right: 20px;
+  padding: 20px;
 }
 
 /* Barra de búsqueda */
@@ -442,6 +338,7 @@ if (props.flash?.error) {
   font-size: 32px;
   font-weight: bold;
   margin: 20px 0;
+  color: #050E3C;
 }
 
 .centro {
@@ -454,7 +351,7 @@ if (props.flash?.error) {
   border: 2px solid rgb(19, 46, 68);
   border-collapse: collapse;
   margin-top: 20px;
-  width: 80%;
+  width: 90%;
 }
 
 .asesores-table th,
@@ -473,6 +370,12 @@ if (props.flash?.error) {
   color: #999;
 }
 
+.sin-proyectos {
+  color: #999;
+  font-style: italic;
+  font-size: 12px;
+}
+
 .proyecto-asignado {
   margin-top: 8px;
   font-size: 12px;
@@ -480,10 +383,6 @@ if (props.flash?.error) {
   background: #f5f5f5;
   padding: 5px;
   border-radius: 4px;
-}
-
-.proyecto-asignado strong {
-  color: #050E3C;
 }
 
 /* Botones */
@@ -506,23 +405,32 @@ if (props.flash?.error) {
   background-color: rgb(210, 25, 25);
   color: white;
   cursor: pointer;
-  text-decoration: none;
   padding: 5px 12px;
   border-radius: 4px;
   border: none;
   width: 100%;
+  margin-top: 5px;
 }
 
 .btn-borrar:hover {
   background-color: rgb(204, 74, 74);
 }
 
-.btn-borrar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.btn-ver-proyectos {
+  background-color: #050E3C;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
 }
 
-/* Acciones */
+.btn-ver-proyectos:hover {
+  background-color: #0a1a6e;
+}
+
+/* Acciones principales */
 .acciones {
   display: flex;
   justify-content: center;
@@ -531,19 +439,146 @@ if (props.flash?.error) {
   margin-bottom: 40px;
 }
 
-.btn-agregar,
+.btn-agregar {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  text-decoration: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-agregar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  text-decoration: none;
+  color: white;
+}
+
 .btn-descargar {
   background-color: rgb(25, 118, 210);
   color: white;
   text-decoration: none;
-  padding: 8px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-.btn-agregar:hover,
 .btn-descargar:hover {
   background-color: rgb(74, 139, 204);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: white;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  background-color: #050E3C;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-table th,
+.modal-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.modal-table th {
+  background-color: #f5f5f5;
+}
+
+.estudiante-item {
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cerrar {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-container {
+    width: 95%;
+  }
+  
+  .acciones {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 </style>
