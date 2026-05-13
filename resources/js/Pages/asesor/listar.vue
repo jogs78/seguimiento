@@ -149,7 +149,7 @@ import { ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 import axios from 'axios'
-import Swal from 'sweetalert2'
+
 
 const props = defineProps({
   todos: Array,

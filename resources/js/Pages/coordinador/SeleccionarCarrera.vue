@@ -1,30 +1,38 @@
 <template>
   <div class="page-wrapper">
     <!-- Encabezado con barras de colores -->
-    <header class="page-header">
-      <div class="hderecho" style="width: 100%; height: 20px;">
-        <div class="cmenor" style="width: 20%;"></div>
-        <div class="cmayor" style="width: 80%;"></div>
+    <header class="app-header">
+      <!-- Barra superior de colores -->
+      <div class="header-bars">
+        <div class="bar-blue"></div>
+        <div class="bar-dark"></div>
       </div>
       
-      <div class="header-content">
+      <!-- Contenido del header -->
+      <div class="header-main">
         <div class="header-left">
-          <img src="/storage/img/logo.png" alt="Logo" class="header-logo">
-          <h2 class="header-title">Sistema de Seguimiento</h2>
+    
+          
+          <div class="logo-area">
+            <img id="logo_1" src="/images/logo_tecnm_tuxtla.png"  alt="Logo" >
+            <h2 class="logo-text">Sistema de Seguimiento</h2>
+          </div>
         </div>
-        <div class="header-right">
-          <Link href="/" class="header-link home-link">
-            <i class="fas fa-home"></i> Inicio
+        
+          <div class="header-actions">
+          <Link :href="route('welcome')" class="header-btn btn-home">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
           </Link>
-          <Link class="header-link logout-link" :href="route('salida')" >
-            <i class="fas fa-sign-out-alt"></i> Salir
+          <Link :href="route('salida')" class="header-btn btn-logout">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Cerrar Sesión</span>
           </Link>
         </div>
+      
       </div>
       
-      <div class="horizontal">
-        <div class="linea"></div>
-      </div>
+      <div class="header-line"></div>
     </header>
 
     <!-- Contenido principal -->
@@ -88,7 +96,7 @@
     <!-- Footer -->
     <footer class="page-footer">
       <div class="footer-content">
-        <p>&copy; 2024 Sistema de Seguimiento a Residencias. Todos los derechos reservados.</p>
+        <p>&copy; 2026 Sistema de Seguimiento a Residencias.</p>
       </div>
     </footer>
   </div>

@@ -24,26 +24,38 @@ class AsesoresExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     }
 
     public function collection()
-    {
-        $query = Asesor::select(
-            'nombre', 
-            'apellido_paterno', 
-            'apellido_materno', 
-            'correo_electronico', 
-            'profesion', 
-            'carrera', 
-            'numero_cedula'
-        );
-
-        // Aplicar filtro por carrera si existe
-        if ($this->carrera_id) {
-            $query->whereHas('carreras', function($q) {
-                $q->where('carrera_id', $this->carrera_id);
-            });
-        }
-
-        return $query->get();
+{
+    $query = Asesor::join('asesor_carrera', 'asesores.id', '=', 'asesor_carrera.asesor_id')
+        ->join('carreras', 'asesor_carrera.carrera_id', '=', 'carreras.id')
+        ->select(
+            'asesores.id',
+            'asesores.nombre',
+            'asesores.apellido_paterno',
+            'asesores.apellido_materno',
+            'asesores.correo_electronico',
+            'asesores.profesion',
+            'asesores.numero_cedula',
+            'carreras.nombre as carrera_nombre'
+        )
+        ->distinct();
+    
+    if ($this->carrera_id) {
+        $query->where('asesor_carrera.carrera_id', $this->carrera_id);
     }
+    
+    return $query->get();
+}
+
+public function map($asesor): array
+{
+    return [
+        $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
+        $asesor->correo_electronico,
+        $asesor->profesion,
+        $asesor->carrera_nombre ?? 'Sin carrera',
+        $asesor->numero_cedula,
+    ];
+}
 
     public function headings(): array
     {
@@ -56,16 +68,7 @@ class AsesoresExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
         ];
     }
 
-    public function map($asesor): array
-    {
-        return [
-            $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
-            $asesor->correo_electronico,
-            $asesor->profesion,
-            $asesor->carrera,
-            $asesor->numero_cedula,
-        ];
-    }
+    
 
     public function styles(Worksheet $sheet)
     {

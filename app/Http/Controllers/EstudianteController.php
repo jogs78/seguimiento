@@ -151,6 +151,8 @@ class EstudianteController extends Controller
       //return view('estudiante.crear',compact('carreras'));
        return Inertia::render('estudiante/crear', [
         'carreras' => $carreras,
+         'auth' => auth()->check(), // Pasar estado de autenticación
+        'user' => auth()->user(),   // Pasar usuario si está autenticado
     ]);
         
     }

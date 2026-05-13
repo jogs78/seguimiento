@@ -28,12 +28,9 @@
         </div>
       </div>
 
-      <!-- Título con período actual -->
+      <!-- Título -->
       <div class="horizontal" style="margin-top: 20px">
-        <p class="subtitulo">
-          Asesores Externos del período 
-          <span class="periodo-nombre">{{ periodoActual?.nombre || 'Actual' }}</span>
-        </p>
+        <p class="subtitulo">Asesores Externos Registrados</p>
       </div>
 
       <!-- Tabla -->
@@ -79,6 +76,7 @@
               </td>
               <td style="padding: 5px">
                 <div v-if="!externo.usuario || externo.usuario?.nombre_usuario === 'Sin cuenta'">
+
                   <form @submit.prevent="crearCuenta(externo.id)">
                     <button type="submit" class="btn-crear-cuenta" :disabled="creandoCuenta === externo.id">
                       {{ creandoCuenta === externo.id ? '...' : 'Crear Cuenta' }}
@@ -93,7 +91,7 @@
             
             <tr v-if="todos.length === 0">
               <td colspan="5" class="sin-datos">
-                No hay asesores externos registrados en el período actual
+                No hay asesores externos registrados
               </td>
             </tr>
           </tbody>
@@ -102,12 +100,9 @@
 
       <!-- Botones de acción -->
       <div class="acciones">
-        
         <a :href="route('imprimir-externos.excel')" class="btn-descargar">
           Descargar lista
         </a>
-
-        
       </div>
     </div>
   </AppLayout>
@@ -122,7 +117,6 @@ import axios from 'axios'
 
 const props = defineProps({
   todos: Array,
-  periodoActual: Object,
   filtroBuscar: String,
   flash: Object
 })
@@ -237,6 +231,7 @@ if (props.flash?.error) {
 .bodydiv {
   margin-left: 20px;
   margin-right: 20px;
+  padding: 20px;
 }
 
 /* Barra de búsqueda */
@@ -310,16 +305,7 @@ if (props.flash?.error) {
   font-size: 32px;
   font-weight: bold;
   margin: 20px 0;
-}
-
-.periodo-nombre {
-  background: linear-gradient(135deg, #050E3C 0%, #0a1a6e 100%);
-  color: white;
-  padding: 4px 15px;
-  border-radius: 25px;
-  font-size: 24px;
-  display: inline-block;
-  margin-left: 10px;
+  color: #050E3C;
 }
 
 .centro {
@@ -332,7 +318,7 @@ if (props.flash?.error) {
   border: 2px solid rgb(19, 46, 68);
   border-collapse: collapse;
   margin-top: 20px;
-  width: 90%;
+  width: 95%;
 }
 
 .externos-table th,
@@ -397,7 +383,7 @@ if (props.flash?.error) {
 }
 
 .btn-borrar:hover {
-  background-color: rgb(204, 74, 74);
+  background-color: rgb(204, 74,  talagsa74);
 }
 
 .btn-borrar:disabled,
@@ -433,13 +419,36 @@ if (props.flash?.error) {
   background-color: rgb(25, 118, 210);
   color: white;
   text-decoration: none;
-  padding: 8px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
 .btn-descargar:hover {
   background-color: rgb(74, 139, 204);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .externos-table {
+    font-size: 12px;
+    width: 100%;
+  }
+  
+  .acciones {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .subtitulo {
+    font-size: 24px;
+  }
 }
 </style>
