@@ -24,7 +24,13 @@ class ActividadController extends Controller
 
         }
         $todos = $proyecto->actividades;
-        return view('proyecto.mostrar',compact('todos','proyecto'));
+
+      
+        //con inertia
+        return Inertia::render('proyecto/mostrar', [
+            'todos' => $todos,
+            'proyecto' => $proyecto
+        ]);
 
     }
 
@@ -33,9 +39,22 @@ class ActividadController extends Controller
      */
       public function create(Proyecto $proyecto)
     {
-        // Obtener los órdenes existentes para este proyecto
+        // Obtener los órdenes existentes (pueden ser múltiples)
         $ordenesExistentes = Actividad::where('proyecto_id', $proyecto->id)
-            ->pluck('orden')
+            ->get()
+            ->flatMap(function($actividad) {
+                // Si el orden contiene comas, dividirlo en múltiples órdenes
+                if (str_contains($actividad->orden, ',')) {
+                    return array_map('trim', explode(',', $actividad->orden));
+                }
+                return [$actividad->orden];
+            })
+            ->map(function($orden) {
+                return (int) $orden;
+            })
+            ->unique()
+            ->sort()
+            ->values()
             ->toArray();
         
         return Inertia::render('actividad/crear', [
@@ -54,33 +73,41 @@ class ActividadController extends Controller
             'actividades.*.nombre' => 'required|string|max:255',
             'actividades.*.descripcion' => 'required|string',
             'actividades.*.semanas' => 'required|integer|min:1',
-            'actividades.*.orden' => 'required|integer|min:1',
+            'actividades.*.orden' => 'required|string', // Cambiado a string
         ]);
         
-        // Verificar que no haya órdenes duplicados
-        $ordenes = collect($request->actividades)->pluck('orden')->toArray();
-        if (count($ordenes) !== count(array_unique($ordenes))) {
-            return redirect()->back()->withErrors(['error' => 'No puede haber dos actividades con el mismo orden']);
-        }
-        
-        // Verificar que los órdenes no estén ya ocupados en la BD
-        $ordenesExistentes = Actividad::where('proyecto_id', $proyecto->id)
-            ->whereIn('orden', $ordenes)
-            ->pluck('orden')
-            ->toArray();
-        
-        if (!empty($ordenesExistentes)) {
-            return redirect()->back()->withErrors(['error' => 'El orden ' . implode(', ', $ordenesExistentes) . ' ya está ocupado']);
-        }
-        
-        // Crear todas las actividades
+        // Procesar cada actividad
         foreach ($request->actividades as $actividadData) {
+            $orden = $actividadData['orden'];
+            
+            // Verificar que el formato del orden sea válido
+            $ordenes = $this->parseOrden($orden);
+            
+            if (empty($ordenes)) {
+                return redirect()->back()->withErrors(['error' => "El orden '$orden' no es válido"]);
+            }
+            
+            // Verificar que los órdenes no estén ya ocupados
+            $ordenesExistentes = Actividad::where('proyecto_id', $proyecto->id)
+                ->get()
+                ->flatMap(function($act) {
+                    return $this->parseOrden($act->orden);
+                })
+                ->toArray();
+            
+            $ordenesOcupados = array_intersect($ordenes, $ordenesExistentes);
+            
+            if (!empty($ordenesOcupados)) {
+                return redirect()->back()->withErrors(['error' => "Los órdenes " . implode(', ', $ordenesOcupados) . " ya están ocupados"]);
+            }
+            
+            // Guardar la actividad
             Actividad::create([
                 'proyecto_id' => $proyecto->id,
                 'nombre' => $actividadData['nombre'],
                 'descripcion' => $actividadData['descripcion'],
                 'semanas' => $actividadData['semanas'],
-                'orden' => $actividadData['orden'],
+                'orden' => $orden,
             ]);
         }
         
@@ -91,21 +118,39 @@ class ActividadController extends Controller
     /**
      * Verificar si un orden está disponible
      */
-    public function verificarOrden(Request $request, Proyecto $proyecto)
+     public function verificarOrden(Request $request, Proyecto $proyecto)
     {
         $orden = $request->input('orden');
-        $actividadId = $request->input('actividad_id'); // Para edición, ignorar la propia actividad
+        $actividadId = $request->input('actividad_id');
         
-        $query = Actividad::where('proyecto_id', $proyecto->id)
-            ->where('orden', $orden);
+        // Parsear el orden (puede ser múltiple como "4,7")
+        $ordenes = $this->parseOrden($orden);
+        
+        if (empty($ordenes)) {
+            return response()->json(['disponible' => false, 'error' => 'Orden inválido']);
+        }
+        
+        // Obtener órdenes ocupados en el proyecto
+        $query = Actividad::where('proyecto_id', $proyecto->id);
         
         if ($actividadId) {
             $query->where('id', '!=', $actividadId);
         }
         
-        $existe = $query->exists();
+        $ordenesOcupados = $query->get()
+            ->flatMap(function($act) {
+                return $this->parseOrden($act->orden);
+            })
+            ->toArray();
         
-        return response()->json(['disponible' => !$existe]);
+        $ordenesConflictivas = array_intersect($ordenes, $ordenesOcupados);
+        $disponible = empty($ordenesConflictivas);
+        
+        return response()->json([
+            'disponible' => $disponible,
+            'ordenes_ocupados' => $ordenesOcupados,
+            'ordenes_conflictivas' => $ordenesConflictivas
+        ]);
     }
     /**
      * Display the specified resource.
@@ -121,21 +166,83 @@ class ActividadController extends Controller
     public function edit(Proyecto $proyecto, Actividad $actividad, $actividadId)
     {   
        $actividad = Actividad::find($actividadId);
-        return view('actividad.editar',compact("actividad","proyecto"));
+       return Inertia::render('actividad/editar', [
+            'proyecto' => $proyecto,
+            'actividad' => $actividad
+        ]);
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateActividadRequest $request, Proyecto $proyecto, Actividad $actividad, $actividadId)
+    public function update(Request $request, Proyecto $proyecto, $actividadId)
     {
-        $proyecto = Proyecto::with('actividades')->find($proyecto->id);
-        $actividad = Actividad::find($actividadId);
-        $actividad->fill($request->all());
-        $actividad->save();
-        return redirect()->route("proyectos.actividades.index",$proyecto->id);
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'semanas' => 'required|integer|min:1',
+            'orden' => 'required|string',
+        ]);
+        
+        $actividad = Actividad::findOrFail($actividadId);
+        $nuevoOrden = $request->orden;
+        
+        // Parsear el nuevo orden
+        $nuevasOrdenes = $this->parseOrden($nuevoOrden);
+        
+        if (empty($nuevasOrdenes)) {
+            throw ValidationException::withMessages([
+                'orden' => "El orden '$nuevoOrden' no es válido"
+            ]);
+        }
+        
+        // Obtener todos los órdenes ocupados por otras actividades
+        $ordenesOcupados = Actividad::where('proyecto_id', $proyecto->id)
+            ->where('id', '!=', $actividad->id)
+            ->get()
+            ->flatMap(function($act) {
+                return $this->parseOrden($act->orden);
+            })
+            ->toArray();
+        
+        $ordenesConflictivas = array_intersect($nuevasOrdenes, $ordenesOcupados);
+        
+        if (!empty($ordenesConflictivas)) {
+            throw ValidationException::withMessages([
+                'orden' => "Los órdenes " . implode(', ', $ordenesConflictivas) . " ya están ocupados por otras actividades"
+            ]);
+        }
+        
+        $actividad->update($request->all());
+        
+        return redirect()->route("proyectos.actividades.index",$proyecto->id) ->with('success', 'Actividad actualizada correctamente');
+   
     }
 
+    /**
+     * Parsea un string de órdenes (ej: "4,7" => [4,7])
+     */
+    private function parseOrden($orden)
+    {
+        if (empty($orden)) {
+            return [];
+        }
+        
+        // Si es solo un número
+        if (is_numeric($orden)) {
+            return [(int) $orden];
+        }
+        
+        // Si contiene comas, dividir y limpiar
+        if (str_contains($orden, ',')) {
+            $ordenes = array_map('trim', explode(',', $orden));
+            $ordenes = array_filter($ordenes, 'is_numeric');
+            return array_map('intval', $ordenes);
+        }
+        
+        return [];
+    }
     /**
      * Remove the specified resource from storage.
      */

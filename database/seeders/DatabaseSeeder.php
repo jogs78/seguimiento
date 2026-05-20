@@ -31,12 +31,13 @@ class DatabaseSeeder extends Seeder
             ProyectoSeeder::class,
             ActividadSeeder::class,
             EstudianteSeeder::class,
+
             //PrimeroSeeder::class,
             //SeguimientoSeeder::class,
             //SegundoSeeder::class,
             //UltimoSeeder::class,
             UsuarioSeeder::class,
-            
+            TipoDocumentoSeeder::class,
             ParcialSeeder::class,
             //finales
         ]);

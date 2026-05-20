@@ -63,5 +63,10 @@ class Estudiante extends Model
         //Parcial tiene estudiante_id
         return $this->hasOne(Ultimo::class);
     }
+
+    public function documentos()
+    {
+        return $this->hasMany(DocumentoEstudiante::class);
+    }
     
 }

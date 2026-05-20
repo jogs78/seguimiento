@@ -1,6 +1,6 @@
 <template>
   <!-- Solo mostrar el layout si hay usuario autenticado -->
-  <div v-if="user" class="app-layout">
+   <div v-if="userData" class="app-layout">
     <!-- Header mejorado -->
     <header class="app-header">
       <!-- Barra superior de colores -->
@@ -86,6 +86,10 @@
                 <i class="fas fa-users"></i>
                 <span>Lista de Estudiantes</span>
               </Link>
+              <Link :href="route('coordinador.evidencias')" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Seguimiento de Documentos</span>
+              </Link>
               <Link :href="route('asesores.index')" class="nav-item">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <span>Asesores Internos</span>
@@ -120,11 +124,19 @@
                 <i class="fas fa-user-edit"></i>
                 <span>Actualizar Datos</span>
               </Link>
+              <Link :href="route('estudiante.evidencias')" class="nav-item">
+                <i class="fas fa-folder-open"></i>
+                <span>Subir Evidencias</span>
+              </Link>
               <Link :href="route('proyectos.create')" class="nav-item">
                 <i class="fas fa-project-diagram"></i>
                 <span>Mi Proyecto</span>
               </Link>
+
+
             </div>
+
+
             
             <div class="nav-section" v-if="user.tiene_proyecto">
               <div class="nav-section-title">Documentos</div>
@@ -182,8 +194,24 @@
 import { ref, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 
+// Recibir usuario como prop
+const props = defineProps({
+  authUser: {
+    type: Object,
+    default: null
+  }
+})
+
+
 const page = usePage()
-const user = computed(() => page.props.auth?.user)
+// Usar el prop si existe, si no usar page.props
+const userData = computed(() => props.authUser || page.props.auth?.user)
+
+//verificar que hay en userData
+console.log("Datos; "+userData.value)
+
+
+const user = computed(() => userData.value)
 const carreraActual = computed(() => page.props.carrera_actual?.nombre)
 
 const menuOpen = ref(true) // Por defecto abierto en escritorio
@@ -204,6 +232,7 @@ const userType = computed(() => {
   }
   return types[user.value.usa_type] || user.value.usa_type
 })
+
 </script>
 
 <style >
@@ -253,6 +282,7 @@ const userType = computed(() => {
 .app-layout {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+  
 }
 
 
@@ -453,8 +483,10 @@ const userType = computed(() => {
 /* ===== MAIN CONTENT ===== */
 .main-content {
   flex: 1;
+  min-width: 0;
   padding: 1.5rem;
   transition: all var(--transition-normal);
+  
 }
 
 .content-wrapper {
@@ -540,6 +572,7 @@ const userType = computed(() => {
   
   .sidebar-open {
     transform: translateX(0);
+    min-width: 25%;
   }
   
   .menu-collapsed .sidebar {

@@ -85,6 +85,12 @@
                   >
                     Borrar
                   </button>
+                  <Link 
+                    :href="route('proyectos.actividades.edit', [proyecto.id, actividad.id])" 
+                    class="botonEditar"
+                  >
+                    Reutilizar
+                  </Link>
                 </th>
               </tr>
               <tr v-if="!proyecto.actividades || proyecto.actividades.length === 0">

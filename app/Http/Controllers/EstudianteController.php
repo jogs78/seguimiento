@@ -7,6 +7,7 @@ use App\Http\Requests\StoreEstudianteRequest;
 use App\Http\Requests\UpdateEstudianteRequest;
 use App\Models\Estudiante;
 use App\Models\Carrera;
+use App\Models\Configuracion;
 use App\Models\Usuario;
 use App\Models\Proyecto;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -148,11 +149,34 @@ class EstudianteController extends Controller
     {
         //MOSTRAR FORMULARIO PARA CREAR
         $carreras = Carrera::all();
+
+        
+         // Verificar si el usuario está autenticado y es coordinador
+     // Verificar si el usuario está autenticado (es coordinador)
+    $esCoordinador = auth()->check() && auth()->user()->usa_type === 'App\\Models\\Coordinador';
+    
+    // Obtener datos del usuario autenticado para pasarlos a la vista
+    $authUser = null;
+    if (auth()->check()) {
+        $user = auth()->user();
+        $authUser = [
+            'id' => $user->id,
+            'usa_id' => $user->usa_id,
+            'usa_type' => $user->usa_type,
+            'usa' => $user->usa ? [
+                'nombre' => $user->usa->nombre,
+                'apellido_paterno' => $user->usa->apellido_paterno,
+                'apellido_materno' => $user->usa->apellido_materno,
+            ] : null,
+        ];
+    }
+
       //return view('estudiante.crear',compact('carreras'));
        return Inertia::render('estudiante/crear', [
         'carreras' => $carreras,
-         'auth' => auth()->check(), // Pasar estado de autenticación
-        'user' => auth()->user(),   // Pasar usuario si está autenticado
+         'esCoordinador' => $esCoordinador,  // Indica si viene del panel del coordinador
+        'auth' => auth()->check(),
+        'authUser' => $authUser  // ✅ Pasar el usuario autenticado
     ]);
         
     }
@@ -359,6 +383,8 @@ class EstudianteController extends Controller
 
     public function primer(Estudiante $estudiante)
     {
+         $delegadoConfig = Configuracion::where('variable', 'delegado')->first();
+        $delegadoActivo = $delegadoConfig && $delegadoConfig->valor === 'si';
         if (is_null($estudiante->id)){
             $estudiante = Auth::getUser()->usa;
         }
@@ -366,27 +392,31 @@ class EstudianteController extends Controller
         //si es un estudiante
         //$externo = Auth::getUser()->usa;
         $primer = $estudiante->primer;
-        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.primer',compact('estudiante','primer')); 
+        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.primer',compact('estudiante','primer','delegadoActivo')); 
         return $pdf->download('Primer_Seguimiento ' . $estudiante->numero_de_control .'.pdf');
     }
 
     public function segundo(Estudiante $estudiante)
     {
+        $delegadoConfig = Configuracion::where('variable', 'delegado')->first();
+        $delegadoActivo = $delegadoConfig && $delegadoConfig->valor === 'si';
         if (is_null($estudiante->id)){
             $estudiante = Auth::getUser()->usa;
         }
         $segundo = $estudiante->segundo;
-        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.segundo',compact('estudiante','segundo')); 
+        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.segundo',compact('estudiante','segundo','delegadoActivo')); 
         return $pdf->download('Segundo_Seguimiento ' . $estudiante->numero_de_control . '.pdf');      
     }
 
     public function ultimo(Estudiante $estudiante)
     {
+        $delegadoConfig = Configuracion::where('variable', 'delegado')->first();
+        $delegadoActivo = $delegadoConfig && $delegadoConfig->valor === 'si';
         if (is_null($estudiante->id)){
             $estudiante = Auth::getUser()->usa;
         }
         $ultimo = $estudiante->ultimo;
-        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.ultimo',compact('estudiante','ultimo')); 
+        $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.ultimo',compact('estudiante','ultimo','delegadoActivo')); 
         return $pdf->download('Ultimo_Seguimiento ' . $estudiante->numero_de_control .'.pdf');
         
     }

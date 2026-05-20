@@ -17,6 +17,8 @@ use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\ExternoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CorreoController;
+use App\Http\Controllers\DocumentoEstudianteController;
+use App\Http\Controllers\DocumentoCoordinadorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,8 +40,17 @@ Route::get('/ejemplo',function(){
 Route::get('/ejemplodos',function(){
     return Inertia::render('estudiante/crear');
 });
+Route::get('/estudiante/evidencias', [DocumentoEstudianteController::class, 'index'])->name('estudiante.evidencias')->middleware('auth');
+Route::get('/estudiante/subir-evidencia', [DocumentoEstudianteController::class, 'index'])->name('estudiante.subir-evidencia')->middleware('auth');
 
+Route::get('/coordinador/evidencias', [DocumentoCoordinadorController::class, 'index'])
+        ->name('coordinador.evidencias');
 
+Route::get('/documentos', [DocumentoEstudianteController::class, 'index'])->name('documentos.index');
+Route::get('/documentos/{id}/download', [DocumentoEstudianteController::class, 'download'])->name('documentos.download');
+Route::delete('/documentos/{id}', [DocumentoEstudianteController::class, 'destroy'])->name('documentos.destroy');
+// Ruta para almacenar documentos (subir evidencia)
+Route::post('/documentos', [DocumentoEstudianteController::class, 'store'])->name('documentos.store');
 Route::post('/seleccionar-carrera',[CoordinadorController::class,'seleccionarCarrera'])->name('coordinadores.seleccionarCarrera');
 // Ruta para la página de bienvenida (adentro)
 Route::get('/adentro', function () {
@@ -66,6 +77,7 @@ Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
 Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Contraseña');
 Route::post('/cambiar-password', [UsuarioController::class, 'cambiarPassword'])->name('usuario.cambiar-password');
 Route::post('/adentro',[AccesoController::class,'adentro'])->name('adentro');
+
 
 //temporal para probar la vista de adentro, ya que no se ha implementado el proceso de seleccion de carrera
 /* Route::get('/adentro', function () {
@@ -130,6 +142,10 @@ Route::resource('configuraciones',ConfiguracionController::class)->middleware('a
 
 Route::resource('estudiantes',EstudianteController::class)->only(['create','store']);
 Route::resource('estudiantes',EstudianteController::class)->except(['create','store'])->middleware('auth');
+ Route::get('/estudiante/subir-evidencia', function () {
+        return Inertia::render('estudiante/subir-evidencia');
+    })->name('estudiante.subir-evidencia');
+ 
 
 Route::get('/coordinador/sugerencias', [ProyectoController::class, 'sugerencias'])->name('coordinadores.sugerencias');
 Route::get('/coordinador/sugerencias-proyecto', [ProyectoController::class, 'sugerenciasProyecto'])->name('coordinadores.sugerenciasProyecto');

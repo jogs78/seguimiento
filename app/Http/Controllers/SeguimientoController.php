@@ -82,7 +82,11 @@ class SeguimientoController extends Controller
                     $segui->califico_externo=Carbon::now();
                     $segui->save();
 
-                    return view('seguimientos.parcial.calificar-externo',compact('estudiante','consecutivo','segui'));                    
+                    return Inertia::render('seguimientos/parcial/calificar-externo', [
+                        'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
+                        'consecutivo' => $consecutivo,
+                        'segui' => $segui
+                    ]);          
                 }
                 if($consecutivo == 'ultimo' ){
                     $ultimo = Parcial::firstOrCreate(
@@ -225,7 +229,7 @@ class SeguimientoController extends Controller
         if ($delegadoActivo && $tipo === 'App\Models\Asesor') {
             $segui->promedio_externo = $segui->promedio_interno;
             $segui->califico_externo = $segui->califico_interno;
-            $segui->comentarios_externo = "*Nota: Proyecto interno - Calificación delegada al asesor interno.*";
+            $segui->comentarios_externo = "Proyecto interno - No se requisita esta sección.";
         }
             $segui->save();
         

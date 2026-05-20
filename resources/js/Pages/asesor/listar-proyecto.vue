@@ -3,7 +3,7 @@
         <div class="page-wrapper">
             
             <!-- Contenido principal -->
-            <main class="main-content">
+            <main class="content-main">
             <div style="margin-top:20px;">
                 <div class="horizontal">
                 <p class="subtitulo">Lista de Proyectos Asignados</p>
@@ -443,7 +443,7 @@ const enviarCorreo = (tipo, id) => {
     text-align: center;
   }
   
-  .main-content {
+  .content-main {
     padding: 1rem;
   }
   

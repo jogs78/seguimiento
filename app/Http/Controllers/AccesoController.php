@@ -33,6 +33,7 @@ class AccesoController extends Controller
 
     $usuario = Auth::user();
 
+    
     if($usuario->usa_type == "App\Models\Coordinador"){
 
         $coordinador = $usuario->usa;

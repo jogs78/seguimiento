@@ -158,7 +158,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="proyecto in proyectos" :key="proyecto.id" class="table-row">
+                <tr v-for="proyecto in proyectosPaginados" :key="proyecto.id" class="table-row">
                 <!-- Nombre del proyecto -->
                 <td class="project-name">
                     <div class="project-title">
@@ -375,12 +375,67 @@
             </table>
         </div>
         </div>
+        <!-- Paginación -->
+      <!-- Paginación - Siempre visible, pero botones deshabilitados cuando no hay suficientes datos -->
+      <div class="pagination-container">
+        <div class="pagination">
+          <button 
+            @click="paginaActual = 1" 
+            :disabled="paginaActual === 1 || totalPaginas <= 1"
+            class="page-btn"
+          >
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button 
+            @click="paginaActual--" 
+            :disabled="paginaActual === 1 || totalPaginas <= 1"
+            class="page-btn"
+          >
+            <i class="fas fa-angle-left"></i>
+          </button>
+          
+          <span class="page-info">
+            <template v-if="totalPaginas > 0">
+              Página {{ paginaActual }} de {{ totalPaginas }}
+            </template>
+            <template v-else>
+              No hay registros
+            </template>
+          </span>
+          
+          <button 
+            @click="paginaActual++" 
+            :disabled="paginaActual === totalPaginas || totalPaginas <= 1"
+            class="page-btn"
+          >
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button 
+            @click="paginaActual = totalPaginas" 
+            :disabled="paginaActual === totalPaginas || totalPaginas <= 1"
+            class="page-btn"
+          >
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
+        
+        <div class="page-size-selector">
+          <label>Mostrar:</label>
+          <select v-model="registrosPorPagina" @change="paginaActual = 1" :disabled="proyectos.length === 0">
+            <option :value="4">4</option>
+            <option :value="8">8</option>
+            <option :value="12">12</option>
+            <option :value="16">16</option>
+          </select>
+          <span>registros por página</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed} from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import { usePage } from '@inertiajs/vue3'
@@ -390,6 +445,28 @@ const props = defineProps({
     proyectos: Array,
     asesores: Array,
     periodoActual: Object
+})
+
+//Paginacion
+const paginaActual = ref(1)
+const registrosPorPagina = ref(4)
+
+// Calcular proyectos paginados
+const proyectosPaginados = computed(() => {
+  const inicio = (paginaActual.value - 1) * registrosPorPagina.value
+  const fin = inicio + registrosPorPagina.value
+  return props.proyectos.slice(inicio, fin)
+})
+
+// Calcular total de páginas
+const totalPaginas = computed(() => {
+  return Math.ceil(props.proyectos.length / registrosPorPagina.value)
+})
+
+// Resetear a página 1 cuando cambian los proyectos (por búsqueda)
+import { watch } from 'vue'
+watch(() => props.proyectos, () => {
+  paginaActual.value = 1
 })
 
 // Inicializar asesor_seleccionado
@@ -577,6 +654,76 @@ export default {
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
+/* ===== PAGINACIÓN ===== */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-btn {
+  background: var(--gray-200);
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--gray-700);
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--primary-medium);
+  color: white;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 500;
+  color: var(--gray-700);
+  margin: 0 0.5rem;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-size-selector label {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+}
+
+.page-size-selector select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+
+.page-size-selector span {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+}
+
+
 .page-wrapper {
   background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
   width: 100%;
@@ -753,20 +900,26 @@ export default {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-}
-
-.table-responsive {
-  overflow-x: auto;
   width: 100%;
 }
 
-.modern-table {
-  width: 100%; 
-  border-collapse: collapse;
-  min-width: 1000px; /* ← Ancho mínimo para que la tabla sea scrollable */
+.table-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
   
 }
 
+.modern-table {
+ min-width: 1000px;
+  border-collapse: collapse;
+  /* ← Ancho mínimo para que la tabla sea scrollable */
+  
+}
+
+.table-responsive {
+  border: 1px solid red; /* ← Temporal para ver si el contenedor existe */
+}
 .modern-table thead th {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));
   color: white;
@@ -1034,6 +1187,11 @@ export default {
 @media (max-width: 768px) {
   .page-wrapper {
     padding: 1rem;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    justify-content: center;
   }
   
   .search-grid {

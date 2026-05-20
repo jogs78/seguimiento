@@ -106,7 +106,10 @@
 import { Link, useForm } from '@inertiajs/vue3'
 
 const props = defineProps({
-  carreras: Array
+  carreras: Array,
+   esCoordinador: Boolean,
+  userType: String,
+  auth: Boolean
 })
 
 const form = useForm({
