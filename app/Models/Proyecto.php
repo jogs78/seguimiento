@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Proyecto extends Model
 {
     use HasFactory;
-    protected $fillable = ["nombre", "objetivo_general", "lugar", "informacion", "justificacion",'asesor_id','externo_id','empresa_id','periodo_id' ];
+    protected $fillable = ['num_registro', 'nombre', 'objetivo_general', 'lugar', 'informacion', 'justificacion', 'asesor_id', 'externo_id', 'empresa_id', 'periodo_id'];
 
     public function empresa()
     {
@@ -38,7 +38,7 @@ class Proyecto extends Model
 
     public function actividades()
     {
-        return $this->hasMany(Actividad::class)->orderBy('orden');
+        return $this->hasMany(Actividad::class);
     }
 
     public function especificos(){

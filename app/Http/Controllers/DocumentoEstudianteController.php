@@ -12,48 +12,37 @@ use Inertia\Inertia;
 class DocumentoEstudianteController extends Controller
 {
 
-public function index2()
-{
-    $tiposDocumento = [
-        ['id' => 1, 'nombre' => 'Prueba 1'],
-        ['id' => 2, 'nombre' => 'Prueba 2'],
-    ];
-    $documentos = []; // Vacío para pruebas
-    return Inertia::render('estudiante/prueba', [
-        'tiposDocumento' => $tiposDocumento,
-        'documentos' => $documentos
-    ]);
-}
 
-   public function index()
-{
-    $estudiante = auth()->user()->usa;
 
-    if (!$estudiante) {
-        return redirect()->route('home')->with('error', 'No se encontró el estudiante autenticado.');
+    public function index()
+    {
+        $estudiante = auth()->user()->usa;
+
+        if (!$estudiante) {
+            return redirect()->route('home')->with('error', 'No se encontró el estudiante autenticado.');
+        }
+        
+        // ✅ DATOS DE PRUEBA (MOCK) - Comenta esto cuando ya funcione
+        // Obtener TODOS los tipos de documento
+        $tiposDocumento = TipoDocumento::orderBy('id')->get();
+
+        
+        $documentos = DocumentoEstudiante::with('tipoDocumento')
+            ->where('estudiante_id', $estudiante->id)
+            ->get();
+        
+        // ✅ Descomenta esto cuando quieras usar la BD
+        // $documentos = DocumentoEstudiante::with('tipoDocumento')
+        //     ->where('estudiante_id', $estudiante->id)
+        //     ->get();
+        // 
+        // $tiposDocumento = TipoDocumento::orderBy('id')->get();
+
+        return Inertia::render('estudiante/evidencias', [
+            'tiposDocumento' => $tiposDocumento,
+            'documentos' => $documentos
+        ]);
     }
-    
-    // ✅ DATOS DE PRUEBA (MOCK) - Comenta esto cuando ya funcione
-      // Obtener TODOS los tipos de documento
-    $tiposDocumento = TipoDocumento::orderBy('id')->get();
-
-    
-    $documentos = DocumentoEstudiante::with('tipoDocumento')
-        ->where('estudiante_id', $estudiante->id)
-        ->get();
-    
-    // ✅ Descomenta esto cuando quieras usar la BD
-    // $documentos = DocumentoEstudiante::with('tipoDocumento')
-    //     ->where('estudiante_id', $estudiante->id)
-    //     ->get();
-    // 
-    // $tiposDocumento = TipoDocumento::orderBy('id')->get();
-
-     return Inertia::render('estudiante/evidencias', [
-        'tiposDocumento' => $tiposDocumento,
-        'documentos' => $documentos
-    ]);
-}
 
     public function store(StoreDocumentoRequest $request)
     {
@@ -115,7 +104,7 @@ public function index2()
                 'ruta_archivo' => $rutaArchivo,
                 'nombre_original' => $nombreOriginal,
                 'mime_type' => $mimeType,
-                'tamano_bytes' => $tamano,
+                'peso_bytes' => $tamano,
 
                 'url_documento' =>
                     $request->url_documento,
@@ -145,6 +134,13 @@ public function index2()
             );
     }
 
+    public function ver($id)
+    {
+        $documento = DocumentoEstudiante::findOrFail($id);
+
+        return Storage::disk('documentos')
+            ->response($documento->ruta_archivo);
+    }
     public function destroy($id)
     {
         $documento = DocumentoEstudiante::findOrFail($id);

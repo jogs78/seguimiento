@@ -19,7 +19,14 @@ return new class extends Migration
             $table->string('tabla')->nullable()->default(null);
             $table->string('campo')->nullable()->default(null);
             
-            
+            $table->foreignId('carrera_id')
+            ->nullable()
+            ->default(null)
+            ->constrained('carreras')
+            ->onDelete('cascade');
+
+            // evita duplicados
+            $table->unique(['variable', 'carrera_id']);
             $table->timestamps();
         });
     }

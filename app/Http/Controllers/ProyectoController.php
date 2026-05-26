@@ -11,6 +11,7 @@ use App\Models\Externo;
 use App\Models\Empresa;
 use App\Models\Usuario;
 use App\Models\Actividad;
+use App\Models\Cronograma;
 use App\Providers\ConfiguracionServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -369,15 +370,13 @@ class ProyectoController extends Controller
         $estudiante = Auth::user()->usa;
         $proyecto = $estudiante->proyecto;
 
-
-
          // Verificar si ya tiene un proyecto
     if (!is_null($proyecto)) {
         
         $proyecto->load([
             'empresa',
             'periodo',
-            'actividades',
+            'actividades.cronogramas' ,
             'asesor',
             'externo',
             'estudiantes'

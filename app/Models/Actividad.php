@@ -10,11 +10,16 @@ class Actividad extends Model
     use HasFactory;
     protected $table = "actividades";
     protected $connection = 'mysql';
-    protected $fillable = ["id", "orden", "nombre", "semanas","descripcion", "proyecto_id"];
+    protected $fillable = ["id", "nombre","descripcion", "proyecto_id"];
 
 
     public function proyecto()
     {
         return $this->belongsTo(Proyecto::class);
+    }
+
+    public function cronogramas()
+    {
+        return $this->hasMany(Cronograma::class)->orderBy('orden');
     }
 }

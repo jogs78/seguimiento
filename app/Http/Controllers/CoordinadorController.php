@@ -71,11 +71,11 @@ class CoordinadorController extends Controller
             'externo',
             'empresa',
             'estudiantes' => function($query) {
-                // Cargar los seguimientos para cada estudiante
                 $query->with([
-                    'primer',   // ← Relación del primer seguimiento
-                    'segundo',  // ← Relación del segundo seguimiento
-                    'ultimo'    // ← Relación del seguimiento final
+                    'primer',
+                    'segundo',
+                    'ultimo',
+                    'documentos.tipoDocumento'
                 ]);
             }
         ]);
@@ -89,12 +89,70 @@ class CoordinadorController extends Controller
 
     $proyectos = $proyectosQuery->get();
 
+    // 🔥 PROCESAR DOCUMENTOS - Usar un array separado
+    $mapeoDocumentos = [
+        'Solicitud de residencia profesional' => 'solicitud',
+        'Anteproyecto' => 'anteproyecto',
+        'KARDEX (SII)' => 'kardex',
+        'Afiliación del seguro social (carnet IMSS)' => 'seguro',
+        'Constancia de servicio social' => 'servicio',
+    ];
+
+    // Crear un array para almacenar los documentos procesados por estudiante
+    $documentosProcesados = [];
+
+    foreach ($proyectos as $proyecto) {
+        foreach ($proyecto->estudiantes as $estudiante) {
+            $documentosProcesados[$estudiante->id] = [
+                'solicitud' => null,
+                'anteproyecto' => null,
+                'kardex' => null,
+                'seguro' => null,
+                'servicio' => null,
+            ];
+            
+            // Procesar cada documento del estudiante
+            foreach ($estudiante->documentos as $documento) {
+                $nombreTipo = $documento->tipoDocumento->nombre;
+                
+                if (isset($mapeoDocumentos[$nombreTipo])) {
+                    $clave = $mapeoDocumentos[$nombreTipo];
+                    $documentosProcesados[$estudiante->id][$clave] = [
+                        'id' => $documento->id,
+                        'subido' => !is_null($documento->ruta_archivo) || !is_null($documento->url_documento),
+                        'nombre' => $documento->nombre_original ?? $nombreTipo,
+                        'ruta_archivo' => $documento->ruta_archivo,
+                        'url_documento' => $documento->url_documento,
+                    ];
+                }
+            }
+        }
+    }
+
     // Cargar asesores
     $asesores = Asesor::whereHas('carreras', function ($q) {
         $q->where('carrera_id', session('carrera_id'));
     })->get();
 
-    return Inertia::render('coordinador/tabla', compact('proyectos', 'asesores', 'periodoActual'));
+    $fueraTiempoConfig = \App\Models\Configuracion::where('variable', 'fuera_de_tiempo')
+        ->where('carrera_id', session('carrera_id'))
+        ->first();
+
+    $fueraTiempoActivo = $fueraTiempoConfig
+        && $fueraTiempoConfig->valor === 'si';
+
+    $internoConfig = Configuracion::where('variable', 'interno')
+        ->where('carrera_id', session('carrera_id'))
+        ->first();
+        
+    return Inertia::render('coordinador/tabla', [
+        'proyectos' => $proyectos,
+        'asesores' => $asesores,
+        'periodoActual' => $periodoActual,
+        'fueraTiempoActivo' => $fueraTiempoActivo,
+        'internoConfig' => $internoConfig,
+        'documentosProcesados' => $documentosProcesados  // ← Pasar el array a la vista
+    ]);
 }
 
     public function asignarAsesor1(){

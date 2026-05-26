@@ -79,7 +79,15 @@ class SeguimientoPolicy
             $en_tiempo = false;
         }
 
-        
+        //si la configuracion fuera de tiempo esta activa en_tiempo true
+        $fueraTiempoConfig = \App\Models\Configuracion::where('variable', 'fuera_de_tiempo')
+        ->where('carrera_id', $proyecto->estudiantes->first()?->carrera_id)
+        ->first();
+        $fueraTiempoActivo = $fueraTiempoConfig && $fueraTiempoConfig->valor === 'si';
+
+        if($fueraTiempoActivo){
+            $en_tiempo = true;
+        }
 
 
         if ($actual->usa_type == "App\Models\Asesor" && $proyecto->asesor_id ==  $actual->usa_id){ 

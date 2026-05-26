@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
             ProyectoSeeder::class,
             ActividadSeeder::class,
             EstudianteSeeder::class,
-
+            CronogramaSeeder::class,
             //PrimeroSeeder::class,
             //SeguimientoSeeder::class,
             //SegundoSeeder::class,

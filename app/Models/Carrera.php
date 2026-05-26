@@ -32,4 +32,9 @@ class Carrera extends Model
     {
         return $this->belongsToMany(Asesor::class, 'asesor_carrera', 'carrera_id', 'asesor_id');
     }
+
+    public function configuraciones()
+    {
+        return $this->hasMany(Configuracion::class);
+    }
 }

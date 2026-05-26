@@ -139,6 +139,10 @@ Route::get('lista-de-proyectos',[ExternoController::class,'proyecto'])->middlewa
 //rutas especificas del coordinador
 Route::resource('periodos',PeriodoController::class)->middleware('auth');
 Route::resource('configuraciones',ConfiguracionController::class)->middleware('auth');
+Route::post('/configuracion/fuera-tiempo', [ConfiguracionController::class, 'actualizarFueraTiempo'])
+    ->name('configuracion.fuera-tiempo');
+Route::post('/configuracion/interno', [ConfiguracionController::class, 'cambiarInterno'])
+    ->name('configuracion.interno');
 
 Route::resource('estudiantes',EstudianteController::class)->only(['create','store']);
 Route::resource('estudiantes',EstudianteController::class)->except(['create','store'])->middleware('auth');
@@ -180,6 +184,10 @@ Route::resource('carreras',CarreraController::class)->except(['show']);
 Route::resource('empresas',EmpresaController::class);
 Route::resource('usuarios',UsuarioController::class);
 Route::resource('proyectos.actividades',ActividadController::class);
+
+Route::get('proyectos/{proyecto}/actividades/{actividad}/reutilizar', [ActividadController::class, 'reutilizar'])->name('proyectos.actividades.reutilizar');
+Route::post('proyectos/{proyecto}/actividades/{actividad}/reutilizar', [ActividadController::class, 'storeReutilizar'])->name('proyectos.actividades.storeReutilizar');
+
 
 //rutas de vistas para aviso o Extras al CRUD
 Route::get('/asesores/{pagina}', [AsesorController::class, 'mostrar'])->middleware('auth');

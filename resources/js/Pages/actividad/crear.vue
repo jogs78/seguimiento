@@ -60,96 +60,59 @@
                     </span>
                   </div>
 
-                  <!-- Semanas -->
-                  <div class="form-group">
-                    <label class="parrafo">¿En cuántas semanas realizarás esta actividad? *</label>
-                    <input 
-                      type="number" 
-                      v-model="actividad.semanas"
-                      class="input-number"
-                      :class="{ 'error': errores.semanas && errores.semanas[index] }"
-                      min="1"
-                      step="1"
-                    />
-                    <span v-if="errores.semanas && errores.semanas[index]" class="error-mensaje">
-                      {{ errores.semanas[index] }}
-                    </span>
-                  </div>
-
-                  <!-- Orden con toggle recurrente -->
-                  <div class="form-group">
-                    <label class="parrafo">Orden de la actividad *</label>
-                    
-                    <!-- Toggle para actividad recurrente -->
-                    <div class="form-group">
-                      <label class="toggle-switch">
-                        <input 
-                          type="checkbox" 
-                          v-model="actividad.esRecurrente"
-                          @change="onToggleRecurrente(index)"
-                        />
-                        <span class="toggle-slider"></span>
-                      </label>
-                      <span class="toggle-label">
-                        {{ actividad.esRecurrente ? '✅ Actividad recurrente (aparece en múltiples órdenes)' : '➡️ Actividad única' }}
-                      </span>
-                    </div>
-
-                    <!-- Orden único -->
-                    <div v-if="!actividad.esRecurrente" class="orden-simple">
+                  <!-- Semanas - Ahora es semana_inicio y semana_fin -->
+                  <div class="form-group-row">
+                    <div class="form-group half">
+                      <label class="parrafo">Semana de inicio *</label>
                       <input 
                         type="number" 
-                        v-model.number="actividad.ordenUnico"
+                        v-model.number="actividad.semana_inicio"
                         class="input-number"
+                        :class="{ 'error': errores.semana_inicio && errores.semana_inicio[index] }"
                         min="1"
-                        placeholder="Ej: 3"
-                        @change="actualizarOrdenTexto(index)"
                       />
-                      <small class="help-text">La actividad aparecerá una sola vez en este orden</small>
+                      <span v-if="errores.semana_inicio && errores.semana_inicio[index]" class="error-mensaje">
+                        {{ errores.semana_inicio[index] }}
+                      </span>
                     </div>
+                    
+                    <div class="form-group half">
+                      <label class="parrafo">Semana de fin *</label>
+                      <input 
+                        type="number" 
+                        v-model.number="actividad.semana_fin"
+                        class="input-number"
+                        :class="{ 'error': errores.semana_fin && errores.semana_fin[index] }"
+                        min="1"
+                      />
+                      <span v-if="errores.semana_fin && errores.semana_fin[index]" class="error-mensaje">
+                        {{ errores.semana_fin[index] }}
+                      </span>
+                    </div>
+                  </div>
 
-                    <!-- Órdenes recurrentes -->
-                    <div v-else class="orden-recurrente">
-                      <div class="agregar-orden">
-                        <input 
-                          type="number" 
-                          v-model.number="actividad.nuevoOrden"
-                          class="input-number-small"
-                          min="1"
-                          placeholder="Nuevo orden"
-                          @keyup.enter="agregarOrden(index)"
-                        />
-                        <button type="button" class="btn-agregar-orden" @click="agregarOrden(index)" :disabled="!actividad.nuevoOrden">
-                          <i class="fas fa-plus"></i>
-                          Agregar
-                        </button>
-                      </div>
+                  <!-- Orden (único, ya no múltiple) -->
+                  <div class="form-group">
+                    <label class="parrafo">Orden de la actividad *</label>
+                    <div class="orden-simple">
+                      <input 
+                        type="number" 
+                        v-model.number="actividad.orden"
+                        class="input-number"
+                        :class="{ 'error': errores.orden && errores.orden[index] }"
+                        min="1"
+                        placeholder="Ej: 1, 2, 3..."
+                      />
+                      <small class="help-text">Orden en que aparecerá esta actividad en el cronograma</small>
                       
-                      <div class="ordenes-lista" v-if="actividad.ordenesLista && actividad.ordenesLista.length > 0">
-                        <label class="label-lista">Órdenes seleccionados:</label>
-                        <div class="ordenes-tags">
-                          <span 
-                            v-for="ord in actividad.ordenesLista" 
-                            :key="ord"
-                            class="orden-tag"
-                          >
-                            {{ ord }}
-                            <button type="button" class="remove-orden" @click="removerOrden(index, ord)">
-                              <i class="fas fa-times"></i>
-                            </button>
-                          </span>
-                        </div>
+                      <!-- Mostrar órdenes ocupados -->
+                      <div v-if="ordenesExistentes && ordenesExistentes.length > 0" class="ordenes-ocupadas">
+                        <small class="warning-text">
+                          <i class="fas fa-info-circle"></i>
+                          Órdenes ya ocupados: {{ ordenesExistentes.join(', ') }}
+                        </small>
                       </div>
-                      
-                      <small class="help-text">La actividad aparecerá en todos estos órdenes</small>
                     </div>
-
-                    <!-- Vista previa del orden final -->
-                    <div class="orden-preview" v-if="actividad.ordenTexto">
-                      <i class="fas fa-eye"></i>
-                      <strong>Orden final:</strong> {{ actividad.ordenTexto }}
-                    </div>
-
                     <span v-if="errores.orden && errores.orden[index]" class="error-mensaje">
                       {{ errores.orden[index] }}
                     </span>
@@ -188,114 +151,54 @@ import AppLayout from '@/Layouts/appLayout.vue'
 
 const props = defineProps({
   proyecto: Object,
-  ordenesExistentes: Array
+  ordenesExistentes: Array  // Órdenes ya ocupados por otras actividades
 })
 
-// Estructura de una actividad
-const crearActividadVacia = (ordenInicial = 1) => ({
+// Estructura de una actividad (nueva versión)
+const crearActividadVacia = (ordenInicial = null) => ({
   nombre: '',
   descripcion: '',
-  semanas: 1,
-  ordenTexto: ordenInicial.toString(),
-  esRecurrente: false,
-  ordenUnico: ordenInicial,
-  ordenesLista: [ordenInicial],
-  nuevoOrden: ''
+  semana_inicio: 1,
+  semana_fin: 4,
+  orden: ordenInicial || obtenerSiguienteOrdenDisponible()
 })
+
+// Obtener el siguiente orden disponible
+const obtenerSiguienteOrdenDisponible = () => {
+  if (!props.ordenesExistentes || props.ordenesExistentes.length === 0) {
+    return 1
+  }
+  // Buscar el primer número faltante
+  for (let i = 1; i <= props.ordenesExistentes.length + 1; i++) {
+    if (!props.ordenesExistentes.includes(i)) {
+      return i
+    }
+  }
+  return props.ordenesExistentes.length + 1
+}
 
 // Inicializar con una actividad
 const actividades = ref([
-  crearActividadVacia(1)
+  crearActividadVacia()
 ])
 
 const guardando = ref(false)
 const errores = reactive({
   nombre: {},
   descripcion: {},
-  semanas: {},
+  semana_inicio: {},
+  semana_fin: {},
   orden: {}
 })
 
-// Actualizar el texto del orden (se guarda como string)
-const actualizarOrdenTexto = (index) => {
-  const act = actividades.value[index]
-  if (act.esRecurrente) {
-    if (act.ordenesLista && act.ordenesLista.length > 0) {
-      act.ordenTexto = act.ordenesLista.join(',')
-    } else {
-      act.ordenTexto = ''
-    }
-  } else {
-    act.ordenTexto = act.ordenUnico ? act.ordenUnico.toString() : ''
-  }
-}
-
-// Al cambiar el toggle
-const onToggleRecurrente = (index) => {
-  const act = actividades.value[index]
-  if (act.esRecurrente) {
-    // Cambiando a recurrente: usar los órdenes existentes
-    if (act.ordenUnico && (!act.ordenesLista || !act.ordenesLista.includes(act.ordenUnico))) {
-      act.ordenesLista = [act.ordenUnico]
-    } else if (!act.ordenesLista || act.ordenesLista.length === 0) {
-      act.ordenesLista = [1]
-    }
-  } else {
-    // Cambiando a único: tomar el primer orden de la lista
-    act.ordenUnico = (act.ordenesLista && act.ordenesLista.length > 0) ? act.ordenesLista[0] : 1
-  }
-  actualizarOrdenTexto(index)
-}
-
-// Agregar orden a la lista
-const agregarOrden = (index) => {
-  const act = actividades.value[index]
-  if (!act.nuevoOrden || act.nuevoOrden < 1) return
-  
-  if (!act.ordenesLista.includes(act.nuevoOrden)) {
-    act.ordenesLista.push(act.nuevoOrden)
-    act.ordenesLista.sort((a, b) => a - b)
-    act.nuevoOrden = ''
-    actualizarOrdenTexto(index)
-  } else {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Orden duplicado',
-      text: `El orden ${act.nuevoOrden} ya está en la lista`,
-      confirmButtonText: 'OK'
-    })
-  }
-}
-
-// Remover orden de la lista
-const removerOrden = (index, orden) => {
-  const act = actividades.value[index]
-  const pos = act.ordenesLista.indexOf(orden)
-  if (pos > -1) {
-    act.ordenesLista.splice(pos, 1)
-    actualizarOrdenTexto(index)
-  }
-}
-
 // Agregar nueva actividad
 const agregarActividad = () => {
-  const nuevoOrden = actividades.value.length + 1
-  actividades.value.push(crearActividadVacia(nuevoOrden))
+  actividades.value.push(crearActividadVacia())
 }
 
-// Eliminar actividad y reordenar
+// Eliminar actividad
 const eliminarActividad = (index) => {
   actividades.value.splice(index, 1)
-  // Reasignar órdenes automáticamente
-  actividades.value.forEach((act, i) => {
-    const nuevoOrd = i + 1
-    if (act.esRecurrente) {
-      act.ordenesLista = [nuevoOrd]
-    } else {
-      act.ordenUnico = nuevoOrd
-    }
-    actualizarOrdenTexto(i)
-  })
 }
 
 // Auto-resize para textarea
@@ -309,32 +212,63 @@ const autoResize = (event) => {
 const validarFormulario = () => {
   let valido = true
   
+  // Limpiar errores anteriores
   errores.nombre = {}
   errores.descripcion = {}
-  errores.semanas = {}
+  errores.semana_inicio = {}
+  errores.semana_fin = {}
   errores.orden = {}
+  
+  const ordenesUtilizados = []
   
   for (let index = 0; index < actividades.value.length; index++) {
     const act = actividades.value[index]
     
+    // Validar nombre
     if (!act.nombre || !act.nombre.trim()) {
       errores.nombre[index] = 'El nombre de la actividad es requerido'
       valido = false
     }
     
+    // Validar descripción
     if (!act.descripcion || !act.descripcion.trim()) {
       errores.descripcion[index] = 'La descripción es requerida'
       valido = false
     }
     
-    if (!act.semanas || act.semanas < 1) {
-      errores.semanas[index] = 'Las semanas deben ser al menos 1'
+    // Validar semana_inicio
+    if (!act.semana_inicio || act.semana_inicio < 1) {
+      errores.semana_inicio[index] = 'La semana de inicio debe ser al menos 1'
       valido = false
     }
     
-    if (!act.ordenTexto || act.ordenTexto.trim() === '') {
-      errores.orden[index] = 'El orden es requerido'
+    // Validar semana_fin
+    if (!act.semana_fin || act.semana_fin < 1) {
+      errores.semana_fin[index] = 'La semana de fin debe ser al menos 1'
       valido = false
+    }
+    
+    // Validar que semana_fin >= semana_inicio
+    if (act.semana_fin && act.semana_inicio && act.semana_fin < act.semana_inicio) {
+      errores.semana_fin[index] = 'La semana de fin debe ser mayor o igual a la semana de inicio'
+      valido = false
+    }
+    
+    // Validar orden
+    if (!act.orden || act.orden < 1) {
+      errores.orden[index] = 'El orden es requerido y debe ser mayor a 0'
+      valido = false
+    } else if (ordenesUtilizados.includes(act.orden)) {
+      errores.orden[index] = `El orden ${act.orden} ya está siendo utilizado por otra actividad`
+      valido = false
+    } else {
+      // Verificar contra órdenes existentes en la base de datos
+      if (props.ordenesExistentes && props.ordenesExistentes.includes(act.orden)) {
+        errores.orden[index] = `El orden ${act.orden} ya está ocupado por otra actividad guardada`
+        valido = false
+      } else {
+        ordenesUtilizados.push(act.orden)
+      }
     }
   }
   
@@ -343,20 +277,19 @@ const validarFormulario = () => {
 
 // Guardar actividades
 const guardarActividades = () => {
-  // Actualizar textos de orden antes de enviar
-  actividades.value.forEach((_, index) => {
-    actualizarOrdenTexto(index)
-  })
-  
   if (!validarFormulario()) {
+    // Construir mensaje de error
+    const mensajesError = []
+    Object.values(errores.nombre).forEach(e => mensajesError.push(`• ${e}`))
+    Object.values(errores.descripcion).forEach(e => mensajesError.push(`• ${e}`))
+    Object.values(errores.semana_inicio).forEach(e => mensajesError.push(`• ${e}`))
+    Object.values(errores.semana_fin).forEach(e => mensajesError.push(`• ${e}`))
+    Object.values(errores.orden).forEach(e => mensajesError.push(`• ${e}`))
+    
     Swal.fire({
       icon: 'error',
       title: 'Errores en el formulario',
-      html: '<ul style="text-align: left;">' + 
-        Object.values(errores.nombre).map(e => `<li>${e}</li>`).join('') +
-        Object.values(errores.descripcion).map(e => `<li>${e}</li>`).join('') +
-        Object.values(errores.semanas).map(e => `<li>${e}</li>`).join('') +
-        Object.values(errores.orden).map(e => `<li>${e}</li>`).join(''),
+      html: '<ul style="text-align: left;">' + mensajesError.map(m => `<li>${m}</li>`).join('') + '</ul>',
       confirmButtonText: 'Corregir'
     })
     return
@@ -369,8 +302,9 @@ const guardarActividades = () => {
     actividades: actividades.value.map(act => ({
       nombre: act.nombre,
       descripcion: act.descripcion,
-      semanas: act.semanas,
-      orden: act.ordenTexto
+      semana_inicio: act.semana_inicio,
+      semana_fin: act.semana_fin,
+      orden: act.orden
     }))
   }
   

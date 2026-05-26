@@ -25,6 +25,7 @@ class EstudianteSeeder extends Seeder
         $estudiante->numero_de_seguridad_social = "1999";
         $estudiante->proyecto_id=1;
         $estudiante->carrera_id = 1;
+        $estudiante->created_at = '2024-01-15 10:00:00'; // Fecha de creación dentro del periodo actual
         $estudiante->save();
 
         $estudiante = new Estudiante();
@@ -39,6 +40,7 @@ class EstudianteSeeder extends Seeder
         $estudiante->numero_de_seguridad_social = "2004";
         $estudiante->proyecto_id=11;
         $estudiante->carrera_id = 1;
+        $estudiante->created_at = '2024-01-15 10:00:00';
         $estudiante->save();
 
         $estudiante = new Estudiante();
@@ -95,6 +97,7 @@ class EstudianteSeeder extends Seeder
         $estudiante->numero_de_seguridad_social = "2000";
         $estudiante->proyecto_id=4;
         $estudiante->carrera_id = 1;
+        $estudiante->created_at = '2024-01-15 10:00:00';
         $estudiante->save(); 
 
         $estudiante = new Estudiante();

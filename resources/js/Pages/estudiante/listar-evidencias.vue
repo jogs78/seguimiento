@@ -54,7 +54,6 @@
           <thead>
             <tr>
               <th class="thfondo">#</th>
-              <th class="thfondo">N° Control</th>
               <th class="thfondo">Estudiante</th>
               <th class="thfondo">Carrera</th>
               <th class="thfondo">Progreso</th>
@@ -70,7 +69,6 @@
           <tbody>
             <tr v-for="(estudiante, index) in estudiantesFiltrados" :key="estudiante.id">
               <td>{{ index + 1 }}</td>
-              <td><strong>{{ estudiante.numero_control }}</strong></td>
               <td>{{ estudiante.nombre }} {{ estudiante.apellido_paterno }} {{ estudiante.apellido_materno }}</td>
               <td>{{ estudiante.carrera }}</td>
               <td class="progreso-cell">

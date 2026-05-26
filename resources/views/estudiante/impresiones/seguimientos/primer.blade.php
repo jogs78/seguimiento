@@ -140,7 +140,7 @@
     <p>Observaciones: </p><p>{{$primer->comentarios_externo}}</p>
     <table class="tabla">
        <!--  en caso de que el asesor externo sea delegado a el interno, se puede omitir los datos del asesor externo y colocar solo el sello de la empresa, organismo o dependencia. -->
-        @if($delegadoActivo)
+        @if($internoActivo)
         <tr>
             <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
                 <br> Nombre y firma asesor externo

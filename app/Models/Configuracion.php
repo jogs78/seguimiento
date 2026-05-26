@@ -9,5 +9,10 @@ class Configuracion extends Model
 {
     use HasFactory;
     protected $table = "configuraciones";
-    protected $fillable = ["id", "variable", "valor", "tipo", "tabla", "campo"];
+    protected $fillable = ["id", "variable", "valor", "tipo", "tabla", "campo", "carrera_id"];
+
+    public function carrera()
+    {
+        return $this->belongsTo(Carrera::class);
+    }
 }

@@ -57,47 +57,62 @@
         </div>
 
         <div class="horizontal">
-          <table style="margin-top:30px; margin-bottom:40px; align-self: center;">
-            <thead>
-              <tr>
-                <th class="thfondo">Nombre</th>
-                <th class="thfondo">Semanas</th>
-                <th class="thfondo">Orden</th>
-                <th class="thfondo">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="actividad in proyecto.actividades" :key="actividad.id">
-                <th class="thcontenido">{{ actividad.nombre }}</th>
-                <th class="thcontenido">{{ actividad.semanas }}</th>
-                <th class="thcontenido">{{ actividad.orden }}</th>
-                <th style="padding:8px;">
-                  <Link 
-                    :href="route('proyectos.actividades.edit', [proyecto.id, actividad.id])" 
-                    class="botonEditar"
-                  >
-                    Editar
-                  </Link>
-                  <button 
-                    @click="confirmarEliminacion(actividad.id)" 
-                    class="botonBorrar"
-                    style="margin-top:5px;"
-                  >
-                    Borrar
-                  </button>
-                  <Link 
-                    :href="route('proyectos.actividades.edit', [proyecto.id, actividad.id])" 
-                    class="botonEditar"
-                  >
-                    Reutilizar
-                  </Link>
-                </th>
-              </tr>
-              <tr v-if="!proyecto.actividades || proyecto.actividades.length === 0">
-                <th colspan="4">Sin actividades</th>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="actividades-table" style="margin-top:30px; margin-bottom:40px;">
+              <thead>
+                <tr>
+                  <th class="thfondo">Nombre</th>
+                  <th class="thfondo">Semana Inicio</th>
+                  <th class="thfondo">Semana Fin</th>
+                  <th class="thfondo">Orden</th>
+                  <th class="thfondo">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="actividad in proyecto.actividades" :key="actividad.id">
+                  <td class="thcontenido">{{ actividad.nombre }}</td>
+                  <td class="thcontenido">
+                    <!-- Mostrar semanas del primer cronograma -->
+                    {{ actividad.cronogramas?.[0]?.semana_inicio || '-' }}
+                  </td>
+                  <td class="thcontenido">
+                    {{ actividad.cronogramas?.[0]?.semana_fin || '-' }}
+                  </td>
+                  <td class="thcontenido">
+                    <!-- Mostrar órdenes (pueden ser múltiples) -->
+                    <span v-for="(cron, idx) in actividad.cronogramas" :key="cron.id">
+                      {{ cron.orden }}{{ idx < actividad.cronogramas.length - 1 ? ', ' : '' }}
+                    </span>
+                  </td>
+                  <td style="padding:8px; white-space: nowrap;">
+                    <Link 
+                      :href="route('proyectos.actividades.edit', [proyecto.id, actividad.id])" 
+                      class="botonEditar"
+                    >
+                      Editar
+                    </Link>
+                    <button 
+                      @click="confirmarEliminacion(actividad.id)" 
+                      class="botonBorrar"
+                      style="margin-top:5px;"
+                    >
+                      Borrar
+                    </button>
+                    <Link 
+                      :href="route('proyectos.actividades.reutilizar', [proyecto.id, actividad.id])" 
+                      class="botonEditar"
+                      style="margin-top:5px;"
+                    >
+                      Reutilizar
+                    </Link>
+                  </td>
+                </tr>
+                <tr v-if="!proyecto.actividades || proyecto.actividades.length === 0">
+                  <td colspan="5" class="text-center">Sin actividades</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="horizontal">
@@ -127,8 +142,15 @@ import AppLayout from '@/Layouts/appLayout.vue'
 
 const props = defineProps({
   proyecto: Object,
+  todos: Array,        // ← Cambiado: ahora son las actividades expandidas
   flash: Object
 })
+
+// 🔍 Depuración
+console.log('=== DATOS RECIBIDOS EN VUE ===');
+console.log('todos:', props.todos);
+console.log('todos length:', props.todos?.length);
+console.log('proyecto:', props.proyecto);
 
 const successMessage = ref(props.flash?.success || null)
 const errorMessage = ref(props.flash?.error || null)

@@ -132,248 +132,572 @@
 
         <!-- Título -->
         <div class="section-title">
-        <div class="title-content">
-            <i class="fas fa-table-list"></i>
-            <h2>Tabla de Proyectos</h2>
-            <span v-if="periodoActual" class="periodo-badge">
-            <i class="fas fa-calendar-alt"></i> {{ periodoActual.nombre }}
-            </span>
-        </div>
+
+        <div class="title-top">
+
+            <!-- IZQUIERDA -->
+            <div class="title-content">
+                <i class="fas fa-table-list"></i>
+
+                <h2>Tabla de Proyectos</h2>
+
+                    <span v-if="periodoActual" class="periodo-badge">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ periodoActual.nombre }}
+                    </span>
+                </div>
+
+                <!-- DERECHA -->
+                <div class="outside-time-toggle">
+
+                    <span class="toggle-label">
+                        Fuera de tiempo
+                    </span>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            v-model="fueraTiempo"
+                            @change="cambiarFueraTiempo"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                    <span
+                        class="toggle-status"
+                        :class="{ active: fueraTiempo }"
+                    >
+                        {{ fueraTiempo ? 'SI' : 'NO' }}
+                    </span>
+
+                </div>
+                <div class="outside-time-toggle">
+
+                    <span class="toggle-label">
+                        Calificación interna
+                    </span>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            v-model="internoActivo"
+                            @change="cambiarInterno"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                    <span
+                        class="toggle-status"
+                        :class="{ active: internoActivo }"
+                    >
+                        {{ internoActivo ? 'SI' : 'NO' }}
+                    </span>
+                  </div>
+            </div>
+
         <div class="title-underline"></div>
-        </div>
+
+    </div>
 
         <!-- Tabla -->
         <div class="table-container">
-        <div class="table-responsive">
-            <table class="modern-table">
-            <thead>
-                <tr>
-                <th><i class="fas fa-file-alt"></i> Nombre proyecto</th>
-                <th><i class="fas fa-chalkboard-teacher"></i> Asesor interno</th>
-                <th><i class="fas fa-building"></i> Empresa / Asesor externo</th>
-                <th><i class="fas fa-users"></i> Estudiante(s)</th>
-                <th><i class="fas fa-chart-line"></i> Seguimiento 1</th>
-                <th><i class="fas fa-chart-line"></i> Seguimiento 2</th>
-                <th><i class="fas fa-chart-line"></i> Seguimiento Final</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="proyecto in proyectosPaginados" :key="proyecto.id" class="table-row">
-                <!-- Nombre del proyecto -->
-                <td class="project-name">
-                    <div class="project-title">
-                    <i class="fas fa-folder-open"></i>
-                    <span>{{ proyecto.nombre }}</span>
-                    </div>
-                </td>
-                
-                <!-- Asesor interno -->
-                <td class="advisor-cell">
-                    <form @submit.prevent="asignarAsesor(proyecto)" class="advisor-form">
-                    <div class="select-wrapper">
-                        <select 
-                        v-model="proyecto.asesor_seleccionado" 
-                        class="form-select"
-                        :class="{ 'has-value': proyecto.asesor_seleccionado }"
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-file-alt"></i> Nombre proyecto</th>
+                            <th><i class="fas fa-chalkboard-teacher"></i> Asesor interno</th>
+                            <th><i class="fas fa-building"></i> Empresa / Asesor externo</th>
+                            <th><i class="fas fa-users"></i> Estudiante(s)</th>
+
+                            <!-- NUEVAS COLUMNAS -->
+                            <th><i class="fas fa-file-signature"></i> Solicitud</th>
+                            <th><i class="fas fa-file-pdf"></i> Anteproyecto</th>
+
+                            <th><i class="fas fa-chart-line"></i> Seguimiento 1</th>
+                            <th><i class="fas fa-chart-line"></i> Seguimiento 2</th>
+                            <th><i class="fas fa-chart-line"></i> Seguimiento Final</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr
+                            v-for="proyecto in proyectosPaginados"
+                            :key="proyecto.id"
+                            class="table-row"
                         >
-                        <option value="" disabled>Elige un asesor...</option>
-                        <option 
-                            v-for="asesor in asesores" 
-                            :key="asesor.id"
-                            :value="asesor.id"
-                        >
-                            {{ asesor.nombre }} {{ asesor.apellido_paterno || '' }}
-                        </option>
-                        </select>
-                        <i class="fas fa-chevron-down select-arrow"></i>
-                    </div>
-                    
-                    <button 
-                        type="submit" 
-                        class="btn-assign"
-                        :class="{ 'btn-change': proyecto.asesor_id }"
-                    >
-                        <i class="fas" :class="proyecto.asesor_id ? 'fa-exchange-alt' : 'fa-user-plus'"></i>
-                        {{ proyecto.asesor_id ? 'CAMBIAR' : 'ASIGNAR' }}
-                    </button>
-                    </form>
 
-                    <div v-if="proyecto.asesor" class="email-section">
-                    <span class="advisor-name">
-                        <i class="fas fa-user-check"></i> {{ proyecto.asesor.nombre }}
-                    </span>
-                    <button 
-                        @click="enviarCorreo('asesor', proyecto.asesor.id)"
-                        class="btn-email"
-                        title="Enviar correo al asesor"
-                    >
-                        <img src="/images/mail.png" alt="Email" class="email-icon">
-                    </button>
-                    </div>
-                    <p v-else class="no-data">
-                    <i class="fas fa-user-slash"></i> Sin asesor interno
-                    </p>
-                </td>
+                            <!-- Nombre del proyecto -->
+                            <td class="project-name">
+                                <div class="project-title">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>{{ proyecto.nombre }}</span>
+                                </div>
+                            </td>
 
-                <!-- Empresa / Asesor externo -->
-                <td class="company-cell">
-                    <div class="company-info">
-                    <i class="fas fa-building"></i>
-                    <span class="company-name">{{ proyecto.empresa?.nombre || 'Sin empresa' }}</span>
-                    </div>
-                    
-                    <div v-if="proyecto.externo" class="externo-info">
-                    <i class="fas fa-user-tie"></i>
-                    <span>{{ proyecto.externo.nombre }} {{ proyecto.externo.apellido_paterno || '' }}</span>
-                    <button 
-                        @click="enviarCorreo('externo', proyecto.externo.id)"
-                        class="btn-email small"
-                        title="Enviar correo al asesor externo"
-                    >
-                        <img src="/images/mail.png" alt="Email" class="email-icon small">
-                    </button>
-                    </div>
-                    <p v-else class="no-data-small">
-                    <i class="fas fa-user-slash"></i> Sin asesor externo
-                    </p>
-                </td>
+                            <!-- Asesor interno -->
+                            <td class="advisor-cell">
+                                <form
+                                    @submit.prevent="asignarAsesor(proyecto)"
+                                    class="advisor-form"
+                                >
+                                    <div class="select-wrapper">
+                                        <select
+                                            v-model="proyecto.asesor_seleccionado"
+                                            class="form-select"
+                                            :class="{ 'has-value': proyecto.asesor_seleccionado }"
+                                        >
+                                            <option value="" disabled>
+                                                Elige un asesor...
+                                            </option>
 
-                <!-- Estudiantes -->
-                <td class="students-cell">
-                    <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="student-item">
-                    <div class="student-info">
-                        <i class="fas fa-user-graduate"></i>
-                        <span>{{ estudiante.numero_control }} {{ estudiante.nombre }} 
-                        {{ estudiante.apellido_paterno }} {{ estudiante.apellido_materno }}</span>
-                    </div>
-                    <button 
-                        @click="enviarCorreo('estudiante', estudiante.id)"
-                        class="btn-email small"
-                        title="Enviar correo al estudiante"
-                    >
-                        <img src="/images/mail.png" alt="Email" class="email-icon small">
-                    </button>
-                    </div>
-                </td>
+                                            <option
+                                                v-for="asesor in asesores"
+                                                :key="asesor.id"
+                                                :value="asesor.id"
+                                            >
+                                                {{ asesor.nombre }}
+                                                {{ asesor.apellido_paterno || '' }}
+                                            </option>
+                                        </select>
 
-                <!-- Seguimiento 1 -->
-                <td class="status-cell">
-                    <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
-                    <div class="status-icons">
-                        <template v-if="estudiante.primer?.puntualidad_interno != null && estudiante.primer?.puntualidad_externo != null">
-                        <button @click="descargarSeguimiento(estudiante.id, 'primer')" class="btn-download" title="Descargar seguimiento">
-                            <img src="/images/UnoSegui.png" alt="Descargar" class="status-icon">
-                        </button>
-                        </template>
-                        <template v-else>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.primer?.puntualidad_interno != null"
-                            src="/images/IntSi.png" 
-                            alt="Interno OK" 
-                            class="status-icon"
-                            title="Asesor Interno ya calificó">
-                            <img v-else 
-                            src="/images/IntNo.png" 
-                            alt="Interno pendiente" 
-                            class="status-icon"
-                            title="Asesor Interno no ha calificado">
-                            <span class="status-label">Interno</span>
-                        </div>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.primer?.puntualidad_externo != null" 
-                            src="/images/ExtSi.png" 
-                            alt="Externo OK" 
-                            class="status-icon"
-                            title="Asesor Externo ya calificó">
-                            <img v-else 
-                            src="/images/ExtNo.png" 
-                            alt="Externo pendiente" 
-                            class="status-icon"
-                            title="Asesor Externo no ha calificado">
-                            <span class="status-label">Externo</span>
-                        </div>
-                        </template>
-                    </div>
-                    </div>
-                </td>
+                                        <i class="fas fa-chevron-down select-arrow"></i>
+                                    </div>
 
-                <!-- Seguimiento 2 -->
-                <td class="status-cell">
-                    <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
-                    <div class="status-icons">
-                        <template v-if="estudiante.segundo?.puntualidad_interno != null && estudiante.segundo?.puntualidad_externo != null">
-                        <button @click="descargarSeguimiento(estudiante.id, 'segundo')" class="btn-download" title="Descargar seguimiento">
-                            <img src="/images/DosSegui.png" alt="Descargar" class="status-icon">
-                        </button>
-                        </template>
-                        <template v-else>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.segundo?.puntualidad_interno != null" 
-                            src="/images/IntSi.png" 
-                            alt="Interno OK" 
-                            class="status-icon">
-                            <img v-else 
-                            src="/images/IntNo.png" 
-                            alt="Interno pendiente" 
-                            class="status-icon">
-                            <span class="status-label">Interno</span>
-                        </div>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.segundo?.puntualidad_externo != null" 
-                            src="/images/ExtSi.png" 
-                            alt="Externo OK" 
-                            class="status-icon">
-                            <img v-else 
-                            src="/images/ExtNo.png" 
-                            alt="Externo pendiente" 
-                            class="status-icon">
-                            <span class="status-label">Externo</span>
-                        </div>
-                        </template>
-                    </div>
-                    </div>
-                </td>
+                                    <button
+                                        type="submit"
+                                        class="btn-assign"
+                                        :class="{ 'btn-change': proyecto.asesor_id }"
+                                    >
+                                        <i
+                                            class="fas"
+                                            :class="proyecto.asesor_id
+                                                ? 'fa-exchange-alt'
+                                                : 'fa-user-plus'"
+                                        ></i>
 
-                <!-- Seguimiento Final -->
-                <td class="status-cell">
-                    <div v-for="estudiante in proyecto.estudiantes" :key="estudiante.id" class="status-item">
-                    <div class="status-icons">
-                        <template v-if="estudiante.ultimo?.promedio_interno != null && estudiante.ultimo?.promedio_externo != null">
-                        <button @click="descargarSeguimiento(estudiante.id, 'ultimo')" class="btn-download" title="Descargar seguimiento">
-                            <img src="/images/TresSegui.png" alt="Descargar" class="status-icon">
-                        </button>
-                        </template>
-                        <template v-else>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.ultimo?.promedio_interno != null" 
-                            src="/images/IntSi.png" 
-                            alt="Interno OK" 
-                            class="status-icon">
-                            <img v-else 
-                            src="/images/IntNo.png" 
-                            alt="Interno pendiente" 
-                            class="status-icon">
-                            <span class="status-label">Interno</span>
-                        </div>
-                        <div class="status-asesor">
-                            <img v-if="estudiante.ultimo?.promedio_externo != null" 
-                            src="/images/ExtSi.png" 
-                            alt="Externo OK" 
-                            class="status-icon">
-                            <img v-else 
-                            src="/images/ExtNo.png" 
-                            alt="Externo pendiente" 
-                            class="status-icon">
-                            <span class="status-label">Externo</span>
-                        </div>
-                        </template>
-                    </div>
-                    </div>
-                </td>
-                </tr>
-            </tbody>
-            </table>
-        </div>
+                                        {{
+                                            proyecto.asesor_id
+                                                ? 'CAMBIAR'
+                                                : 'ASIGNAR'
+                                        }}
+                                    </button>
+                                </form>
+
+                                <div v-if="proyecto.asesor" class="email-section">
+                                    <span class="advisor-name">
+                                        <i class="fas fa-user-check"></i>
+                                        {{ proyecto.asesor.nombre }}
+                                    </span>
+
+                                    <button
+                                        @click="enviarCorreo('asesor', proyecto.asesor.id)"
+                                        class="btn-email"
+                                        title="Enviar correo al asesor"
+                                    >
+                                        <img
+                                            src="/images/mail.png"
+                                            alt="Email"
+                                            class="email-icon"
+                                        >
+                                    </button>
+                                </div>
+
+                                <p v-else class="no-data">
+                                    <i class="fas fa-user-slash"></i>
+                                    Sin asesor interno
+                                </p>
+                            </td>
+
+                            <!-- Empresa / Asesor externo -->
+                            <td class="company-cell">
+                                <div class="company-info">
+                                    <i class="fas fa-building"></i>
+
+                                    <span class="company-name">
+                                        {{ proyecto.empresa?.nombre || 'Sin empresa' }}
+                                    </span>
+                                </div>
+
+                                <div
+                                    v-if="proyecto.externo"
+                                    class="externo-info"
+                                >
+                                    <i class="fas fa-user-tie"></i>
+
+                                    <span>
+                                        {{ proyecto.externo.nombre }}
+                                        {{ proyecto.externo.apellido_paterno || '' }}
+                                    </span>
+
+                                    <button
+                                        @click="enviarCorreo('externo', proyecto.externo.id)"
+                                        class="btn-email small"
+                                        title="Enviar correo al asesor externo"
+                                    >
+                                        <img
+                                            src="/images/mail.png"
+                                            alt="Email"
+                                            class="email-icon small"
+                                        >
+                                    </button>
+                                </div>
+
+                                <p v-else class="no-data-small">
+                                    <i class="fas fa-user-slash"></i>
+                                    Sin asesor externo
+                                </p>
+                            </td>
+
+                            <!-- Estudiantes -->
+                            <td class="students-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="estudiante.id"
+                                    class="student-item"
+                                >
+                                    <div class="student-info">
+                                        <i class="fas fa-user-graduate"></i>
+
+                                        <span>
+                                            {{ estudiante.numero_control }}
+                                            {{ estudiante.nombre }}
+                                            {{ estudiante.apellido_paterno }}
+                                            {{ estudiante.apellido_materno }}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        @click="enviarCorreo('estudiante', estudiante.id)"
+                                        class="btn-email small"
+                                        title="Enviar correo al estudiante"
+                                    >
+                                        <img
+                                            src="/images/mail.png"
+                                            alt="Email"
+                                            class="email-icon small"
+                                        >
+                                    </button>
+                                </div>
+                            </td>
+
+                           <!-- SOLICITUD -->
+<td class="status-cell">
+    <div
+        v-for="estudiante in proyecto.estudiantes"
+        :key="'solicitud-' + estudiante.id"
+        class="status-item"
+    >
+        <template v-if="getDocumentosEstudiante(estudiante.id)?.solicitud?.subido">
+            <button
+                @click="verDocumento(getDocumentosEstudiante(estudiante.id).solicitud)"
+                class="btn-download"
+                title="Ver solicitud"
+            >
+                <i class="fas fa-eye status-icon" style="color: #28a745;"></i>
+            </button>
+
+            <button
+                @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).solicitud)"
+                class="btn-download"
+                title="Descargar solicitud"
+            >
+                <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
+            </button>
+
+            <span class="status-label">Subido</span>
+        </template>
+
+        <template v-else>
+            <div class="status-asesor">
+                <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
+                <span class="status-label">Pendiente</span>
+            </div>
+        </template>
+    </div>
+</td>
+
+<!-- ANTEPROYECTO -->
+<td class="status-cell">
+    <div
+        v-for="estudiante in proyecto.estudiantes"
+        :key="'anteproyecto-' + estudiante.id"
+        class="status-item"
+    >
+        <template v-if="getDocumentosEstudiante(estudiante.id)?.anteproyecto?.subido">
+            <button
+                @click="verDocumento(getDocumentosEstudiante(estudiante.id).anteproyecto)"
+                class="btn-download"
+                title="Ver anteproyecto"
+            >
+                <i class="fas fa-eye status-icon" style="color: #28a745;"></i>
+            </button>
+
+            <button
+                @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).anteproyecto)"
+                class="btn-download"
+                title="Descargar anteproyecto"
+            >
+                <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
+            </button>
+
+            <span class="status-label">Subido</span>
+        </template>
+
+        <template v-else>
+            <div class="status-asesor">
+                <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
+                <span class="status-label">Pendiente</span>
+            </div>
+        </template>
+    </div>
+</td>
+
+                            <!-- Seguimiento 1 -->
+                            <td class="status-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="estudiante.id"
+                                    class="status-item"
+                                >
+                                    <div class="status-icons">
+
+                                        <template
+                                            v-if="
+                                                estudiante.primer?.puntualidad_interno != null
+                                                &&
+                                                estudiante.primer?.puntualidad_externo != null
+                                            "
+                                        >
+                                            <button
+                                                @click="descargarSeguimiento(estudiante.id, 'primer')"
+                                                class="btn-download"
+                                                title="Descargar seguimiento"
+                                            >
+                                                <img
+                                                    src="/images/UnoSegui.png"
+                                                    alt="Descargar"
+                                                    class="status-icon"
+                                                >
+                                            </button>
+                                        </template>
+
+                                        <template v-else>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.primer?.puntualidad_interno != null"
+                                                    src="/images/IntSi.png"
+                                                    alt="Interno OK"
+                                                    class="status-icon"
+                                                    title="Asesor Interno ya calificó"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/IntNo.png"
+                                                    alt="Interno pendiente"
+                                                    class="status-icon"
+                                                    title="Asesor Interno no ha calificado"
+                                                >
+
+                                                <span class="status-label">
+                                                    Interno
+                                                </span>
+                                            </div>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.primer?.puntualidad_externo != null"
+                                                    src="/images/ExtSi.png"
+                                                    alt="Externo OK"
+                                                    class="status-icon"
+                                                    title="Asesor Externo ya calificó"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/ExtNo.png"
+                                                    alt="Externo pendiente"
+                                                    class="status-icon"
+                                                    title="Asesor Externo no ha calificado"
+                                                >
+
+                                                <span class="status-label">
+                                                    Externo
+                                                </span>
+                                            </div>
+
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Seguimiento 2 -->
+                            <td class="status-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="estudiante.id"
+                                    class="status-item"
+                                >
+                                    <div class="status-icons">
+
+                                        <template
+                                            v-if="
+                                                estudiante.segundo?.puntualidad_interno != null
+                                                &&
+                                                estudiante.segundo?.puntualidad_externo != null
+                                            "
+                                        >
+                                            <button
+                                                @click="descargarSeguimiento(estudiante.id, 'segundo')"
+                                                class="btn-download"
+                                                title="Descargar seguimiento"
+                                            >
+                                                <img
+                                                    src="/images/DosSegui.png"
+                                                    alt="Descargar"
+                                                    class="status-icon"
+                                                >
+                                            </button>
+                                        </template>
+
+                                        <template v-else>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.segundo?.puntualidad_interno != null"
+                                                    src="/images/IntSi.png"
+                                                    alt="Interno OK"
+                                                    class="status-icon"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/IntNo.png"
+                                                    alt="Interno pendiente"
+                                                    class="status-icon"
+                                                >
+
+                                                <span class="status-label">
+                                                    Interno
+                                                </span>
+                                            </div>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.segundo?.puntualidad_externo != null"
+                                                    src="/images/ExtSi.png"
+                                                    alt="Externo OK"
+                                                    class="status-icon"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/ExtNo.png"
+                                                    alt="Externo pendiente"
+                                                    class="status-icon"
+                                                >
+
+                                                <span class="status-label">
+                                                    Externo
+                                                </span>
+                                            </div>
+
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Seguimiento Final -->
+                            <td class="status-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="estudiante.id"
+                                    class="status-item"
+                                >
+                                    <div class="status-icons">
+
+                                        <template
+                                            v-if="
+                                                estudiante.ultimo?.promedio_interno != null
+                                                &&
+                                                estudiante.ultimo?.promedio_externo != null
+                                            "
+                                        >
+                                            <button
+                                                @click="descargarSeguimiento(estudiante.id, 'ultimo')"
+                                                class="btn-download"
+                                                title="Descargar seguimiento"
+                                            >
+                                                <img
+                                                    src="/images/TresSegui.png"
+                                                    alt="Descargar"
+                                                    class="status-icon"
+                                                >
+                                            </button>
+                                        </template>
+
+                                        <template v-else>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.ultimo?.promedio_interno != null"
+                                                    src="/images/IntSi.png"
+                                                    alt="Interno OK"
+                                                    class="status-icon"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/IntNo.png"
+                                                    alt="Interno pendiente"
+                                                    class="status-icon"
+                                                >
+
+                                                <span class="status-label">
+                                                    Interno
+                                                </span>
+                                            </div>
+
+                                            <div class="status-asesor">
+                                                <img
+                                                    v-if="estudiante.ultimo?.promedio_externo != null"
+                                                    src="/images/ExtSi.png"
+                                                    alt="Externo OK"
+                                                    class="status-icon"
+                                                >
+
+                                                <img
+                                                    v-else
+                                                    src="/images/ExtNo.png"
+                                                    alt="Externo pendiente"
+                                                    class="status-icon"
+                                                >
+
+                                                <span class="status-label">
+                                                    Externo
+                                                </span>
+                                            </div>
+
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <!-- Paginación -->
       <!-- Paginación - Siempre visible, pero botones deshabilitados cuando no hay suficientes datos -->
@@ -444,9 +768,39 @@ import AppLayout from '@/Layouts/appLayout.vue'
 const props = defineProps({
     proyectos: Array,
     asesores: Array,
-    periodoActual: Object
+    periodoActual: Object,
+    fueraTiempoActivo: Boolean,
+    internoConfig: Object,
+    documentosProcesados: Object  // ← Agregar esta prop
 })
 
+const getDocumentosEstudiante = (estudianteId) => {
+    return props.documentosProcesados[estudianteId] || {
+        solicitud: null,
+        anteproyecto: null,
+        kardex: null,
+        seguro: null,
+        servicio: null
+    }}
+const fueraTiempo = ref(props.fueraTiempoActivo)
+const internoActivo = ref(
+  props.internoConfig?.valor === 'si'
+)
+
+const cambiarFueraTiempo = () => {
+
+    router.post('/configuracion/fuera-tiempo', {
+        activo: fueraTiempo.value
+    }, {
+        preserveScroll: true
+    })
+}
+
+const cambiarInterno = () => {
+  router.post(route('configuracion.interno'), {
+    valor: internoActivo.value ? 'si' : 'no'
+  })
+}
 //Paginacion
 const paginaActual = ref(1)
 const registrosPorPagina = ref(4)
@@ -462,6 +816,7 @@ const proyectosPaginados = computed(() => {
 const totalPaginas = computed(() => {
   return Math.ceil(props.proyectos.length / registrosPorPagina.value)
 })
+
 
 // Resetear a página 1 cuando cambian los proyectos (por búsqueda)
 import { watch } from 'vue'
@@ -623,6 +978,49 @@ const descargarSeguimiento = (estudianteId, tipo) => {
     }
     window.open(route(rutas[tipo], estudianteId), '_blank')
 }
+
+// Ver documento
+const verDocumento = (documento) => {
+    if (!documento || !documento.subido) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Documento no disponible',
+            text: 'El estudiante aún no ha subido este documento',
+            confirmButtonText: 'OK'
+        })
+        return
+    }
+    
+    // Si tiene URL externa
+    if (documento.url_documento) {
+        window.open(documento.url_documento, '_blank')
+        return
+    }
+    
+    // Si tiene archivo subido
+    if (documento.ruta_archivo) {
+        window.open(route('documentos.ver', documento.id), '_blank')
+    }
+}
+
+// Descargar documento
+const descargarDocumento = (documento) => {
+    if (!documento || !documento.subido) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Documento no disponible',
+            text: 'El estudiante aún no ha subido este documento',
+            confirmButtonText: 'OK'
+        })
+        return
+    }
+    
+    if (documento.ruta_archivo) {
+        window.open(route('documentos.download', documento.id), '_blank')
+    } else if (documento.url_documento) {
+        window.open(documento.url_documento, '_blank')
+    }
+}
 </script>
 
 <script>
@@ -652,6 +1050,80 @@ export default {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.title-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.outside-time-toggle{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#f8fafc;
+    padding:10px 16px;
+    border-radius:14px;
+    border:1px solid #e2e8f0;
+}
+
+.toggle-label{
+    font-weight:600;
+    color:#334155;
+}
+
+.toggle-status{
+    font-weight:bold;
+    color:#ef4444;
+    min-width:25px;
+}
+
+.toggle-status.active{
+    color:#22c55e;
+}
+
+.switch{
+    position:relative;
+    display:inline-block;
+    width:54px;
+    height:28px;
+}
+
+.switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+
+.slider{
+    position:absolute;
+    cursor:pointer;
+    inset:0;
+    background:#cbd5e1;
+    transition:.3s;
+    border-radius:30px;
+}
+
+.slider:before{
+    position:absolute;
+    content:"";
+    height:22px;
+    width:22px;
+    left:3px;
+    bottom:3px;
+    background:white;
+    transition:.3s;
+    border-radius:50%;
+}
+
+.switch input:checked + .slider{
+    background:#22c55e;
+}
+
+.switch input:checked + .slider:before{
+    transform:translateX(26px);
 }
 
 /* ===== PAGINACIÓN ===== */

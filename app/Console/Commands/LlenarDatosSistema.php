@@ -13,148 +13,138 @@ use Carbon\Carbon;
 
 use Illuminate\Console\Command;
 
+
 class LlenarDatosSistema extends Command
 {
     /**
-     * The name and signature of the console command.
-     *
-     * @var string
+     * Nombre del comando
      */
     protected $signature = 'app:llenar-datos-sistema';
 
     /**
-     * The console command description.
-     *
-     * @var string
+     * Descripción
      */
-    protected $description = 'Llena la base de datos con datos relacionados (estudiantes, asesores, proyectos, usuarios)';
+    protected $description = 'Ejecuta seeders y crea un estudiante demo';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        //
-         $this->info('Iniciando llenado de datos iniciales...');
 
-        // 1. Llenar primero con los seeders
-        Artisan::call('db:seed', ['--class' => 'DatabaseSeeder']);
-        //$periodo = Periodo::factory()->create();
+        $this->info('Ejecutando seeders...');
 
-        $hoy = Carbon::now();
+        /*
+        |--------------------------------------------------------------------------
+        | Ejecutar seeders
+        |--------------------------------------------------------------------------
+        */
 
-        if ($hoy->month <= 6) {
+        Artisan::call('db:seed');
 
-            $nombrePeriodo = 'Enero - Junio ' . $hoy->year;
+        $this->info('Seeders ejecutados correctamente.');
 
-            $fechaInicio = Carbon::create($hoy->year, 1, 1);
+        /*
+        |--------------------------------------------------------------------------
+        | Buscar carrera
+        |--------------------------------------------------------------------------
+        */
 
-            $fechaFinal = Carbon::create($hoy->year, 6, 30);
+        $carrera = Carrera::first();
 
-        } else {
+        if (!$carrera) {
 
-            $nombrePeriodo = 'Agosto - Diciembre ' . $hoy->year;
+            $this->error('No existe ninguna carrera.');
 
-            $fechaInicio = Carbon::create($hoy->year, 8, 1);
-
-            $fechaFinal = Carbon::create($hoy->year, 12, 31);
+            return;
         }
 
-        // Buscar si YA existe un periodo para ese semestre
-        $periodo = Periodo::where(function ($query) use ($fechaInicio, $fechaFinal) {
+        /*
+        |--------------------------------------------------------------------------
+        | Crear estudiante
+        |--------------------------------------------------------------------------
+        */
 
-            $query->whereBetween('fecha_inicio', [$fechaInicio, $fechaFinal])
-                ->orWhereBetween('fecha_final', [$fechaInicio, $fechaFinal]);
+        $estudiante = new Estudiante();
 
-        })->first();
+        $estudiante->nombre = 'Carlos';
 
+        $estudiante->apellido_paterno = 'Santana';
 
-        // Si no existe, crearlo
-        if (!$periodo) {
+        $estudiante->apellido_materno = 'Demo';
 
-            $periodo = Periodo::create([
+        $estudiante->correo_electronico =
+            'santana@gmail.com';
 
-                'nombre' => $nombrePeriodo,
+        $estudiante->numero_de_control =
+            '22110001';
 
-                'fecha_inicio' => $fechaInicio,
+        $estudiante->telefono =
+            '5555555555';
 
-                'fecha_final' => $fechaFinal,
+        $estudiante->direccion =
+            'Dirección demo';
 
-                'fecha_inicio_1er_reporte' => $fechaInicio->copy()->addDays(5),
+        $estudiante->institucion_seguridad_social =
+            'IMSS';
 
-                'fecha_final_1er_reporte' => $fechaInicio->copy()->addDays(10),
+        $estudiante->numero_de_seguridad_social =
+            123456789;
 
-                'fecha_inicio_2do_reporte' => $fechaInicio->copy()->addDays(28),
+        $estudiante->carrera_id =
+            $carrera->id;
 
-                'fecha_final_2do_reporte' => $fechaInicio->copy()->addDays(35),
+        // SIN PROYECTO
+        $estudiante->proyecto_id = null;
 
-                'fecha_inicio_reporte_final' => $fechaInicio->copy()->addDays(40),
+        $estudiante->save();
 
-                'fecha_final_reporte_final' => $fechaInicio->copy()->addDays(45),
-            ]);
-        }
+        $this->info('Estudiante creado.');
 
-        // 2. Crear más asesores
-        $asesores = Asesor::factory(3)->create();
+        /*
+        |--------------------------------------------------------------------------
+        | Crear usuario
+        |--------------------------------------------------------------------------
+        */
 
-        $carreras = Carrera::all();
+        $usuario = new Usuario();
 
-        foreach ($asesores as $asesor) {
+        $usuario->usa_id =
+            $estudiante->id;
 
-            // asignar entre 1 y 2 carreras random
-            $asesor->carreras()->attach(
-                $carreras->random(rand(1,2))->pluck('id')
-            );
-        }
+        $usuario->usa_type =
+            Estudiante::class;
 
-        // 3. Crear más estudiantes
-        $estudiantes = Estudiante::factory(10)->create();
+        $usuario->nombre_usuario =
+            'santana@gmail.com';
 
-        // 4. Crear más proyectos y asignar relaciones
-        foreach ($estudiantes as $estudiante) {
+        $usuario->contraseña =
+            Hash::make('1234');
 
-            $asesoresCompatibles = Asesor::whereHas('carreras', function ($query) use ($estudiante) {
-            $query->where('carrera_id', $estudiante->carrera_id);
-            })->get();
-            
-            // evitar error si no hay asesores
-            if ($asesoresCompatibles->isEmpty()) {
-                continue;
-            }
+        $usuario->save();
 
-            $asesor = $asesoresCompatibles->random();
+        $this->info('Usuario creado.');
 
-            $proyecto = Proyecto::create([
-                'nombre' => 'Proyecto de ' . $estudiante->nombre,
-                'objetivo_general' => 'Objetivo de prueba',
-                'justificacion' => 'Justificación de prueba',
-                'informacion' => 'Información de prueba',
-                'estudiante_id' => $estudiante->id,
-                'asesor_id' => $asesor->id,
-                'externo_id' => null,
-                'empresa_id' => null,
-                'periodo_id' => $periodo->id,
-            ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Datos finales
+        |--------------------------------------------------------------------------
+        */
 
-            // Usuario para estudiante
-            Usuario::create([
-                'usa_id' => $estudiante->id,
-                'usa_type' => Estudiante::class,
-                'nombre_usuario' => $estudiante->correo_electronico,
-                'contraseña' => Hash::make('1234'),
-            ]);
-        }
+        $this->newLine();
 
-        // Usuarios para asesores
-        foreach ($asesores as $asesor) {
-            Usuario::create([
-                'usa_id' => $asesor->id,
-                'usa_type' => Asesor::class,
-                'nombre_usuario' => $asesor->correo_electronico,
-                'contraseña' => Hash::make('1234'),
-            ]);
-        }
+        $this->info('================================');
 
-        $this->info('Datos creados correctamente ');
+        $this->info('USUARIO CREADO');
+
+        $this->info('================================');
+
+        $this->line('Usuario: santana@gmail.com');
+
+        $this->line('Password: 1234');
+
+        $this->newLine();
+
+        $this->info('Proceso terminado.');
     }
 }

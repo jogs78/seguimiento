@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('actividades', function (Blueprint $table) {
             $table->id();
-            $table->string("orden");
+            //$table->string("orden");
             $table->string("nombre");
-            $table->integer("semanas");
+            //$table->integer("semanas");
             $table->string("descripcion");
             $table->foreignId('proyecto_id')->nullable()->default(null)->constrained('proyectos');
             $table->timestamps();

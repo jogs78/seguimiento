@@ -3,59 +3,40 @@
     <div class="bodydiv">
       <div class="horizontal">
         <p class="subtitulo">
-          <i class="fas fa-edit"></i>
-          Actualizar Actividad
+          <i class="fas fa-copy"></i>
+          Reutilizar Actividad
         </p>
       </div>
 
       <div class="centro">
         <div class="form-card">
-          <form @submit.prevent="actualizarActividad" class="formulario">
-            
-            <!-- Campo: Nombre -->
-            <div class="form-group">
-              <label class="parrafo">
-                <i class="fas fa-tag"></i>
-                Nombre de la actividad
-              </label>
-              <input 
-                type="text" 
-                v-model="form.nombre"
-                class="input-text"
-                :class="{ 'error': errores.nombre }"
-                placeholder="Ingrese el nombre de la actividad"
-              />
-              <span v-if="errores.nombre" class="error-mensaje">
-                <i class="fas fa-exclamation-circle"></i> {{ errores.nombre }}
-              </span>
+          <!-- Información de la actividad original (solo lectura) -->
+          <div class="info-card">
+            <div class="info-header">
+              <i class="fas fa-info-circle"></i>
+              <h3>Actividad a reutilizar</h3>
             </div>
-
-            <!-- Campo: Descripción -->
-            <div class="form-group">
-              <label class="parrafo">
-                <i class="fas fa-align-left"></i>
-                Describe cómo realizarás esta actividad
-              </label>
-              <textarea 
-                ref="textareaRef"
-                v-model="form.descripcion"
-                class="textarea-auto"
-                :class="{ 'error': errores.descripcion }"
-                rows="1"
-                placeholder="Describe detalladamente la actividad..."
-                @input="autoResize"
-              ></textarea>
-              <span v-if="errores.descripcion" class="error-mensaje">
-                <i class="fas fa-exclamation-circle"></i> {{ errores.descripcion }}
-              </span>
+            <div class="info-content">
+              <p><strong>Nombre:</strong> {{ actividad.nombre }}</p>
+              <p><strong>Descripción:</strong> {{ actividad.descripcion }}</p>
+              <div v-if="actividad.cronogramas && actividad.cronogramas.length > 0" class="info-original">
+                <p><strong>Configuración original:</strong></p>
+                <ul>
+                  <li v-for="cron in actividad.cronogramas" :key="cron.id">
+                    Orden: {{ cron.orden }} | Semanas: {{ cron.semana_inicio }} - {{ cron.semana_fin }}
+                  </li>
+                </ul>
+              </div>
             </div>
+          </div>
 
-            <!-- Campos: Semanas (inicio y fin) -->
+          <!-- Formulario para nueva configuración -->
+          <form @submit.prevent="reutilizarActividad" class="formulario">
             <div class="form-group-row">
               <div class="form-group half">
                 <label class="parrafo">
                   <i class="fas fa-play-circle"></i>
-                  Semana de inicio
+                  Semana de inicio *
                 </label>
                 <input 
                   type="number" 
@@ -63,8 +44,7 @@
                   class="input-number"
                   :class="{ 'error': errores.semana_inicio }"
                   min="1"
-                  step="1"
-                  placeholder="Semana inicial"
+                  placeholder="Ej: 1"
                 />
                 <span v-if="errores.semana_inicio" class="error-mensaje">
                   <i class="fas fa-exclamation-circle"></i> {{ errores.semana_inicio }}
@@ -74,16 +54,15 @@
               <div class="form-group half">
                 <label class="parrafo">
                   <i class="fas fa-stop-circle"></i>
-                  Semana de fin
+                  Semana de fin *
                 </label>
                 <input 
                   type="number" 
                   v-model.number="form.semana_fin"
                   class="input-number"
                   :class="{ 'error': errores.semana_fin }"
-                  min="1"
-                  step="1"
-                  placeholder="Semana final"
+                  :min="form.semana_inicio || 1"
+                  placeholder="Ej: 4"
                 />
                 <span v-if="errores.semana_fin" class="error-mensaje">
                   <i class="fas fa-exclamation-circle"></i> {{ errores.semana_fin }}
@@ -91,13 +70,11 @@
               </div>
             </div>
 
-            <!-- Campo: Orden (único) -->
             <div class="form-group">
               <label class="parrafo">
                 <i class="fas fa-sort-numeric-down"></i>
-                Orden de la actividad
+                Orden de la actividad *
               </label>
-              
               <div class="orden-simple">
                 <input 
                   type="number" 
@@ -105,41 +82,29 @@
                   class="input-number"
                   :class="{ 'error': errores.orden }"
                   min="1"
-                  placeholder="Ej: 1, 2, 3..."
+                  placeholder="Ej: 5"
                 />
                 <small class="help-text">Orden en que aparecerá esta actividad en el cronograma</small>
                 
-                <!-- Mostrar órdenes ocupados por otras actividades -->
-                <div v-if="ordenesOcupados && ordenesOcupados.length > 0" class="ordenes-ocupadas">
+                <div v-if="ordenesExistentes && ordenesExistentes.length > 0" class="ordenes-ocupadas">
                   <i class="fas fa-info-circle"></i>
                   <small class="warning-text">
-                    Órdenes ocupados por otras actividades: {{ ordenesOcupados.join(', ') }}
+                    Órdenes ocupados en este proyecto: {{ ordenesExistentes.join(', ') }}
                   </small>
                 </div>
               </div>
-
               <span v-if="errores.orden" class="error-mensaje">
                 <i class="fas fa-exclamation-circle"></i> {{ errores.orden }}
               </span>
             </div>
 
-            <!-- Mostrar información adicional -->
-            <div v-if="cronogramaInfo" class="info-card">
-              <i class="fas fa-info-circle"></i>
-              <div class="info-content">
-                <p><strong>Información actual:</strong></p>
-                <p>📅 Semanas: {{ cronogramaInfo.semana_inicio }} a {{ cronogramaInfo.semana_fin }}</p>
-                <p>🔢 Orden: {{ cronogramaInfo.orden }}</p>
-              </div>
-            </div>
-
             <!-- Botones -->
             <div class="botones-container">
-              <button type="submit" class="btn-actualizar" :disabled="cargando">
-                <i class="fas" :class="cargando ? 'fa-spinner fa-pulse' : 'fa-save'"></i>
-                {{ cargando ? 'Actualizando...' : 'Actualizar Actividad' }}
+              <button type="submit" class="btn-reutilizar" :disabled="cargando">
+                <i class="fas" :class="cargando ? 'fa-spinner fa-pulse' : 'fa-copy'"></i>
+                {{ cargando ? 'Reutilizando...' : 'Reutilizar Actividad' }}
               </button>
-              <Link :href="route('proyectos.show', proyectoId)" class="btn-cancelar">
+              <Link :href="route('proyectos.show', proyecto.id)" class="btn-cancelar">
                 <i class="fas fa-times"></i> Cancelar
               </Link>
             </div>
@@ -151,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, reactive } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 
@@ -159,60 +124,21 @@ import AppLayout from '@/Layouts/appLayout.vue'
 const props = defineProps({
   proyecto: { type: Object, required: true },
   actividad: { type: Object, required: true },
-  cronograma: { type: Object, required: false }, // Información del cronograma actual
-  ordenesOcupados: { type: Array, default: () => [] }, // Órdenes ocupados por otras actividades
-  flash: Object
+  ordenesExistentes: { type: Array, default: () => [] }
 })
 
-const proyectoId = props.proyecto.id
-const actividadId = props.actividad.id
-
-// Formulario (estructura actualizada)
 const form = ref({
-  nombre: props.actividad.nombre || '',
-  descripcion: props.actividad.descripcion || '',
-  semana_inicio: props.cronograma?.semana_inicio || 1,
-  semana_fin: props.cronograma?.semana_fin || 4,
-  orden: props.cronograma?.orden || 1
-})
-
-// Información del cronograma actual
-const cronogramaInfo = computed(() => {
-  if (props.cronograma) {
-    return {
-      semana_inicio: props.cronograma.semana_inicio,
-      semana_fin: props.cronograma.semana_fin,
-      orden: props.cronograma.orden
-    }
-  }
-  return null
+  semana_inicio: 1,
+  semana_fin: 4,
+  orden: null
 })
 
 const cargando = ref(false)
 const errores = ref({})
-const textareaRef = ref(null)
-
-// Auto-resize
-const autoResize = () => {
-  nextTick(() => {
-    if (textareaRef.value) {
-      textareaRef.value.style.height = 'auto'
-      textareaRef.value.style.height = textareaRef.value.scrollHeight + 'px'
-    }
-  })
-}
 
 // Validar formulario
 const validarFormulario = () => {
   const nuevosErrores = {}
-  
-  if (!form.value.nombre.trim()) {
-    nuevosErrores.nombre = 'El nombre de la actividad es requerido'
-  }
-  
-  if (!form.value.descripcion.trim()) {
-    nuevosErrores.descripcion = 'La descripción es requerida'
-  }
   
   if (!form.value.semana_inicio || form.value.semana_inicio < 1) {
     nuevosErrores.semana_inicio = 'La semana de inicio debe ser al menos 1'
@@ -222,26 +148,22 @@ const validarFormulario = () => {
     nuevosErrores.semana_fin = 'La semana de fin debe ser al menos 1'
   }
   
-  // Validar que semana_fin >= semana_inicio
   if (form.value.semana_inicio && form.value.semana_fin && form.value.semana_fin < form.value.semana_inicio) {
     nuevosErrores.semana_fin = 'La semana de fin debe ser mayor o igual a la semana de inicio'
   }
   
   if (!form.value.orden || form.value.orden < 1) {
     nuevosErrores.orden = 'El orden debe ser mayor a 0'
-  } else {
-    // Verificar si el orden está ocupado por otra actividad
-    if (props.ordenesOcupados && props.ordenesOcupados.includes(form.value.orden)) {
-      nuevosErrores.orden = `El orden ${form.value.orden} ya está ocupado por otra actividad`
-    }
+  } else if (props.ordenesExistentes.includes(form.value.orden)) {
+    nuevosErrores.orden = `El orden ${form.value.orden} ya está ocupado`
   }
   
   errores.value = nuevosErrores
   return Object.keys(nuevosErrores).length === 0
 }
 
-// Actualizar actividad
-const actualizarActividad = () => {
+// Reutilizar actividad
+const reutilizarActividad = () => {
   if (!validarFormulario()) {
     const mensajesError = []
     Object.values(errores.value).forEach(e => mensajesError.push(`• ${e}`))
@@ -257,32 +179,20 @@ const actualizarActividad = () => {
   
   cargando.value = true
   
-  // Datos a enviar (estructura actualizada)
-  const datosEnvio = {
-    nombre: form.value.nombre,
-    descripcion: form.value.descripcion,
-    semana_inicio: form.value.semana_inicio,
-    semana_fin: form.value.semana_fin,
-    orden: form.value.orden,
-    cronograma_id: props.cronograma?.id || null
-  }
-  
-  router.put(route('proyectos.actividades.update', [proyectoId, actividadId]), datosEnvio, {
+  router.post(route('proyectos.actividades.storeReutilizar', [props.proyecto.id, props.actividad.id]), form.value, {
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
         icon: 'success',
-        title: '¡Actualizada!',
-        text: 'La actividad ha sido actualizada correctamente',
+        title: '¡Reutilizada!',
+        text: 'La actividad ha sido reutilizada correctamente',
         confirmButtonText: 'OK'
       }).then(() => {
-        router.visit(route('proyectos.show', proyectoId))
+        router.visit(route('proyectos.show', props.proyecto.id))
       })
     },
     onError: (errors) => {
       const nuevosErrores = {}
-      if (errors.nombre) nuevosErrores.nombre = errors.nombre
-      if (errors.descripcion) nuevosErrores.descripcion = errors.descripcion
       if (errors.semana_inicio) nuevosErrores.semana_inicio = errors.semana_inicio
       if (errors.semana_fin) nuevosErrores.semana_fin = errors.semana_fin
       if (errors.orden) nuevosErrores.orden = errors.orden
@@ -292,7 +202,7 @@ const actualizarActividad = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: Object.values(errors)[0] || 'No se pudo actualizar la actividad',
+        text: Object.values(errors)[0] || 'No se pudo reutilizar la actividad',
         confirmButtonText: 'OK'
       })
     },
@@ -301,15 +211,58 @@ const actualizarActividad = () => {
     }
   })
 }
-
-// Inicializar auto-resize
-onMounted(() => {
-  autoResize()
-})
 </script>
 
 <style scoped>
-/* Estilos actualizados */
+.form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+.info-card {
+  background-color: #e8f4fd;
+  border-left: 4px solid #002455;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.info-header i {
+  color: #002455;
+  font-size: 1.2rem;
+}
+
+.info-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #002455;
+}
+
+.info-content p {
+  margin: 0.5rem 0;
+}
+
+.info-original {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #cce5ff;
+}
+
+.info-original ul {
+  margin: 0.5rem 0 0 1.5rem;
+}
+
 .form-group-row {
   display: flex;
   gap: 1rem;
@@ -331,7 +284,6 @@ onMounted(() => {
 }
 
 .ordenes-ocupadas {
-  margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
   background-color: #fff3cd;
   border-radius: 6px;
@@ -348,45 +300,17 @@ onMounted(() => {
 .help-text {
   color: #6c757d;
   font-size: 0.75rem;
-  margin-top: 0.25rem;
 }
 
-.info-card {
-  background-color: #e8f4fd;
-  border-left: 4px solid #002455;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-}
-
-.info-card i {
-  color: #002455;
-  font-size: 1.2rem;
-  margin-top: 0.2rem;
-}
-
-.info-content p {
-  margin: 0.25rem 0;
-  font-size: 0.85rem;
-}
-
-.input-text,
-.input-number,
-.textarea-auto {
+.input-number {
   width: 100%;
   padding: 0.6rem 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.2s;
 }
 
-.input-text:focus,
-.input-number:focus,
-.textarea-auto:focus {
+.input-number:focus {
   outline: none;
   border-color: #002455;
   box-shadow: 0 0 0 3px rgba(0, 36, 85, 0.1);
@@ -410,8 +334,8 @@ onMounted(() => {
   margin-top: 2rem;
 }
 
-.btn-actualizar {
-  background: linear-gradient(135deg, #002455, #050E3C);
+.btn-reutilizar {
+  background: linear-gradient(135deg, #17a2b8, #138496);
   color: white;
   border: none;
   padding: 0.6rem 1.5rem;
@@ -424,12 +348,12 @@ onMounted(() => {
   gap: 0.5rem;
 }
 
-.btn-actualizar:hover:not(:disabled) {
+.btn-reutilizar:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 36, 85, 0.3);
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
 }
 
-.btn-actualizar:disabled {
+.btn-reutilizar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -446,14 +370,12 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: background 0.2s;
 }
 
 .btn-cancelar:hover {
   background: #5a6268;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .form-group-row {
     flex-direction: column;
@@ -464,7 +386,7 @@ onMounted(() => {
     flex-direction: column;
   }
   
-  .btn-actualizar,
+  .btn-reutilizar,
   .btn-cancelar {
     width: 100%;
     justify-content: center;

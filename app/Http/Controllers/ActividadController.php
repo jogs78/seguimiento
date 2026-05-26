@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Actividad;
+use App\Models\Cronograma;
 use App\Models\Proyecto;
 use App\Models\Periodo;
 use Illuminate\Http\Request;
@@ -19,43 +20,50 @@ class ActividadController extends Controller
      */
     public function index(Proyecto $proyecto)
     {
-        if (! Gate::allows('update',$proyecto)){
+        if (!Gate::allows('update', $proyecto)) {
             return view('estudiante.aviso.no-autorizado');
-
         }
-        $todos = $proyecto->actividades;
-
-      
-        //con inertia
+        
+        // Cargar actividades con sus cronogramas
+        $actividades = $proyecto->actividades()->with('cronogramas')->get();
+        
+        // Expandir cada actividad por cada cronograma
+        $actividadesExpandidas = [];
+        
+        foreach ($actividades as $actividad) {
+            foreach ($actividad->cronogramas as $cronograma) {
+                $actividadesExpandidas[] = [
+                    'id' => $actividad->id,
+                    'nombre' => $actividad->nombre,
+                    'descripcion' => $actividad->descripcion,
+                    'cronograma_id' => $cronograma->id,
+                    'orden' => $cronograma->orden,
+                    'semana_inicio' => $cronograma->semana_inicio,
+                    'semana_fin' => $cronograma->semana_fin,
+                ];
+            }
+        }
+        
+        // Ordenar por orden
+        usort($actividadesExpandidas, function($a, $b) {
+            return $a['orden'] - $b['orden'];
+        });
+        
         return Inertia::render('proyecto/mostrar', [
-            'todos' => $todos,
+            'todos' => $actividadesExpandidas,
             'proyecto' => $proyecto
         ]);
-
     }
 
     /**
      * Show the form for creating a new resource.
      */
-      public function create(Proyecto $proyecto)
+    public function create(Proyecto $proyecto)
     {
-        // Obtener los órdenes existentes (pueden ser múltiples)
-        $ordenesExistentes = Actividad::where('proyecto_id', $proyecto->id)
-            ->get()
-            ->flatMap(function($actividad) {
-                // Si el orden contiene comas, dividirlo en múltiples órdenes
-                if (str_contains($actividad->orden, ',')) {
-                    return array_map('trim', explode(',', $actividad->orden));
-                }
-                return [$actividad->orden];
-            })
-            ->map(function($orden) {
-                return (int) $orden;
-            })
-            ->unique()
-            ->sort()
-            ->values()
-            ->toArray();
+        // Obtener órdenes existentes de los cronogramas
+        $ordenesExistentes = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+            $q->where('proyecto_id', $proyecto->id);
+        })->pluck('orden')->unique()->sort()->values()->toArray();
         
         return Inertia::render('actividad/crear', [
             'proyecto' => $proyecto,
@@ -72,84 +80,71 @@ class ActividadController extends Controller
             'actividades' => 'required|array|min:1',
             'actividades.*.nombre' => 'required|string|max:255',
             'actividades.*.descripcion' => 'required|string',
-            'actividades.*.semanas' => 'required|integer|min:1',
-            'actividades.*.orden' => 'required|string', // Cambiado a string
+            'actividades.*.semana_inicio' => 'required|integer|min:1',
+            'actividades.*.semana_fin' => 'required|integer|min:1|gte:actividades.*.semana_inicio',
+            'actividades.*.orden' => 'required|integer|min:1',
         ]);
         
-        // Procesar cada actividad
+        // Verificar órdenes duplicados
+        $ordenes = collect($request->actividades)->pluck('orden')->toArray();
+        $ordenesDuplicados = array_diff_assoc($ordenes, array_unique($ordenes));
+        
+        if (!empty($ordenesDuplicados)) {
+            return redirect()->back()->withErrors(['error' => 'Los órdenes no pueden repetirse: ' . implode(', ', $ordenesDuplicados)]);
+        }
+        
+        // Verificar que los órdenes no estén ocupados
+        $ordenesExistentes = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+            $q->where('proyecto_id', $proyecto->id);
+        })->pluck('orden')->toArray();
+        
+        $ordenesOcupados = array_intersect($ordenes, $ordenesExistentes);
+        
+        if (!empty($ordenesOcupados)) {
+            return redirect()->back()->withErrors(['error' => "Los órdenes " . implode(', ', $ordenesOcupados) . " ya están ocupados"]);
+        }
+        
+        // Guardar actividades y cronogramas
         foreach ($request->actividades as $actividadData) {
-            $orden = $actividadData['orden'];
-            
-            // Verificar que el formato del orden sea válido
-            $ordenes = $this->parseOrden($orden);
-            
-            if (empty($ordenes)) {
-                return redirect()->back()->withErrors(['error' => "El orden '$orden' no es válido"]);
-            }
-            
-            // Verificar que los órdenes no estén ya ocupados
-            $ordenesExistentes = Actividad::where('proyecto_id', $proyecto->id)
-                ->get()
-                ->flatMap(function($act) {
-                    return $this->parseOrden($act->orden);
-                })
-                ->toArray();
-            
-            $ordenesOcupados = array_intersect($ordenes, $ordenesExistentes);
-            
-            if (!empty($ordenesOcupados)) {
-                return redirect()->back()->withErrors(['error' => "Los órdenes " . implode(', ', $ordenesOcupados) . " ya están ocupados"]);
-            }
-            
-            // Guardar la actividad
-            Actividad::create([
+            $actividad = Actividad::create([
                 'proyecto_id' => $proyecto->id,
                 'nombre' => $actividadData['nombre'],
                 'descripcion' => $actividadData['descripcion'],
-                'semanas' => $actividadData['semanas'],
-                'orden' => $orden,
+            ]);
+            
+            Cronograma::create([
+                'actividad_id' => $actividad->id,
+                'orden' => $actividadData['orden'],
+                'semana_inicio' => $actividadData['semana_inicio'],
+                'semana_fin' => $actividadData['semana_fin'],
             ]);
         }
         
-        return redirect()->route('proyectos.create', $proyecto->id)
+        return redirect()->route('proyectos.actividades.index', $proyecto->id)
             ->with('success', 'Actividades creadas correctamente');
     }
     
     /**
      * Verificar si un orden está disponible
      */
-     public function verificarOrden(Request $request, Proyecto $proyecto)
+    public function verificarOrden(Request $request, Proyecto $proyecto)
     {
         $orden = $request->input('orden');
-        $actividadId = $request->input('actividad_id');
+        $cronogramaId = $request->input('cronograma_id');
         
-        // Parsear el orden (puede ser múltiple como "4,7")
-        $ordenes = $this->parseOrden($orden);
+        $query = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+            $q->where('proyecto_id', $proyecto->id);
+        });
         
-        if (empty($ordenes)) {
-            return response()->json(['disponible' => false, 'error' => 'Orden inválido']);
+        if ($cronogramaId) {
+            $query->where('id', '!=', $cronogramaId);
         }
         
-        // Obtener órdenes ocupados en el proyecto
-        $query = Actividad::where('proyecto_id', $proyecto->id);
-        
-        if ($actividadId) {
-            $query->where('id', '!=', $actividadId);
-        }
-        
-        $ordenesOcupados = $query->get()
-            ->flatMap(function($act) {
-                return $this->parseOrden($act->orden);
-            })
-            ->toArray();
-        
-        $ordenesConflictivas = array_intersect($ordenes, $ordenesOcupados);
-        $disponible = empty($ordenesConflictivas);
+        $ordenOcupado = $query->where('orden', $orden)->exists();
         
         return response()->json([
-            'disponible' => $disponible,
-            'ordenes_ocupados' => $ordenesOcupados,
-            'ordenes_conflictivas' => $ordenesConflictivas
+            'disponible' => !$ordenOcupado,
+            'orden' => $orden
         ]);
     }
     /**
@@ -181,77 +176,127 @@ class ActividadController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
-            'semanas' => 'required|integer|min:1',
-            'orden' => 'required|string',
+            'semana_inicio' => 'required|integer|min:1',
+            'semana_fin' => 'required|integer|min:1|gte:semana_inicio',
+            'orden' => 'required|integer|min:1',
+            'cronograma_id' => 'required|exists:cronogramas,id',
         ]);
         
         $actividad = Actividad::findOrFail($actividadId);
-        $nuevoOrden = $request->orden;
+        $cronograma = Cronograma::findOrFail($request->cronograma_id);
         
-        // Parsear el nuevo orden
-        $nuevasOrdenes = $this->parseOrden($nuevoOrden);
+        // Verificar que el cronograma pertenece a la actividad
+        if ($cronograma->actividad_id != $actividad->id) {
+            return redirect()->back()->withErrors(['error' => 'El cronograma no pertenece a esta actividad']);
+        }
         
-        if (empty($nuevasOrdenes)) {
+        // Verificar que el nuevo orden no esté ocupado por otro cronograma
+        $ordenOcupado = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+            $q->where('proyecto_id', $proyecto->id);
+        })->where('id', '!=', $cronograma->id)
+        ->where('orden', $request->orden)
+        ->exists();
+        
+        if ($ordenOcupado) {
             throw ValidationException::withMessages([
-                'orden' => "El orden '$nuevoOrden' no es válido"
+                'orden' => "El orden {$request->orden} ya está ocupado por otra actividad"
             ]);
         }
         
-        // Obtener todos los órdenes ocupados por otras actividades
-        $ordenesOcupados = Actividad::where('proyecto_id', $proyecto->id)
-            ->where('id', '!=', $actividad->id)
-            ->get()
-            ->flatMap(function($act) {
-                return $this->parseOrden($act->orden);
-            })
-            ->toArray();
+        // Actualizar actividad
+        $actividad->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+        ]);
         
-        $ordenesConflictivas = array_intersect($nuevasOrdenes, $ordenesOcupados);
+        // Actualizar cronograma
+        $cronograma->update([
+            'orden' => $request->orden,
+            'semana_inicio' => $request->semana_inicio,
+            'semana_fin' => $request->semana_fin,
+        ]);
         
-        if (!empty($ordenesConflictivas)) {
-            throw ValidationException::withMessages([
-                'orden' => "Los órdenes " . implode(', ', $ordenesConflictivas) . " ya están ocupados por otras actividades"
-            ]);
-        }
-        
-        $actividad->update($request->all());
-        
-        return redirect()->route("proyectos.actividades.index",$proyecto->id) ->with('success', 'Actividad actualizada correctamente');
-   
+        return redirect()->route("proyectos.actividades.index", $proyecto->id)
+            ->with('success', 'Actividad actualizada correctamente');
     }
 
-    /**
-     * Parsea un string de órdenes (ej: "4,7" => [4,7])
-     */
-    private function parseOrden($orden)
-    {
-        if (empty($orden)) {
-            return [];
-        }
-        
-        // Si es solo un número
-        if (is_numeric($orden)) {
-            return [(int) $orden];
-        }
-        
-        // Si contiene comas, dividir y limpiar
-        if (str_contains($orden, ',')) {
-            $ordenes = array_map('trim', explode(',', $orden));
-            $ordenes = array_filter($ordenes, 'is_numeric');
-            return array_map('intval', $ordenes);
-        }
-        
-        return [];
-    }
+    
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Proyecto $proyecto, Actividad $actividad, $actividadId)
-    {   
-        $proyecto = Proyecto::with('actividades')->find($proyecto->id);
-        $actividad = Actividad::find($actividadId);
+    public function destroy(Proyecto $proyecto, $actividadId)
+    {
+        $actividad = Actividad::where('proyecto_id', $proyecto->id)
+            ->findOrFail($actividadId);
+        
+        // Eliminar cronogramas asociados (si no usas cascade)
+        $actividad->cronogramas()->delete();
+        
+        // Eliminar actividad
         $actividad->delete();
-        return redirect()->route("proyectos.actividades.index",$proyecto->id);
+        
+        return redirect()->route("proyectos.actividades.index", $proyecto->id)
+            ->with('success', 'Actividad eliminada correctamente');
     }
+
+    /**
+ * Show the form for reusing an activity
+ */
+public function reutilizar(Proyecto $proyecto, $actividadId)
+{
+    $actividad = Actividad::with('cronogramas')->findOrFail($actividadId);
+    
+    // Obtener órdenes existentes en el proyecto actual
+    $ordenesExistentes = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+        $q->where('proyecto_id', $proyecto->id);
+    })->pluck('orden')->unique()->sort()->values()->toArray();
+    
+    return Inertia::render('actividad/reutilizar', [
+        'proyecto' => $proyecto,
+        'actividad' => $actividad,
+        'ordenesExistentes' => $ordenesExistentes
+    ]);
+}
+
+/**
+ * Store a reused activity
+ */
+public function storeReutilizar(Request $request, Proyecto $proyecto, $actividadId)
+{
+    $request->validate([
+        'semana_inicio' => 'required|integer|min:1',
+        'semana_fin' => 'required|integer|min:1|gte:semana_inicio',
+        'orden' => 'required|integer|min:1',
+    ]);
+    
+    $actividadOriginal = Actividad::findOrFail($actividadId);
+    
+    // Verificar si el orden ya está ocupado
+    $ordenOcupado = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+        $q->where('proyecto_id', $proyecto->id);
+    })->where('orden', $request->orden)->exists();
+    
+    if ($ordenOcupado) {
+        return redirect()->back()->withErrors(['orden' => "El orden {$request->orden} ya está ocupado"]);
+    }
+    
+    // Crear nueva actividad (copiar la original)
+    $nuevaActividad = Actividad::create([
+        'proyecto_id' => $proyecto->id,
+        'nombre' => $actividadOriginal->nombre,
+        'descripcion' => $actividadOriginal->descripcion,
+    ]);
+    
+    // Crear nuevo cronograma
+    Cronograma::create([
+        'actividad_id' => $nuevaActividad->id,
+        'orden' => $request->orden,
+        'semana_inicio' => $request->semana_inicio,
+        'semana_fin' => $request->semana_fin,
+    ]);
+    
+    return redirect()->route('proyectos.show', $proyecto->id)
+        ->with('success', 'Actividad reutilizada correctamente');
+}
     
 }

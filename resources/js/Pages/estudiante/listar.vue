@@ -38,55 +38,128 @@
 
       <!-- Tabla -->
       <div style="margin-bottom: 40px" class="centro">
-        <table border="1" class="estudiantes-table">
-          <thead>
-            <tr>
-              <th class="thfondo">ID</th>
-              <th class="thfondo">NOMBRE</th>
-              <th class="thfondo">APELLIDOS</th>
-              <th class="thfondo">ACCIONES</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="estudiante in todos" :key="estudiante.id">
-              <td style="padding: 5px">{{ estudiante.id }}</td>
-              <td style="padding: 5px">{{ estudiante.nombre }}</td>
-              <td style="padding: 5px">
-                {{ estudiante.apellido_paterno }} {{ estudiante.apellido_materno }}
-              </td>
-              <td style="padding: 8px">
-                <Link :href="route('estudiantes.edit', estudiante.id)" class="btn-editar">
-                  Editar
-                </Link>
-                <form @submit.prevent="confirmarEliminacion(estudiante.id)">
-                  <button 
-                    type="submit" 
-                    class="btn-borrar" 
-                    :disabled="eliminando === estudiante.id"
-                    style="margin-top: 5px;"
-                  >
-                    {{ eliminando === estudiante.id ? '...' : 'Borrar' }}
-                  </button>
-                </form>
-              </td>
-            </tr>
-            
-            <tr v-if="todos.length === 0">
-              <td colspan="5" class="sin-datos">
-                No hay estudiantes registrados en el período actual
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table border="1" class="estudiantes-table">
+            <thead>
+              <tr>
+                <th class="thfondo">ID</th>
+                <th class="thfondo">Número de Control</th>
+                <th class="thfondo">NOMBRE</th>
+                <th class="thfondo">APELLIDOS</th>
+                <th class="thfondo">KARDEX (SII)</th>
+                <th class="thfondo">Seguro Social</th>
+                <th class="thfondo">Servicio Social</th>
+                <th class="thfondo">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="estudiante in todos" :key="estudiante.id">
+                <td style="padding: 5px">{{ estudiante.id }}</td>
+                <td style="padding: 5px">{{ estudiante.numero_de_control || '-' }}</td>
+                <td style="padding: 5px">{{ estudiante.nombre }}</td>
+                <td style="padding: 5px">
+                  {{ estudiante.apellido_paterno }} {{ estudiante.apellido_materno }}
+                </td>
+                
+                <!-- KARDEX -->
+                <td class="documento-cell">
+                  <div v-if="getDocumentoPorNombre(estudiante, 'KARDEX (SII)')" class="documento-status">
+                    <span :class="getDocumentoClase(estudiante, 'KARDEX (SII)')">
+                      <i :class="getDocumentoIcono(estudiante, 'KARDEX (SII)')"></i>
+                      {{ getDocumentoTexto(estudiante, 'KARDEX (SII)') }}
+                    </span>
+                    <button 
+                      v-if="getDocumentoUrl(estudiante, 'KARDEX (SII)')"
+                      @click="verDocumento(getDocumentoUrl(estudiante, 'KARDEX (SII)'))"
+                      class="btn-ver-documento"
+                      title="Ver documento"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <span v-else class="documento-pendiente">
+                    <i class="fas fa-clock"></i> No subido
+                  </span>
+                </td>
+                
+                <!-- Seguro Social -->
+                <td class="documento-cell">
+                  <div v-if="getDocumentoPorNombre(estudiante, 'Afiliación del seguro social (carnet IMSS)')" class="documento-status">
+                    <span :class="getDocumentoClase(estudiante, 'Afiliación del seguro social (carnet IMSS)')">
+                      <i :class="getDocumentoIcono(estudiante, 'Afiliación del seguro social (carnet IMSS)')"></i>
+                      {{ getDocumentoTexto(estudiante, 'Afiliación del seguro social (carnet IMSS)') }}
+                    </span>
+                    <button 
+                      v-if="getDocumentoUrl(estudiante, 'Afiliación del seguro social (carnet IMSS)')"
+                      @click="verDocumento(getDocumentoUrl(estudiante, 'Afiliación del seguro social (carnet IMSS)'))"
+                      class="btn-ver-documento"
+                      title="Ver documento"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <span v-else class="documento-pendiente">
+                    <i class="fas fa-clock"></i> No subido
+                  </span>
+                </td>
+                
+                <!-- Servicio Social -->
+                <td class="documento-cell">
+                  <div v-if="getDocumentoPorNombre(estudiante, 'Constancia de servicio social')" class="documento-status">
+                    <span :class="getDocumentoClase(estudiante, 'Constancia de servicio social')">
+                      <i :class="getDocumentoIcono(estudiante, 'Constancia de servicio social')"></i>
+                      {{ getDocumentoTexto(estudiante, 'Constancia de servicio social') }}
+                    </span>
+                    <button 
+                      v-if="getDocumentoUrl(estudiante, 'Constancia de servicio social')"
+                      @click="verDocumento(getDocumentoUrl(estudiante, 'Constancia de servicio social'))"
+                      class="btn-ver-documento"
+                      title="Ver documento"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <span v-else class="documento-pendiente">
+                    <i class="fas fa-clock"></i> No subido
+                  </span>
+                </td>
+                
+                <td style="padding: 8px; white-space: nowrap;">
+                  <Link :href="route('estudiantes.edit', estudiante.id)" class="btn-editar">
+                    <i class="fas fa-edit"></i> Editar
+                  </Link>
+                  <form @submit.prevent="confirmarEliminacion(estudiante.id)">
+                    <button 
+                      type="submit" 
+                      class="btn-borrar" 
+                      :disabled="eliminando === estudiante.id"
+                      style="margin-top: 5px;"
+                    >
+                      <i class="fas fa-trash"></i> {{ eliminando === estudiante.id ? '...' : 'Borrar' }}
+                    </button>
+                  </form>
+                 </td>
+                
+              </tr>
+              
+              <tr v-if="todos.length === 0">
+                <td colspan="8" class="sin-datos">
+                  No hay estudiantes registrados en el período actual
+                </td>
+                
+              </tr>
+            </tbody>
+           </table>
+        </div>
       </div>
 
       <!-- Botones de acción -->
       <div class="acciones">
         <Link :href="route('estudiantes.create')" class="btn-agregar">
-          Agregar un Estudiante
+          <i class="fas fa-plus"></i> Agregar un Estudiante
         </Link>
         <a :href="route('generar-estudiantes.excel')" class="btn-descargar">
-          Descargar lista
+          <i class="fas fa-download"></i> Descargar lista
         </a>
       </div>
     </div>
@@ -99,12 +172,12 @@ import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 import axios from 'axios'
 
-
 const props = defineProps({
   todos: Array,
   periodoActual: Object,
   filtroBuscar: String,
-  flash: Object
+  flash: Object,
+  tiposDocumentosRequeridos: Array
 })
 
 // Estado reactivo
@@ -113,7 +186,76 @@ const sugerencias = ref([])
 const eliminando = ref(null)
 let timeoutSugerencias = null
 
-// Método para buscar estudiantes
+// Función para obtener el documento por nombre
+const getDocumentoPorNombre = (estudiante, nombreDocumento) => {
+  if (!estudiante.documentos) return null
+  
+  return estudiante.documentos.find(doc => 
+    doc.tipo_documento?.nombre === nombreDocumento || 
+    doc.tipo_documento?.nombre === nombreDocumento
+  )
+}
+
+// Obtener URL del documento
+const getDocumentoUrl = (estudiante, nombreDocumento) => {
+  const doc = getDocumentoPorNombre(estudiante, nombreDocumento)
+  if (!doc) return null
+  
+  // Si tiene ruta_archivo, generar URL de descarga
+  if (doc.ruta_archivo) {
+    return route('documentos.download', doc.id)
+  }
+  
+  // Si tiene URL externa
+  if (doc.url_documento) {
+    return doc.url_documento
+  }
+  
+  return null
+}
+
+// Obtener clase CSS según estado
+const getDocumentoClase = (estudiante, nombreDocumento) => {
+  const doc = getDocumentoPorNombre(estudiante, nombreDocumento)
+  if (!doc) return 'documento-pendiente'
+  
+  if (doc.ruta_archivo || doc.url_documento) {
+    return 'documento-subido'
+  }
+  
+  return 'documento-pendiente'
+}
+
+// Obtener icono según estado
+const getDocumentoIcono = (estudiante, nombreDocumento) => {
+  const doc = getDocumentoPorNombre(estudiante, nombreDocumento)
+  if (!doc) return 'fas fa-clock'
+  
+  if (doc.ruta_archivo || doc.url_documento) {
+    return 'fas fa-check-circle'
+  }
+  
+  return 'fas fa-clock'
+}
+
+// Obtener texto según estado
+const getDocumentoTexto = (estudiante, nombreDocumento) => {
+  const doc = getDocumentoPorNombre(estudiante, nombreDocumento)
+  if (!doc) return 'No subido'
+  
+  if (doc.ruta_archivo || doc.url_documento) {
+    return 'Subido'
+  }
+  
+  return 'Pendiente'
+}
+
+// Ver documento
+const verDocumento = (url) => {
+  window.open(url, '_blank')
+}
+
+// Buscar estudiantes
 const buscarEstudiantes = () => {
   router.get(route('estudiantes.index'), 
     { buscar: terminoBusqueda.value },
@@ -193,6 +335,7 @@ if (props.flash?.error) {
   Swal.fire('Error', props.flash.error, 'error')
 }
 </script>
+
 
 <style scoped>
 .bodydiv {
@@ -371,5 +514,120 @@ if (props.flash?.error) {
 .btn-agregar:hover,
 .btn-descargar:hover {
   background-color: rgb(74, 139, 204);
+}
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.estudiantes-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.documento-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+.documento-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.documento-subido {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.documento-pendiente {
+  color: #856404;
+  font-weight: 500;
+}
+
+.btn-ver-documento {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #002455;
+  transition: all 0.2s;
+}
+
+.btn-ver-documento:hover {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.btn-editar, .btn-borrar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.btn-editar {
+  background-color: #002455;
+  color: white;
+}
+
+.btn-editar:hover {
+  background-color: #050E3C;
+}
+
+.btn-borrar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-borrar:hover {
+  background-color: #c82333;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-agregar, .btn-descargar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-agregar {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.btn-descargar {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+}
+
+.btn-agregar:hover, .btn-descargar:hover {
+  transform: translateY(-2px);
+}
+
+.sin-datos {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
 }
 </style>

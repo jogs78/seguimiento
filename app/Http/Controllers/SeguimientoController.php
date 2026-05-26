@@ -67,8 +67,14 @@ class SeguimientoController extends Controller
                     );
                     $ultimo->califico_interno=Carbon::now();
                     $ultimo->save();
-
-                    return view('seguimientos.ultimo.calificar-interno',compact('estudiante','consecutivo','ultimo'));
+                    //con inertia
+                    return Inertia::render('seguimientos/ultimo/calificar-interno', [
+                        'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
+                        'consecutivo' => $consecutivo,
+                        'ultimo' => $ultimo
+                    ]);
+                    //return view('seguimientos.ultimo.calificar-interno',compact('estudiante','
+                    //return view('seguimientos.ultimo.calificar-interno',compact('estudiante','consecutivo','ultimo'));
 
                 }
                 break;
@@ -94,7 +100,13 @@ class SeguimientoController extends Controller
                     );
                     $ultimo->califico_externo=Carbon::now();
                     $ultimo->save();
-                    return view('seguimientos.ultimo.calificar-externo',compact('estudiante','consecutivo','ultimo'));
+                    //con inertia
+                    return Inertia::render('seguimientos/ultimo/calificar-externo', [
+                        'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
+                        'consecutivo' => $consecutivo,
+                        'ultimo' => $ultimo
+                    ]);
+                   
                 }
                 break;
             
@@ -113,8 +125,11 @@ class SeguimientoController extends Controller
         $tipo = $usuario->usa_type;
 
          // Verificar si la delegación está activa
-        $delegadoConfig = Configuracion::where('variable', 'delegado')->first();
-        $delegadoActivo = $delegadoConfig && $delegadoConfig->valor === 'si';
+        $internoConfig = Configuracion::where('variable', 'interno')
+        ->where('carrera_id', $estudiante->carrera_id)
+        ->first();
+
+        $internoActivo = $internoConfig && $internoConfig->valor === 'si';
         
         switch ($tipo) {
             case 'App\Models\Asesor':
@@ -226,10 +241,15 @@ class SeguimientoController extends Controller
 
             // Si está activa la delegación y está calificando el asesor interno,
         // copiar automáticamente las calificaciones al asesor externo
-        if ($delegadoActivo && $tipo === 'App\Models\Asesor') {
+        if ($internoActivo && $tipo === 'App\Models\Asesor') {
+            //si es ultimo no realizar esta accion
+            if($consecutivo != 'primer' and $consecutivo != 'segundo'){
+                $segui->promedio_externo = $segui->promedio_interno;      
+            }else{  
             $segui->promedio_externo = $segui->promedio_interno;
             $segui->califico_externo = $segui->califico_interno;
             $segui->comentarios_externo = "Proyecto interno - No se requisita esta sección.";
+            }
         }
             $segui->save();
         
