@@ -12,6 +12,9 @@
         <div class="form-card">
           <form @submit.prevent="actualizarActividad" class="formulario">
             
+            <!-- ✅ CAMPO OCULTO PARA cronograma_id -->
+            <input type="hidden" v-model="form.cronograma_id" />
+
             <!-- Campo: Nombre -->
             <div class="form-group">
               <label class="parrafo">
@@ -159,21 +162,22 @@ import AppLayout from '@/Layouts/appLayout.vue'
 const props = defineProps({
   proyecto: { type: Object, required: true },
   actividad: { type: Object, required: true },
-  cronograma: { type: Object, required: false }, // Información del cronograma actual
-  ordenesOcupados: { type: Array, default: () => [] }, // Órdenes ocupados por otras actividades
+  cronograma: { type: Object, required: false },
+  ordenesOcupados: { type: Array, default: () => [] },
   flash: Object
 })
 
 const proyectoId = props.proyecto.id
 const actividadId = props.actividad.id
 
-// Formulario (estructura actualizada)
+// ✅ Inicializar formulario con cronograma_id
 const form = ref({
   nombre: props.actividad.nombre || '',
   descripcion: props.actividad.descripcion || '',
   semana_inicio: props.cronograma?.semana_inicio || 1,
   semana_fin: props.cronograma?.semana_fin || 4,
-  orden: props.cronograma?.orden || 1
+  orden: props.cronograma?.orden || 1,
+  cronograma_id: props.cronograma?.id || null  // ← CAMPO IMPORTANTE
 })
 
 // Información del cronograma actual
@@ -222,18 +226,19 @@ const validarFormulario = () => {
     nuevosErrores.semana_fin = 'La semana de fin debe ser al menos 1'
   }
   
-  // Validar que semana_fin >= semana_inicio
   if (form.value.semana_inicio && form.value.semana_fin && form.value.semana_fin < form.value.semana_inicio) {
     nuevosErrores.semana_fin = 'La semana de fin debe ser mayor o igual a la semana de inicio'
   }
   
   if (!form.value.orden || form.value.orden < 1) {
     nuevosErrores.orden = 'El orden debe ser mayor a 0'
-  } else {
-    // Verificar si el orden está ocupado por otra actividad
-    if (props.ordenesOcupados && props.ordenesOcupados.includes(form.value.orden)) {
-      nuevosErrores.orden = `El orden ${form.value.orden} ya está ocupado por otra actividad`
-    }
+  } else if (props.ordenesOcupados.includes(form.value.orden)) {
+    nuevosErrores.orden = `El orden ${form.value.orden} ya está ocupado por otra actividad`
+  }
+  
+  // ✅ Validar que cronograma_id esté presente
+  if (!form.value.cronograma_id) {
+    nuevosErrores.general = 'Error interno: No se encontró el cronograma asociado'
   }
   
   errores.value = nuevosErrores
@@ -257,14 +262,14 @@ const actualizarActividad = () => {
   
   cargando.value = true
   
-  // Datos a enviar (estructura actualizada)
+  // ✅ Datos a enviar (incluyendo cronograma_id)
   const datosEnvio = {
     nombre: form.value.nombre,
     descripcion: form.value.descripcion,
     semana_inicio: form.value.semana_inicio,
     semana_fin: form.value.semana_fin,
     orden: form.value.orden,
-    cronograma_id: props.cronograma?.id || null
+    cronograma_id: form.value.cronograma_id
   }
   
   router.put(route('proyectos.actividades.update', [proyectoId, actividadId]), datosEnvio, {
@@ -286,6 +291,7 @@ const actualizarActividad = () => {
       if (errors.semana_inicio) nuevosErrores.semana_inicio = errors.semana_inicio
       if (errors.semana_fin) nuevosErrores.semana_fin = errors.semana_fin
       if (errors.orden) nuevosErrores.orden = errors.orden
+      if (errors.cronograma_id) nuevosErrores.general = errors.cronograma_id
       
       errores.value = nuevosErrores
       

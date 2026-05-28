@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreignId('externo_id')->nullable()->default(null)->constrained('externos');
             $table->foreignId('empresa_id')->nullable()->default(null)->constrained('empresas');
             $table->foreignId('periodo_id')->nullable()->default(null)->constrained('periodos');
+            $table->boolean('fuera_de_tiempo')->nullable()->default(false);
             $table->timestamps();
         });
     }

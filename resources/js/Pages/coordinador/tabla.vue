@@ -148,32 +148,7 @@
                 </div>
 
                 <!-- DERECHA -->
-                <div class="outside-time-toggle">
-
-                    <span class="toggle-label">
-                        Fuera de tiempo
-                    </span>
-
-                    <label class="switch">
-
-                        <input
-                            type="checkbox"
-                            v-model="fueraTiempo"
-                            @change="cambiarFueraTiempo"
-                        >
-
-                        <span class="slider"></span>
-
-                    </label>
-
-                    <span
-                        class="toggle-status"
-                        :class="{ active: fueraTiempo }"
-                    >
-                        {{ fueraTiempo ? 'SI' : 'NO' }}
-                    </span>
-
-                </div>
+                
                 <div class="outside-time-toggle">
 
                     <span class="toggle-label">
@@ -223,6 +198,7 @@
                             <th><i class="fas fa-chart-line"></i> Seguimiento 1</th>
                             <th><i class="fas fa-chart-line"></i> Seguimiento 2</th>
                             <th><i class="fas fa-chart-line"></i> Seguimiento Final</th>
+                            <th><i class="fas fa-clock"></i> Fuera de tiempo</th>
                         </tr>
                     </thead>
 
@@ -693,7 +669,25 @@
                                     </div>
                                 </div>
                             </td>
-
+                            <!-- FUERA DE TIEMPO (Toggle por proyecto) -->
+                            <td class="status-cell-f">
+                                <div class="status-item-f">
+                                    <div class="toggle-container-f">
+                                        <label class="toggle-switch-f">
+                                            <input 
+                                                type="checkbox" 
+                                                :checked="proyecto.fuera_de_tiempo === 1 || proyecto.fuera_de_tiempo === true"
+                                                @change="toggleFueraTiempo(proyecto, $event)"
+                                                :disabled="cambiandoFueraTiempo === proyecto.id"
+                                            />
+                                            <span class="toggle-slider-f"></span>
+                                        </label>
+                                        <span class="status-label-f">
+                                            {{ (proyecto.fuera_de_tiempo === 1 || proyecto.fuera_de_tiempo === true) ? 'Permitir fuera de tiempo' : 'Permitir solo en tiempo' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -759,7 +753,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed} from 'vue'
+import { ref, reactive, onMounted, computed, watch} from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import { usePage } from '@inertiajs/vue3'
@@ -769,9 +763,8 @@ const props = defineProps({
     proyectos: Array,
     asesores: Array,
     periodoActual: Object,
-    fueraTiempoActivo: Boolean,
     internoConfig: Object,
-    documentosProcesados: Object  // ← Agregar esta prop
+    documentosProcesados: Object  
 })
 
 const getDocumentosEstudiante = (estudianteId) => {
@@ -782,17 +775,87 @@ const getDocumentosEstudiante = (estudianteId) => {
         seguro: null,
         servicio: null
     }}
-const fueraTiempo = ref(props.fueraTiempoActivo)
+//const fueraTiempo = ref(props.fueraTiempoActivo)
+// Estado para bloquear mientras guarda
+const proyectosConEstado = ref([])
+
+// Inicializar proyectos con el booleano
+onMounted(() => {
+    if (props.proyectos) {
+        proyectosConEstado.value = props.proyectos.map(proyecto => ({
+            ...proyecto,
+            fuera_de_tiempo: proyecto.fuera_de_tiempo === 1 || 
+                             proyecto.fuera_de_tiempo === true || 
+                             proyecto.fuera_de_tiempo === 'si'
+        }))
+    }
+})
+
+
+watch(() => props.proyectos, (nuevosProyectos) => {
+    if (nuevosProyectos) {
+        proyectosConEstado.value = nuevosProyectos.map(proyecto => ({
+            ...proyecto,
+            fuera_de_tiempo: proyecto.fuera_de_tiempo === 1 || 
+                             proyecto.fuera_de_tiempo === true || 
+                             proyecto.fuera_de_tiempo === 'si'
+        }))
+    }
+}, { immediate: true })
+
 const internoActivo = ref(
   props.internoConfig?.valor === 'si'
 )
 
+
+/*
 const cambiarFueraTiempo = () => {
 
     router.post('/configuracion/fuera-tiempo', {
         activo: fueraTiempo.value
     }, {
         preserveScroll: true
+    })
+}*/
+// Estado para el toggle de fuera de tiempo
+const cambiandoFueraTiempo = ref(null)
+
+const toggleFueraTiempo = (proyecto, event) => {
+    // Obtener el valor del checkbox
+    const nuevoValor = event.target.checked
+    
+    // Bloquear el toggle mientras se procesa
+    cambiandoFueraTiempo.value = proyecto.id
+    
+    // Actualizar visualmente inmediatamente
+    proyecto.fuera_de_tiempo = nuevoValor
+    
+    router.post(route('configuracion.fuera-tiempo'), {
+        activo: nuevoValor,
+        proyecto_id: proyecto.id
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Actualizado',
+                text: nuevoValor ? 'Proyecto marcado para permitir fuera de tiempo' : 'Proyecto marcado para permitir solo en tiempo',
+                confirmButtonText: 'OK'
+            })
+        },
+        onError: (errors) => {
+            // Revertir el cambio visual
+            proyecto.fuera_de_tiempo = !nuevoValor
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: Object.values(errors)[0] || 'No se pudo actualizar',
+                confirmButtonText: 'OK'
+            })
+        },
+        onFinish: () => {
+            cambiandoFueraTiempo.value = null
+        }
     })
 }
 
@@ -819,7 +882,6 @@ const totalPaginas = computed(() => {
 
 
 // Resetear a página 1 cuando cambian los proyectos (por búsqueda)
-import { watch } from 'vue'
 watch(() => props.proyectos, () => {
   paginaActual.value = 1
 })
@@ -943,6 +1005,7 @@ const aplicarFiltros = () => {
     preserveScroll: true,
     replace: true
   })
+  
 }
 
 // Al cargar el componente, sincronizar filters con los query params
@@ -1051,6 +1114,128 @@ export default {
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
+
+/* Estilos para el toggle switch */
+/* Asegurar que cada celda tenga posición relativa */
+.status-cell-f {
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.status-item-f {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60px;
+}
+
+.toggle-container-f {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Toggle switch */
+.toggle-switch-f {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch-f input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider-f {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #28a745;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider-f:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider-f {
+    background-color: #d9534f;
+}
+
+input:checked + .toggle-slider-f:before {
+    transform: translateX(26px);
+}
+
+input:disabled + .toggle-slider-f {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.status-label-f {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #28a745;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #d9534f;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+input:disabled + .toggle-slider {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.status-label {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+
 .title-top{
     display:flex;
     justify-content:space-between;

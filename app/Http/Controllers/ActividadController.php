@@ -158,15 +158,27 @@ class ActividadController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Proyecto $proyecto, Actividad $actividad, $actividadId)
-    {   
-       $actividad = Actividad::find($actividadId);
-       return Inertia::render('actividad/editar', [
-            'proyecto' => $proyecto,
-            'actividad' => $actividad
-        ]);
-        
-    }
+    public function edit(Proyecto $proyecto, $actividadId)
+{   
+    $actividad = Actividad::with('cronogramas')->findOrFail($actividadId);
+    
+    // Obtener el primer cronograma (o el que quieras editar)
+    $cronograma = $actividad->cronogramas->first();
+    
+    // Obtener órdenes ocupados por otras actividades
+    $ordenesOcupados = Cronograma::whereHas('actividad', function($q) use ($proyecto) {
+        $q->where('proyecto_id', $proyecto->id);
+    })->where('actividad_id', '!=', $actividadId)
+      ->pluck('orden')
+      ->toArray();
+    
+    return Inertia::render('actividad/editar', [
+        'proyecto' => $proyecto,
+        'actividad' => $actividad,
+        'cronograma' => $cronograma,
+        'ordenesOcupados' => $ordenesOcupados
+    ]);
+}
 
     /**
      * Update the specified resource in storage.

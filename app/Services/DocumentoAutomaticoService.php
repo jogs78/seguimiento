@@ -22,11 +22,7 @@ class DocumentoAutomaticoService
         | Obtener tipo documento
         |--------------------------------------------------------------------------
         */
-
-        $tipoDocumento = TipoDocumento::where(
-            'nombre',
-            'Anteproyecto'
-        )->first();
+        $tipoDocumento = TipoDocumento::where('nombre', 'Anteproyecto')->first();
 
         if (!$tipoDocumento) {
             return;
@@ -34,79 +30,72 @@ class DocumentoAutomaticoService
 
         /*
         |--------------------------------------------------------------------------
+        | Cargar relaciones necesarias
+        |--------------------------------------------------------------------------
+        */
+        $estudiante->load([
+            'proyecto.actividades.cronogramas',
+            'proyecto.asesor'
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
         | Generar PDF
         |--------------------------------------------------------------------------
         */
-
-        $pdf = Pdf::loadView(
-            'estudiante.impresiones.anteproyecto',
-            compact('estudiante')
-        );
+        $pdf = Pdf::loadView('estudiante.impresiones.anteproyecto', compact('estudiante'));
+        
+        // Configurar PDF
+        $pdf->setPaper('letter', 'portrait');
+        $pdf->setOptions([
+            'defaultFont' => 'sans-serif',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true
+        ]);
 
         /*
         |--------------------------------------------------------------------------
         | Nombre archivo
         |--------------------------------------------------------------------------
         */
-
-        $nombreArchivo =
-            'anteproyecto_' .
-            $estudiante->numero_de_control .
-            '.pdf';
+        $nombreArchivo = 'anteproyecto_' . $estudiante->numero_de_control . '.pdf';
 
         /*
         |--------------------------------------------------------------------------
         | Carpeta estudiante
         |--------------------------------------------------------------------------
         */
-
-        $carpeta =
-            'estudiantes/' .
-            $estudiante->numero_de_control;
+        $carpeta = 'estudiantes/' . $estudiante->numero_de_control;
 
         /*
         |--------------------------------------------------------------------------
         | Ruta final
         |--------------------------------------------------------------------------
         */
-
-        $rutaCompleta =
-            $carpeta . '/' . $nombreArchivo;
+        $rutaCompleta = $carpeta . '/' . $nombreArchivo;
 
         /*
         |--------------------------------------------------------------------------
         | Guardar PDF físicamente
         |--------------------------------------------------------------------------
         */
-
-        Storage::disk('documentos')->put(
-            $rutaCompleta,
-            $pdf->output()
-        );
+        Storage::disk('documentos')->put($rutaCompleta, $pdf->output());
 
         /*
         |--------------------------------------------------------------------------
         | Guardar o actualizar BD
         |--------------------------------------------------------------------------
         */
-
         DocumentoEstudiante::updateOrCreate(
-
             [
                 'estudiante_id' => $estudiante->id,
                 'tipo_documento_id' => $tipoDocumento->id,
             ],
-
             [
                 'ruta_archivo' => $rutaCompleta,
-
                 'nombre_original' => $nombreArchivo,
-
                 'mime_type' => 'application/pdf',
-
-                'peso_bytes' => Storage::disk('documentos')
-                    ->size($rutaCompleta),
-
+                'peso_bytes' => Storage::disk('documentos')->size($rutaCompleta),
                 'subido_en' => now(),
             ]
         );

@@ -21,13 +21,16 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Models\Estudiante;
 use Inertia\Inertia;
-
+use App\Helpers\DocumentosHelper;
+use App\Services\DocumentoAutomaticoService;
 
 class ProyectoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    
+
     public function index(Request $request)
     {
         $buscarEstudiante = $request->input('buscar');
@@ -85,6 +88,9 @@ class ProyectoController extends Controller
             })
             ->get();
 
+       // Procesar documentos usando el Helper
+        $documentosProcesados = DocumentosHelper::procesarDocumentosDeProyectos($proyectos);
+
         $asesores = Asesor::all();
         //con inertia
         return Inertia::render('coordinador/tabla', [
@@ -93,11 +99,12 @@ class ProyectoController extends Controller
             'filtroBuscarEstudiante' => $buscarEstudiante,
             'filtroBuscarProyecto' => $buscarProyecto,
             'filtroBuscarAsesor' => $buscarAsesor,
-            'filtroBuscarEmpresa' => $buscarEmpresa
+            'filtroBuscarEmpresa' => $buscarEmpresa,
+            'documentosProcesados' => $documentosProcesados
         ]);
 
         //return view('coordinador.tabla', compact('proyectos', 'asesores'));
-    }
+    }   
 
     public function sugerencias(Request $request)
 {
@@ -301,7 +308,8 @@ class ProyectoController extends Controller
         
         DB::commit();
         // \Log::info('9. TRANSACCIÓN COMPLETADA');
-        
+        DocumentoAutomaticoService::guardarSolicitud($estudiante);
+        DocumentoAutomaticoService::guardarAnteproyecto($estudiante);
         return redirect()->route("home")
             ->with('success', 'Proyecto registrado correctamente');
         
@@ -391,10 +399,10 @@ class ProyectoController extends Controller
         //si no entonces que cargue el registro
         $carrera_id = $estudiante->carrera_id;
         // O si la relación es directa con la tabla pivote 'asesor_carrera'
-    $asesores = Asesor::join('asesor_carrera', 'asesores.id', '=', 'asesor_carrera.asesor_id')
-    ->where('asesor_carrera.carrera_id', $carrera_id)
-    ->select('asesores.*')
-    ->get();
+        $asesores = Asesor::join('asesor_carrera', 'asesores.id', '=', 'asesor_carrera.asesor_id')
+        ->where('asesor_carrera.carrera_id', $carrera_id)
+        ->select('asesores.*')
+        ->get();
 
         //$asesores = Asesor::all();
         $empresas = Empresa::all();
@@ -473,4 +481,19 @@ class ProyectoController extends Controller
         return redirect()->route('proyectos.create')->with('success', 'Te has unido exitosamente al proyecto.');
     }
     
+    public function actualizarFueraTiempo(Request $request)
+    {
+        $request->validate([
+            'activo' => 'required|boolean',
+            'proyecto_id' => 'required|exists:proyectos,id',
+        ]);
+
+        $proyecto = Proyecto::findOrFail($request->proyecto_id);
+        
+        // Guardar como boolean (true/false)
+        $proyecto->fuera_de_tiempo = $request->activo; // true o false directamente
+        $proyecto->save();
+
+        return back()->with('success', 'Configuración actualizada para este proyecto');
+    }
 }

@@ -123,6 +123,8 @@ Route::get('segundo/{estudiante?}',[EstudianteController::class,'segundo'])->mid
 Route::get('ultimo/{estudiante?}',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
 Route::post('/proyectos/unirse', [ProyectoController::class, 'unirse'])->name('proyectos.unirse');
 Route::get('/buscar-proyectos', [ProyectoController::class, 'buscar'])->name('proyectos.buscar');
+Route::post('/configuracion/fuera-tiempo', [ProyectoController::class, 'actualizarFueraTiempo'])
+    ->name('configuracion.fuera-tiempo');
 
 
 //rutas especificas del asesor interno
@@ -139,8 +141,6 @@ Route::get('lista-de-proyectos',[ExternoController::class,'proyecto'])->middlewa
 //rutas especificas del coordinador
 Route::resource('periodos',PeriodoController::class)->middleware('auth');
 Route::resource('configuraciones',ConfiguracionController::class)->middleware('auth');
-Route::post('/configuracion/fuera-tiempo', [ConfiguracionController::class, 'actualizarFueraTiempo'])
-    ->name('configuracion.fuera-tiempo');
 Route::post('/configuracion/interno', [ConfiguracionController::class, 'cambiarInterno'])
     ->name('configuracion.interno');
 

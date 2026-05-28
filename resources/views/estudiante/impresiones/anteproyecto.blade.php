@@ -41,44 +41,58 @@
 
 
         <div class="cuadro">
-            <table  class="tabla" border="1">
+            <table class="tabla" border="1">
                 <thead>
                     <tr>
-                        <th style="width: 15%;"></th>
-                        @for ($i = 1 ; $i <= 16; $i++)
-                            <th>{{$i}}</th>  
+                        <th style="width: 25%;">Actividad</th>
+                        @for ($i = 1; $i <= 16; $i++)
+                            <th style="width: 4.6875%;">{{ $i }}</th>  
                         @endfor
                     </tr>
                 </thead>
                 <tbody>
-                @php
-                    $anterior = 0;
-                @endphp
-                @forelse ($estudiante->proyecto->actividades as $actividad)
-                    <tr>
-                        <td>{{$actividad->nombre}}</td>
-                        @for ($i = 0; $i < $anterior; $i++)
-                            <td> </td>                                                        
-                        @endfor
-                        @for ($i = 1 ; $i <= 16-$anterior; $i++)
-                            @if ($i <= $actividad->semanas)
-                                <td>X</td>
-                            @else
-                                <td> </td>                                
-                            @endif
-                        @endfor
-                        @php
-                        $anterior = $anterior + $actividad->semanas ;
+                    @php
+                        // Crear un array para marcar qué semanas están ocupadas
+                        $semanasOcupadas = [];
+                        
+                        foreach ($estudiante->proyecto->actividades as $actividad) {
+                            foreach ($actividad->cronogramas as $cronograma) {
+                                $inicio = $cronograma->semana_inicio;
+                                $fin = min($cronograma->semana_fin, 16);
+                                
+                                for ($i = $inicio; $i <= $fin; $i++) {
+                                    $semanasOcupadas[$actividad->id][$i] = true;
+                                }
+                            }
+                        }
                     @endphp
-    
-                    </tr>
-                    @empty
+                    
+                    @foreach ($estudiante->proyecto->actividades as $actividad)
                         <tr>
-                            <th colspan="3">Sin actividades</th>
+                            <td style="text-align: left; padding: 8px;">{{ $actividad->name ?? $actividad->nombre }}</td>
+                            
+                            @for ($i = 1; $i <= 16; $i++)
+                                @php
+                                    $tieneActividad = isset($semanasOcupadas[$actividad->id][$i]);
+                                @endphp
+                                <td style="background-color: {{ $tieneActividad ? '#d4edda' : 'white' }}; text-align: center;">
+                                    @if ($tieneActividad)
+                                        X
+                                    @else
+                                        &nbsp;
+                                    @endif
+                                </td>
+                            @endfor
                         </tr>
-                @endforelse 
-                </tbody>    
-                </table>
+                    @endforeach
+                    
+                    @if ($estudiante->proyecto->actividades->isEmpty())
+                        <tr>
+                            <td colspan="17" style="text-align: center;">Sin actividades</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
         </div>
         
         <p class="inciso">e) Descripción detallada de las actividades</p>

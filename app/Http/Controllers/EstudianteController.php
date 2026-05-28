@@ -536,6 +536,11 @@ class EstudianteController extends Controller
     |--------------------------------------------------------------------------
     */
 
+     $estudiante->load([
+        'proyecto.actividades.cronogramas',
+        'proyecto.asesor'
+    ]);
+    
     DocumentoAutomaticoService::guardarAnteproyecto(
         $estudiante
     );

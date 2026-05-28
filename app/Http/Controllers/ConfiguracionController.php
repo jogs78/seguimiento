@@ -16,7 +16,9 @@ class ConfiguracionController extends Controller
     
 public function index()
 {
-    $todos = Configuracion::all();
+    //devolver todas las configuraciones a la vista con inertia excepto la variable "interno"
+    
+    $todos = Configuracion::whereNotIn('variable', ['interno'])->get();
     
     return Inertia::render('configuracion/listar', [
         'configuraciones' => $todos
@@ -109,39 +111,6 @@ public function index()
     }
     }
 
-    public function actualizarFueraTiempo(Request $request)
-    {
-        $request->validate([
-            'activo' => 'required|boolean',
-        ]);
-
-        // obtener carrera actual de la sesión
-        $carreraId = session('carrera_id');
-
-        if (!$carreraId) {
-            return back()->with('error', 'No hay carrera seleccionada');
-        }
-
-        // buscar configuración
-        $config = Configuracion::where('variable', 'fuera_de_tiempo')
-            ->where('carrera_id', $carreraId)
-            ->first();
-
-        // si no existe, crearla
-        if (!$config) {
-
-            $config = new Configuracion();
-            $config->variable = 'fuera_de_tiempo';
-            $config->carrera_id = $carreraId;
-        }
-
-        // guardar valor
-        $config->valor = $request->activo ? 'si' : 'no';
-
-        $config->save();
-
-        return back()->with('success', 'Configuración actualizada');
-    }
 
     public function cambiarInterno(Request $request)
     {

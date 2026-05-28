@@ -30,76 +30,77 @@
       </div>
 
       <!-- Grid de documentos -->
-      <div class="documentos-grid">
-        <div 
-          v-for="tipo in tiposDocumento" 
-          :key="tipo.id"
-          class="documento-card" 
-          :class="{ 'completado': getDocumentoPorTipo(tipo.id) }"
-        >
-          <div class="card-header">
-            <i class="fas" :class="getIconoPorTipo(tipo.id)"></i>
-            <h3>
-              {{ tipo.nombre }}
-              <span v-if="tipo.obligatorio" class="required">*</span>
-              <span v-else class="opcional">(Opcional)</span>
-            </h3>
-            <span class="estado" :class="{ 'subido': getDocumentoPorTipo(tipo.id) }">
-              <i v-if="getDocumentoPorTipo(tipo.id)" class="fas fa-check-circle"></i>
-              <i v-else class="fas fa-clock"></i>
-              {{ getDocumentoPorTipo(tipo.id) ? 'Subido' : 'Pendiente' }}
-            </span>
-          </div>
-          
-          <div class="card-body">
-            <!-- Formulario de subida - SIEMPRE visible -->
-            <form @submit.prevent="subirDocumento(tipo.id)" class="upload-form">
-              <div class="file-input-container">
-                <input 
-                  type="file" 
-                  :ref="el => setInputRef(tipo.id, el)"
-                  @change="handleFileChange(tipo.id, $event)"
-                  accept=".pdf"
-                  class="file-input"
-                />
-                <button type="button" class="btn-seleccionar" @click="seleccionarArchivo(tipo.id)">
-                  <i class="fas fa-folder-open"></i>
-                  Seleccionar archivo
-                </button>
-                <span class="nombre-archivo" v-if="archivosSeleccionados[tipo.id]">
-                  {{ archivosSeleccionados[tipo.id]?.name }}
-                </span>
-              </div>
-              <button type="submit" class="btn-subir" :disabled="!archivosSeleccionados[tipo.id] || cargando[tipo.id]">
-                <i class="fas" :class="cargando[tipo.id] ? 'fa-spinner fa-pulse' : 'fa-upload'"></i>
-                {{ cargando[tipo.id] ? 'Subiendo...' : 'Subir documento' }}
-              </button>
-            </form>
-            
-            <!-- Documento ya subido (si existe) -->
-            <div v-if="getDocumentoPorTipo(tipo.id)" class="documento-subido">
-              <div class="info-documento">
-                <i class="fas fa-file-pdf"></i>
-                <div class="detalles">
-                  <span class="nombre">{{ getDocumentoPorTipo(tipo.id).nombre_original }}</span>
-                  <span class="tamaño">{{ formatTamaño(getDocumentoPorTipo(tipo.id).peso_bytes) }}</span>
-                  <span class="fecha">Subido: {{ formatFecha(getDocumentoPorTipo(tipo.id).created_at) }}</span>
-                </div>
-              </div>
-              <div class="acciones-documento">
-                <a :href="route('documentos.download', getDocumentoPorTipo(tipo.id).id)" class="btn-descargar">
-                  <i class="fas fa-download"></i>
-                  Descargar
-                </a>
-                <button @click="eliminarDocumento(getDocumentoPorTipo(tipo.id).id, tipo.id)" class="btn-eliminar">
-                  <i class="fas fa-trash"></i>
-                  Eliminar
-                </button>
-              </div>
-            </div>
+      <!-- Grid de documentos -->
+<div class="documentos-grid">
+  <div 
+    v-for="tipo in tiposDocumento" 
+    :key="tipo.id"
+    class="documento-card" 
+    :class="{ 'completado': getDocumentoPorTipo(tipo.id) }"
+  >
+    <div class="card-header">
+      <i class="fas" :class="getIconoPorTipo(tipo.id)"></i>
+      <h3>
+        {{ tipo.nombre }}
+        <span v-if="tipo.obligatorio" class="required">*</span>
+        <span v-else class="opcional">(Opcional)</span>
+      </h3>
+      <span class="estado" :class="{ 'subido': getDocumentoPorTipo(tipo.id) }">
+        <i v-if="getDocumentoPorTipo(tipo.id)" class="fas fa-check-circle"></i>
+        <i v-else class="fas fa-clock"></i>
+        {{ getDocumentoPorTipo(tipo.id) ? 'Subido' : 'Pendiente' }}
+      </span>
+    </div>
+    
+    <div class="card-body">
+      <!-- ✅ Formulario de subida - SOLO visible si NO hay documento -->
+      <form v-if="!getDocumentoPorTipo(tipo.id)" @submit.prevent="subirDocumento(tipo.id)" class="upload-form">
+        <div class="file-input-container">
+          <input 
+            type="file" 
+            :ref="el => setInputRef(tipo.id, el)"
+            @change="handleFileChange(tipo.id, $event)"
+            accept=".pdf"
+            class="file-input"
+          />
+          <button type="button" class="btn-seleccionar" @click="seleccionarArchivo(tipo.id)">
+            <i class="fas fa-folder-open"></i>
+            Seleccionar archivo
+          </button>
+          <span class="nombre-archivo" v-if="archivosSeleccionados[tipo.id]">
+            {{ archivosSeleccionados[tipo.id]?.name }}
+          </span>
+        </div>
+        <button type="submit" class="btn-subir" :disabled="!archivosSeleccionados[tipo.id] || cargando[tipo.id]">
+          <i class="fas" :class="cargando[tipo.id] ? 'fa-spinner fa-pulse' : 'fa-upload'"></i>
+          {{ cargando[tipo.id] ? 'Subiendo...' : 'Subir documento' }}
+        </button>
+      </form>
+      
+      <!-- ✅ Documento ya subido (si existe) - SOLO visible si hay documento -->
+      <div v-if="getDocumentoPorTipo(tipo.id)" class="documento-subido">
+        <div class="info-documento">
+          <i class="fas fa-file-pdf"></i>
+          <div class="detalles">
+            <span class="nombre">{{ getDocumentoPorTipo(tipo.id).nombre_original }}</span>
+            <span class="tamaño">{{ formatTamaño(getDocumentoPorTipo(tipo.id).peso_bytes) }}</span>
+            <span class="fecha">Subido: {{ formatFecha(getDocumentoPorTipo(tipo.id).subido_en || getDocumentoPorTipo(tipo.id).created_at) }}</span>
           </div>
         </div>
+        <div class="acciones-documento">
+          <a :href="route('documentos.download', getDocumentoPorTipo(tipo.id).id)" class="btn-descargar">
+            <i class="fas fa-download"></i>
+            Descargar
+          </a>
+          <button @click="eliminarDocumento(getDocumentoPorTipo(tipo.id).id, tipo.id)" class="btn-eliminar">
+            <i class="fas fa-trash"></i>
+            Eliminar
+          </button>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
 
       <!-- Progreso general -->
       <div class="progreso-section">
