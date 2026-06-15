@@ -52,16 +52,5 @@ class ConfiguracionSeeder extends Seeder
             $nueva->carrera_id = $carrera->id;
             $nueva->save();
         }
-
-        //peticion fuera de tiempo
-        /*
-        foreach ($carreras as $carrera) {
-
-            $nueva = new Configuracion();
-            $nueva->variable = "fuera_de_tiempo";
-            $nueva->valor = "no";
-            $nueva->carrera_id = $carrera->id;
-            $nueva->save();
-        }*/
     }
 }

@@ -32,7 +32,7 @@ class TipoDocumentoSeeder extends Seeder
                 'obligatorio' => true,
             ],
             [
-                'nombre' => 'Afiliación del seguro social (carnet IMSS)',
+                'nombre' => 'Afiliación del seguro social',
                 'obligatorio' => true,
             ],
             [

@@ -366,9 +366,9 @@ const verDetalle = (estudiante) => {
     title: 'Detalles del estudiante',
     html: `
       <p><strong>Nombre:</strong> ${estudiante.nombre} ${estudiante.apellido_paterno} ${estudiante.apellido_materno}</p>
-      <p><strong>N° Control:</strong> ${estudiante.numero_control}</p>
+      <p><strong>N° Control:</strong> ${estudiante.numero_de_control}</p>
       <p><strong>Carrera:</strong> ${estudiante.carrera}</p>
-      <p><strong>Progreso:</strong> ${estudiante.progreso}%</p>
+      <p><strong>Proyecto:</strong> ${estudiante.proyecto}</p>
     `,
     confirmButtonText: 'OK'
   })

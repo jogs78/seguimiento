@@ -1,130 +1,128 @@
 <template>
+  <AppLayout>
 
-<AppLayout>
+  <div class="bodydiv">
 
-<div class="bodydiv">
+      <div class="horizontal">
 
-    <div class="horizontal">
+          <p class="subtitulo">
 
-        <p class="subtitulo">
+              <i class="fas fa-edit"></i>
 
-            <i class="fas fa-edit"></i>
+              Editar Proyecto
 
-            Editar Proyecto
+          </p>
 
-        </p>
+      </div>
 
-    </div>
+      <div class="card-section">
 
-    <div class="card-section">
+          <div class="card-header">
 
-        <div class="card-header">
+              <i class="fas fa-project-diagram"></i>
 
-            <i class="fas fa-project-diagram"></i>
+              Actualiza los datos del proyecto
 
-            Actualiza los datos del proyecto
+          </div>
 
-        </div>
+          <div class="card-body">
 
-        <div class="card-body">
+              <form @submit.prevent="actualizarProyecto" class="form-grid">
 
-            <form @submit.prevent="actualizarProyecto" class="form-grid">
+                  <div class="form-group full-width">
 
-                <div class="form-group full-width">
+                      <label>Nombre</label>
 
-                    <label>Nombre</label>
+                      <input
+                          type="text"
+                          v-model="form.nombre"
+                          class="input-text"
+                      >
 
-                    <input
-                        type="text"
-                        v-model="form.nombre"
-                        class="input-text"
-                    >
+                      <span v-if="errores.nombre" class="error">
+                          {{ errores.nombre }}
+                      </span>
 
-                    <span v-if="errores.nombre" class="error">
-                        {{ errores.nombre }}
-                    </span>
+                  </div>
 
-                </div>
+                  <div class="form-group full-width">
 
-                <div class="form-group full-width">
+                      <label>Objetivo General</label>
 
-                    <label>Objetivo General</label>
+                      <textarea
+                          v-model="form.objetivo_general"
+                          class="textarea"
+                      ></textarea>
 
-                    <textarea
-                        v-model="form.objetivo_general"
-                        class="textarea"
-                    ></textarea>
+                  </div>
 
-                </div>
+                  <div class="form-group">
 
-                <div class="form-group">
+                      <label>Lugar</label>
 
-                    <label>Lugar</label>
+                      <input
+                          type="text"
+                          v-model="form.lugar"
+                          class="input-text"
+                      >
 
-                    <input
-                        type="text"
-                        v-model="form.lugar"
-                        class="input-text"
-                    >
+                  </div>
 
-                </div>
+                  <div class="form-group">
 
-                <div class="form-group">
+                      <label>Información</label>
 
-                    <label>Información</label>
+                      <input
+                          type="text"
+                          v-model="form.informacion"
+                          class="input-text"
+                      >
 
-                    <input
-                        type="text"
-                        v-model="form.informacion"
-                        class="input-text"
-                    >
+                  </div>
 
-                </div>
+                  <div class="form-group full-width">
 
-                <div class="form-group full-width">
+                      <label>Justificación</label>
 
-                    <label>Justificación</label>
+                      <textarea
+                          v-model="form.justificacion"
+                          class="textarea"
+                      ></textarea>
 
-                    <textarea
-                        v-model="form.justificacion"
-                        class="textarea"
-                    ></textarea>
+                  </div>
 
-                </div>
+                  <div class="form-actions">
 
-                <div class="form-actions">
+                      <button
+                          type="submit"
+                          class="btn-submit"
+                          :disabled="cargando"
+                      >
 
-                    <button
-                        type="submit"
-                        class="btn-submit"
-                        :disabled="cargando"
-                    >
+                          <i
+                              class="fas"
+                              :class="cargando
+                                  ? 'fa-spinner fa-pulse'
+                                  : 'fa-save'"
+                          ></i>
 
-                        <i
-                            class="fas"
-                            :class="cargando
-                                ? 'fa-spinner fa-pulse'
-                                : 'fa-save'"
-                        ></i>
+                          {{ cargando
+                              ? 'Actualizando...'
+                              : 'Actualizar Proyecto' }}
 
-                        {{ cargando
-                            ? 'Actualizando...'
-                            : 'Actualizar Proyecto' }}
+                      </button>
 
-                    </button>
+                  </div>
 
-                </div>
+              </form>
 
-            </form>
+          </div>
 
-        </div>
+      </div>
 
-    </div>
+  </div>
 
-</div>
-
-</AppLayout>
-
+  </AppLayout>
 </template>
 
 <script setup>

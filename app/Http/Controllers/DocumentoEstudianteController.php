@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\DocumentoEstudiante;
 use App\Models\TipoDocumento;
 use App\Http\Requests\StoreDocumentoRequest;
+use App\Providers\ConfiguracionServiceProvider;
+use App\Models\Estudiante;
+use App\Models\Periodo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -13,36 +16,44 @@ class DocumentoEstudianteController extends Controller
 {
 
 
+public function index()
+{
+    $estudiante = auth()->user()->usa;
 
-    public function index()
-    {
-        $estudiante = auth()->user()->usa;
-
-        if (!$estudiante) {
-            return redirect()->route('home')->with('error', 'No se encontró el estudiante autenticado.');
-        }
-        
-        // ✅ DATOS DE PRUEBA (MOCK) - Comenta esto cuando ya funcione
-        // Obtener TODOS los tipos de documento
-        $tiposDocumento = TipoDocumento::orderBy('id')->get();
-
-        
-        $documentos = DocumentoEstudiante::with('tipoDocumento')
-            ->where('estudiante_id', $estudiante->id)
-            ->get();
-        
-        // ✅ Descomenta esto cuando quieras usar la BD
-        // $documentos = DocumentoEstudiante::with('tipoDocumento')
-        //     ->where('estudiante_id', $estudiante->id)
-        //     ->get();
-        // 
-        // $tiposDocumento = TipoDocumento::orderBy('id')->get();
-
-        return Inertia::render('estudiante/evidencias', [
-            'tiposDocumento' => $tiposDocumento,
-            'documentos' => $documentos
-        ]);
+    if (!$estudiante) {
+        return redirect()
+            ->route('home')
+            ->with(
+                'error',
+                'No se encontró el estudiante autenticado.'
+            );
     }
+
+    $tiposDocumento = TipoDocumento::query();
+   //si el estudiante no tiene proyecto registrado o no tiene num_registro, ocultar el documento de cancelación
+    if ( !$estudiante->proyecto || !$estudiante->proyecto->num_registro) 
+    {
+        $tiposDocumento->where(
+            'nombre',
+            '!=',
+            'Solicitud de cancelación de proyecto'
+        );
+    }
+
+    $tiposDocumento = $tiposDocumento
+        ->orderBy('id')
+        ->get();
+
+    $documentos = DocumentoEstudiante::with('tipoDocumento')
+        ->where('estudiante_id', $estudiante->id)
+        ->get();
+
+    return Inertia::render('estudiante/evidencias', [
+        'tiposDocumento' => $tiposDocumento,
+        'documentos' => $documentos,
+        'proyecto' => $estudiante->proyecto
+    ]);
+}
 
     public function store(StoreDocumentoRequest $request)
     {
@@ -56,22 +67,20 @@ class DocumentoEstudianteController extends Controller
         $nombreOriginal = null;
         $mimeType = null;
         $tamano = null;
-
       
         // Subida de archivo
-
-
         if ($request->hasFile('archivo')) {
 
             $archivo = $request->file('archivo');
 
-            $nombreArchivo = time() . '_' .
-                Str::slug($tipoDocumento->nombre) . '.' .
+            $nombreArchivo = Str::slug($tipoDocumento->nombre) . '.' .
                 $archivo->getClientOriginalExtension();
 
-            $carpeta = 'estudiantes/' .
-                $estudiante->numero_de_control;
+            $periodoActual = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'));
 
+            $carpeta = 'estudiantes_' . $periodoActual->nombre . '/expedientes/' .
+                    Str::slug($estudiante->nombre . ' ' . $estudiante->apellido_paterno . ' ' . $estudiante->apellido_materno) . '_' .
+                    $estudiante->numero_de_control;
             $rutaArchivo = Storage::disk('documentos')
                 ->putFileAs(
                     $carpeta,

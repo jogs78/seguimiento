@@ -19,6 +19,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CorreoController;
 use App\Http\Controllers\DocumentoEstudianteController;
 use App\Http\Controllers\DocumentoCoordinadorController;
+use App\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,13 +34,11 @@ use App\Http\Controllers\DocumentoCoordinadorController;
 
 use Inertia\Inertia;
 
-Route::get('/ejemplo',function(){
+Route::get('/login',function(){
     return Inertia::render('acceso/formulario');
 })->name('Inicio_Sesion');
 
-Route::get('/ejemplodos',function(){
-    return Inertia::render('estudiante/crear');
-});
+
 Route::get('/estudiante/evidencias', [DocumentoEstudianteController::class, 'index'])->name('estudiante.evidencias')->middleware('auth');
 Route::get('/estudiante/subir-evidencia', [DocumentoEstudianteController::class, 'index'])->name('estudiante.subir-evidencia')->middleware('auth');
 
@@ -52,16 +51,11 @@ Route::delete('/documentos/{id}', [DocumentoEstudianteController::class, 'destro
 // Ruta para almacenar documentos (subir evidencia)
 Route::post('/documentos', [DocumentoEstudianteController::class, 'store'])->name('documentos.store');
 Route::post('/seleccionar-carrera',[CoordinadorController::class,'seleccionarCarrera'])->name('coordinadores.seleccionarCarrera');
+Route::post('/seleccionar-carrera',[AccesoController::class,'seleccionarCarrera'])->name('seleccionar.carrera');
 // Ruta para la página de bienvenida (adentro)
 Route::get('/adentro', function () {
     return Inertia::render('acceso/adentro');
 })->name('adentro')->middleware('auth');
-
-/*
-Route::get('/', function () {
-    return view('welcome');
-});
-*/
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -71,6 +65,14 @@ Route::get('/saludar', function (){
     return view('saludo');
 });
 
+
+
+// Recuperación de contraseña 
+Route::get('/olvide-contrasena', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('/olvide-contrasena', [ForgotPasswordController::class, 'sendResetLink'])->name('password.send');
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
 //rutas de introduccion o practica
 Route::get('/entrar',[PuertaController::class,'formulario']);
 Route::get('/salir',[AccesoController::class,'salida'])->name('salida');
@@ -78,15 +80,7 @@ Route::get('/contraseña',[AccesoController::class,'cambio'])->name('Cambiar_Con
 Route::post('/cambiar-password', [UsuarioController::class, 'cambiarPassword'])->name('usuario.cambiar-password');
 Route::post('/adentro',[AccesoController::class,'adentro'])->name('adentro');
 
-
-//temporal para probar la vista de adentro, ya que no se ha implementado el proceso de seleccion de carrera
-/* Route::get('/adentro', function () {
-    return view('acceso.adentro');
-})->name('adentro');
-*/
-
 Route::get('home',[AccesoController::class,'home'])->middleware('auth')->name('home');
-Route::get('/login',[AccesoController::class,'login'])->name('login');
 //Route::get('/registro',[AccesoController::class,'registro'])->name('registro');
 //Route::get('/periodo',[AccesoController::class,'periodo'])->name('periodo');
 Route::get('/reporte',[AccesoController::class,'reporte'])->name('reporte');
@@ -96,8 +90,6 @@ Route::get('/plantilla',[AccesoController::class,'plantilla'])->name('plantilla'
 //rutas especificas del coordinador
 Route::get('tabla',[CoordinadorController::class,'tabla'])->middleware('auth')->name('coordinadores.tabla');
 //con inertia lo de tabla
-
-
 
 Route::get('asignar-asesores',[CoordinadorController::class,'asignarAsesor1'])->middleware('auth')->name('coordinadores.asignarAsesor1');
 Route::post('asignar-asesores',[CoordinadorController::class,'asignarAsesor2'])->middleware('auth')->name('coordinadores.asignarAsesor2');
@@ -122,6 +114,7 @@ Route::get('primer/{estudiante?}',[EstudianteController::class,'primer'])->middl
 Route::get('segundo/{estudiante?}',[EstudianteController::class,'segundo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.segundo');
 Route::get('ultimo/{estudiante?}',[EstudianteController::class,'ultimo'])->middleware('auth')->name('estudiante.impresiones.seguimientos.ultimo');
 Route::post('/proyectos/unirse', [ProyectoController::class, 'unirse'])->name('proyectos.unirse');
+Route::get('/proyecto/mostrar', [ProyectoController::class, 'create'])->name('proyectos.mostrar'); 
 Route::get('/buscar-proyectos', [ProyectoController::class, 'buscar'])->name('proyectos.buscar');
 Route::post('/configuracion/fuera-tiempo', [ProyectoController::class, 'actualizarFueraTiempo'])
     ->name('configuracion.fuera-tiempo');

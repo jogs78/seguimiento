@@ -24,7 +24,9 @@
             <tr>
                 <th style="width: 30%;"></th>
                 <th style="text-align: right;  font-weight: bold; width: 50%;">NUM. DEL REGISTRO DEL PROYECTO:</th>
-                <th style="text-align: right; width: 20%;"> ___________________</th><!--Cambiar-->
+                <th style="text-align: right; width: 20%;">
+                    {{ $estudiante->proyecto->num_registro ? $estudiante->proyecto->num_registro : 'PROYECTO NUEVO' }}
+                </th>
             </tr>
         </table>
         <p class="inciso">a) Nombre del proyecto: </p>

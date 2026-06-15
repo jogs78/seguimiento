@@ -14,25 +14,16 @@ class ConfiguracionController extends Controller
      * Display a listing of the resource.
      */
     
-public function index()
-{
-    //devolver todas las configuraciones a la vista con inertia excepto la variable "interno"
-    
-    $todos = Configuracion::whereNotIn('variable', ['interno'])->get();
-    
-    return Inertia::render('configuracion/listar', [
-        'configuraciones' => $todos
-    ]);
-}
-
-
-    /*public function index()
+    public function index()
     {
-        $todos = Configuracion::all();
-        return view('configuracion.listar',compact('todos'));
+        //devolver todas las configuraciones a la vista con inertia excepto la variable "interno"
+        
+        $todos = Configuracion::whereNotIn('variable', ['interno'])->get();
+        
+        return Inertia::render('configuracion/listar', [
+            'configuraciones' => $todos
+        ]);
     }
-    
-    */
 
     /**
      * Show the form for creating a new resource.

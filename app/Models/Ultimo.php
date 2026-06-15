@@ -17,4 +17,9 @@ class Ultimo extends Model
     {
         return $this->belongsTo(Seguimiento::class);
     }
+
+    public function estudiante()
+    {
+        return $this->belongsTo(Estudiante::class);
+    }
 }

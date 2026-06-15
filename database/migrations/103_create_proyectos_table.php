@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("objetivo_general")->nullable()->default(null);
             $table->string("lugar")->nullable()->default(null);
             $table->string("informacion")->nullable()->default(null);
-            $table->string("justificacion")->nullable()->default(null);
+            $table->text("justificacion")->nullable()->default(null);
             $table->enum('origen',["Banco de Proyectos","Propuesta propia","Trabajador"]);
             $table->foreignId('asesor_id')->nullable()->default(null)->constrained('asesores');
             $table->foreignId('externo_id')->nullable()->default(null)->constrained('externos');

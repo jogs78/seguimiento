@@ -29,70 +29,81 @@ class ProyectoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
-
     public function index(Request $request)
     {
         $buscarEstudiante = $request->input('buscar');
         $buscarProyecto = $request->input('buscar_proyecto');
-        $buscarAsesor = $request->input('buscar_asesor');
+        $buscarAsesor = trim($request->input('buscar_asesor'));
         $buscarEmpresa = $request->input('buscar_empresa');
+
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
         $carrera_id = session('carrera_id');
 
-        // Función helper para aplicar filtro de carrera a estudiantes
+        // Función helper para aplicar filtro de carrera
         $aplicarFiltroCarrera = function($query) use ($carrera_id) {
+
             if ($carrera_id) {
                 $query->where('carrera_id', $carrera_id);
-                //imprimir en consola el valor de carrera_id
-                //imprimir que se aplicó el filtro de carrera usando echo
-                //echo "Filtro de carrera aplicado: " . $carrera_id . "\n";
-
-            }
-            else{
-                //imprimir que no se aplicó el filtro de carrera
-                
-               // echo "No se aplicó filtro de carrera\n";
-
             }
             return $query;
         };
 
-        $proyectos = Proyecto::with(['empresa', 'asesor', 'externo', 'estudiantes'])
+        $proyectos = Proyecto::with([
+                'empresa',
+                'asesor',
+                'externo',
+                'estudiantes'
+            ])
             ->where('periodo_id', $periodo_id)
-            // Filtro base de carrera
+
+            // FILTRO BASE POR CARRERA
             ->when($carrera_id, function ($query) use ($carrera_id) {
                 return $query->whereHas('estudiantes', function ($q) use ($carrera_id) {
                     $q->where('carrera_id', $carrera_id);
                 });
             })
+
+            // BUSCAR ESTUDIANTE
             ->when($buscarEstudiante, function ($query, $buscarEstudiante) use ($aplicarFiltroCarrera) {
                 $query->whereHas('estudiantes', function ($q) use ($buscarEstudiante, $aplicarFiltroCarrera) {
                     $aplicarFiltroCarrera($q);
-                    $q->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$buscarEstudiante}%"]);
+                    $q->whereRaw("
+                        CONCAT(
+                            nombre, ' ',
+                            apellido_paterno, ' ',
+                            apellido_materno
+                        ) LIKE ?
+                    ", ["%{$buscarEstudiante}%"]);
+
                 });
             })
+            // BUSCAR PROYECTO
             ->when($buscarProyecto, function ($query, $buscarProyecto) use ($aplicarFiltroCarrera) {
                 $query->where('nombre', 'like', "%{$buscarProyecto}%")
                     ->whereHas('estudiantes', $aplicarFiltroCarrera);
             })
-            ->when($buscarAsesor, function ($query, $buscarAsesor) use ($aplicarFiltroCarrera) {
+            // BUSCAR ASESOR
+            ->when($buscarAsesor, function ($query) use ($buscarAsesor, $aplicarFiltroCarrera) {
                 $query->whereHas('asesor', function ($q) use ($buscarAsesor) {
-                    $q->where('nombre', 'like', "%{$buscarAsesor}%");
+                    $q->whereRaw("
+                        CONCAT(
+                            nombre, ' ',
+                            apellido_paterno, ' ',
+                            apellido_materno
+                        ) LIKE ?
+                    ", ["%{$buscarAsesor}%"]);
                 })->whereHas('estudiantes', $aplicarFiltroCarrera);
             })
+            // BUSCAR EMPRESA
             ->when($buscarEmpresa, function ($query, $buscarEmpresa) use ($aplicarFiltroCarrera) {
                 $query->whereHas('empresa', function ($q) use ($buscarEmpresa) {
                     $q->where('nombre', 'like', "%{$buscarEmpresa}%");
                 })->whereHas('estudiantes', $aplicarFiltroCarrera);
             })
             ->get();
-
-       // Procesar documentos usando el Helper
+        // Procesar documentos
         $documentosProcesados = DocumentosHelper::procesarDocumentosDeProyectos($proyectos);
-
         $asesores = Asesor::all();
-        //con inertia
         return Inertia::render('coordinador/tabla', [
             'proyectos' => $proyectos,
             'asesores' => $asesores,
@@ -102,30 +113,28 @@ class ProyectoController extends Controller
             'filtroBuscarEmpresa' => $buscarEmpresa,
             'documentosProcesados' => $documentosProcesados
         ]);
-
-        //return view('coordinador.tabla', compact('proyectos', 'asesores'));
-    }   
-
-    public function sugerencias(Request $request)
-{
-    $query = $request->input('query');
-    $carrera_id = session('carrera_id');
-    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-    
-    if (!$carrera_id) {
-        return response()->json([]);
     }
 
-    $estudiantes = Estudiante::where('carrera_id', $carrera_id)
-        ->whereHas('proyecto', function($q) use ($periodo_id) {  // ← Opcional: filtrar por periodo
-            $q->where('periodo_id', $periodo_id);
-        })
-        ->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$query}%"])
-        ->limit(10)
-        ->pluck(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) as nombre_completo"));
+    public function sugerencias(Request $request)
+    {
+        $query = $request->input('query');
+        $carrera_id = session('carrera_id');
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+        
+        if (!$carrera_id) {
+            return response()->json([]);
+        }
 
-    return response()->json($estudiantes);
-}
+        $estudiantes = Estudiante::where('carrera_id', $carrera_id)
+            ->whereHas('proyecto', function($q) use ($periodo_id) {  // ← Opcional: filtrar por periodo
+                $q->where('periodo_id', $periodo_id);
+            })
+            ->whereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$query}%"])
+            ->limit(10)
+            ->pluck(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) as nombre_completo"));
+
+        return response()->json($estudiantes);
+    }
 
     public function sugerenciasEmpresa(Request $request)
     {
@@ -203,21 +212,16 @@ class ProyectoController extends Controller
      */
     public function store(StoreProyectoRequest $request)
 {
-    \Log::info('=== INICIO STORE PROYECTO ===');
-    \Log::info('Datos recibidos:', $request->all());
-    echo 'Datos recibidos: ' . json_encode($request->all()) . "\n";
+    
     DB::beginTransaction();
     
     try {
-        // 🔹 1. Manejar empresa
+        // Manejar empresa
         $empresaId = $request->empresa_id;
         
         // Si es nueva empresa (valor -1)
         if ($empresaId == -1) {
             echo 'creando nueva empresa';
-            //\Log::info('1. Creando nueva empresa...');
-            
-            // Validar que los campos requeridos no estén vacíos
             if (empty($request->nombre_e)) {
                 throw new \Exception('El nombre de la empresa es requerido');
             }
@@ -240,38 +244,28 @@ class ProyectoController extends Controller
             ]);
             
             $empresaId = $empresa->id;
-           // \Log::info('2. Empresa creada con ID: ' . $empresaId);
-        } else {
-            echo 'usando empresa existente';
-          //  \Log::info('1. Usando empresa existente ID: ' . $empresaId);
-        }
-        
-        // 🔹 2. Crear proyecto
-        // \Log::info('3. Creando proyecto...');
-        
+           
+        } 
         $proyecto = Proyecto::create([
+            'num_registro' => $request->num_registro,
             'nombre' => $request->nombre,
             'objetivo_general' => $request->objetivo_general,
             'lugar' => $request->lugar,
             'informacion' => $request->informacion,
             'justificacion' => $request->justificacion,
+            'origen' => $request->origen,
             'asesor_id' => $request->asesor_id,
             'empresa_id' => $empresaId,
             'periodo_id' => ConfiguracionServiceProvider::get('periodo_id'),
         ]);
-        
-        // \Log::info('4. Proyecto creado con ID: ' . $proyecto->id);
-        
-        // 🔹 3. Asignar proyecto al estudiante
+        if (!Auth::check()) {
+        return redirect()->route('Inicio_Sesion');
+        }
+        //Asignar proyecto al estudiante
         $estudiante = Auth::user()->usa;
         $estudiante->proyecto_id = $proyecto->id;
         $estudiante->save();
-        
-        // \Log::info('5. Estudiante actualizado');
-        
-        // 🔹 4. Procesar asesor externo (si se proporcionó)
-        // \Log::info('6. Procesando asesor externo...');
-        
+        //  Procesar asesor externo (si se proporcionó)
         if ($request->filled('correo_ae') && $request->filled('nombre_ae')) {
             // Buscar o crear asesor externo
             $ae = Externo::firstOrCreate(
@@ -284,9 +278,7 @@ class ProyectoController extends Controller
                     'puesto' => $request->puesto_ae
                 ]
             );
-            
-            // \Log::info('7. Asesor externo ID: ' . $ae->id);
-            
+    
             // Crear usuario para el asesor externo
             Usuario::firstOrCreate(
                 ['nombre_usuario' => $ae->correo_electronico],
@@ -301,13 +293,9 @@ class ProyectoController extends Controller
             $proyecto->externo_id = $ae->id;
             $proyecto->save();
             
-            // \Log::info('8. Asesor externo asignado al proyecto');
-        } else {
-            // \Log::info('7. No se proporcionó asesor externo');
-        }
-        
+            
+        }      
         DB::commit();
-        // \Log::info('9. TRANSACCIÓN COMPLETADA');
         DocumentoAutomaticoService::guardarSolicitud($estudiante);
         DocumentoAutomaticoService::guardarAnteproyecto($estudiante);
         return redirect()->route("home")
@@ -315,22 +303,11 @@ class ProyectoController extends Controller
         
     } catch (\Throwable $th) {
         DB::rollBack();
-        // \Log::error('ERROR EN STORE: ' . $th->getMessage());
-        // \Log::error($th->getTraceAsString());
-        
         return back()
             ->withErrors(['error' => 'Error al guardar: ' . $th->getMessage()])
             ->withInput();
     }
 }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Proyecto $proyecto)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -349,17 +326,38 @@ class ProyectoController extends Controller
      */
     public function update(UpdateProyectoRequest $request, Proyecto $proyecto)
     {
-        Log::channel('debug')->info('checar');
-        if (! Gate::allows('update',$proyecto)){
-            //con inertia
-            return Inertia::render('estudiante/avisos/no-autorizado');
-            //return view('estudiante.aviso.no-autorizado');
+        //Log::channel('debug')->info('checar');
 
+        if (!Gate::allows('update', $proyecto)) {
+            return Inertia::render(
+                'estudiante/avisos/no-autorizado'
+            );
         }
-        //ACTUALIZAR LA BASE DE DATOS CON LOS DATOS QUE VIENEN DEL FORMULARIO DE EDITAR UN PERIODO
+
+        // Actualizar proyecto
         $proyecto->fill($request->all());
+
         $proyecto->save();
-        return redirect()->route("home");
+        //regenerar documentos  automáticos para todos los estudiantes del proyecto
+        $proyecto->load('estudiantes');
+
+        foreach ($proyecto->estudiantes as $estudiante) {
+
+            DocumentoAutomaticoService::guardarSolicitud(
+                $estudiante
+            );
+
+            DocumentoAutomaticoService::guardarAnteproyecto(
+                $estudiante
+            );
+        }
+
+        return redirect()
+            ->route("proyectos.mostrar")
+            ->with(
+                'success',
+                'Proyecto actualizado correctamente'
+            );
     }
 
     /**
@@ -372,31 +370,32 @@ class ProyectoController extends Controller
         return redirect()->route("home");
     }
 
-  public function create()
+    public function create()
     {
-
+        if (!Auth::check()) {
+        return redirect()->route('Inicio_Sesion');
+        }
         $estudiante = Auth::user()->usa;
         $proyecto = $estudiante->proyecto;
 
          // Verificar si ya tiene un proyecto
-    if (!is_null($proyecto)) {
+        if (!is_null($proyecto)) {
+            
+            $proyecto->load([
+                'empresa',
+                'periodo',
+                'actividades.cronogramas' ,
+                'asesor',
+                'externo',
+                'estudiantes'
+            ]);
+            
+            return Inertia::render('proyecto/mostrar', [
+                'proyecto' => $proyecto
+            ]);
+        } 
         
-        $proyecto->load([
-            'empresa',
-            'periodo',
-            'actividades.cronogramas' ,
-            'asesor',
-            'externo',
-            'estudiantes'
-        ]);
-        
-        return Inertia::render('proyecto/mostrar', [
-            'proyecto' => $proyecto
-        ]);
-    } 
-        
-        //return view (vista que muestra el proyecto y con el enlace de "actividades del proyecto")
-        //si no entonces que cargue el registro
+      
         $carrera_id = $estudiante->carrera_id;
         // O si la relación es directa con la tabla pivote 'asesor_carrera'
         $asesores = Asesor::join('asesor_carrera', 'asesores.id', '=', 'asesor_carrera.asesor_id')
@@ -414,10 +413,27 @@ class ProyectoController extends Controller
             'asesores' => $asesores,
             'empresas' => $empresas,
             'periodo' => $periodo,
-            'externos' => $externos
+            'externos' => $externos,
+            'tecnologico' => ConfiguracionServiceProvider::get('tecnologico')
         ]);
 
     }
+
+    public function show(Proyecto $proyecto)
+{
+    $proyecto->load([
+        'empresa',
+        'periodo',
+        'actividades.cronogramas',
+        'asesor',
+        'externo',
+        'estudiantes'
+    ]);
+
+    return Inertia::render('proyecto/mostrar', [
+        'proyecto' => $proyecto
+    ]);
+}
 
     public function buscar(Request $request) 
     {
@@ -432,8 +448,7 @@ class ProyectoController extends Controller
         }
         
         // Buscar proyectos que:
-        // 1. Tengan nombre similar a la búsqueda
-        // 2. TENGAN ESTUDIANTES DE LA MISMA CARRERA
+        // Tengan nombre similar a la búsque y TENGAN ESTUDIANTES DE LA MISMA CARRERA
         $proyectos = Proyecto::where('nombre', 'like', "%{$termino}%")
             ->whereHas('estudiantes', function($query) use ($estudiante) {
                 // Buscar estudiantes que tengan la misma carrera que el estudiante actual
@@ -467,7 +482,6 @@ class ProyectoController extends Controller
             return back()->withErrors(['error' => 'Solo los estudiantes pueden unirse a proyectos.']);
         }
 
-        /** @var \App\Models\Estudiante $estudiante */
         $estudiante = $usuario->usa;
 
         if ($estudiante->proyecto_id !== null) {
@@ -490,7 +504,6 @@ class ProyectoController extends Controller
 
         $proyecto = Proyecto::findOrFail($request->proyecto_id);
         
-        // Guardar como boolean (true/false)
         $proyecto->fuera_de_tiempo = $request->activo; // true o false directamente
         $proyecto->save();
 

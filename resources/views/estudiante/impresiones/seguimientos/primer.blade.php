@@ -8,7 +8,7 @@
     <style>
         *{font-size: 12px;}
         p {
-            line-height: 0.5; /* Puedes ajustar este valor según lo que necesites */
+            line-height: 0.5; 
         }
     </style>
 </head>
@@ -165,7 +165,7 @@
                     Sello de la empresa, organismo o dependencia
                 </th>
                 <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
-                    {{ $segundo->califico_externo ? \Carbon\Carbon::parse($segundo->califico_externo)->format('Y-m-d') : 'No fechado' }}  
+                    {{ $primer->califico_externo ? \Carbon\Carbon::parse($primer->califico_externo)->format('Y-m-d') : 'No fechado' }}  
                     <br> Fecha de Evaluación
                 </th>
             </tr>

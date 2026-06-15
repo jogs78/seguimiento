@@ -15,8 +15,10 @@ class DocumentoEstudiante extends Model
         'ruta_archivo',
         'nombre_original',
         'mime_type',
-        'tamano',
-        'url'
+        'peso_bytes',
+        'url_documento',
+        'extension',
+        'actualizado_en'
     ];
     
     public function estudiante()

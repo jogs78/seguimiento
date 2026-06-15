@@ -121,7 +121,6 @@
     </div>
   </AppLayout>
 </template>
-
 <script setup>
 import { ref, computed } from 'vue'
 import { Link, router } from '@inertiajs/vue3'

@@ -12,11 +12,11 @@ use App\Models\Carrera;
 use App\Models\DocumentoEstudiante;
 use App\Models\TipoDocumento;
 use App\Models\Configuracion;
+use App\Models\Periodo;
 use App\Models\Usuario;
 use App\Models\Proyecto;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Providers\ConfiguracionServiceProvider;
-use App\Models\Periodo;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,96 +31,82 @@ class EstudianteController extends Controller
 {
     /**
      * Display a listing of the resource.
-    
-    
+     
      */
-    /*
+
+   
     public function index(Request $request)
     {
         $buscar = $request->input('buscar');
-
-        if ($buscar) {
-            $todos = Estudiante::where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')->get();
+        $usuario = Auth::user();
+        
+        // Determinar la carrera según el rol del usuario
+        if ($usuario->usa_type === 'App\\Models\\Coordinador') {
+            $carrera_id = session('carrera_id');
+            
+            if (!$carrera_id) {
+                return redirect()->route('seleccionar.carrera')
+                    ->with('error', 'Debes seleccionar una carrera primero');
+            }
+        } elseif ($usuario->usa_type === 'App\\Models\\Estudiante') {
+            $estudiante = $usuario->usa;
+            $carrera_id = $estudiante->carrera_id;
+            
+            if (!$carrera_id) {
+                return redirect()->route('home')->with('error', 'Tu perfil no tiene una carrera asignada');
+            }
         } else {
-            $todos = Estudiante::all();
+            return redirect()->route('home')->with('error', 'Acceso no autorizado');
         }
-
-            return view('estudiante.listar', compact('todos')); // vista por defecto
         
-    }*/
-    
-    public function index(Request $request)
-{
-    $buscar = $request->input('buscar');
-    $usuario = Auth::user();
-    
-    // Determinar la carrera según el rol del usuario
-    if ($usuario->usa_type === 'App\\Models\\Coordinador') {
-        $carrera_id = session('carrera_id');
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
         
-        if (!$carrera_id) {
-            return redirect()->route('seleccionar.carrera')
-                ->with('error', 'Debes seleccionar una carrera primero');
+        if (!$periodo_id) {
+            return redirect()->back()->with('error', 'No hay un período configurado');
         }
-    } elseif ($usuario->usa_type === 'App\\Models\\Estudiante') {
-        $estudiante = $usuario->usa;
-        $carrera_id = $estudiante->carrera_id;
         
-        if (!$carrera_id) {
-            return redirect()->route('home')->with('error', 'Tu perfil no tiene una carrera asignada');
+        $periodoActual = Periodo::find($periodo_id);
+        
+        // Cargar estudiantes con sus documentos
+        $query = Estudiante::select('estudiantes.*')
+            ->with(['documentos' => function($q) {
+                $q->with('tipoDocumento');
+            }])
+            ->where('estudiantes.carrera_id', $carrera_id)
+            ->where('estudiantes.created_at', '>=', $periodoActual->fecha_inicio)
+            ->where('estudiantes.created_at', '<=', $periodoActual->fecha_final);
+        
+        // Búsqueda
+        if ($buscar) {
+            $query->where(function($q) use ($buscar) {
+                $q->where('estudiantes.nombre', 'like', '%' . $buscar . '%')
+                ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $buscar . '%')
+                ->orWhere('estudiantes.apellido_materno', 'like', '%' . $buscar . '%')
+                ->orWhere('estudiantes.numero_control', 'like', '%' . $buscar . '%')
+                ->orWhere(DB::raw("CONCAT(estudiantes.nombre, ' ', estudiantes.apellido_paterno, ' ', estudiantes.apellido_materno)"), 'like', '%' . $buscar . '%');
+            });
         }
-    } else {
-        return redirect()->route('home')->with('error', 'Acceso no autorizado');
+        
+        $query->orderBy('estudiantes.apellido_paterno')
+            ->orderBy('estudiantes.apellido_materno')
+            ->orderBy('estudiantes.nombre');
+        
+        $todos = $query->get();
+        
+        // Obtener los tipos de documentos que nos interesan (por nombre)
+        $tiposDocumentosRequeridos = [
+            'KARDEX (SII)',
+            'Afiliación del seguro social',
+            'Constancia de servicio social'
+        ];
+        
+        return Inertia::render('estudiante/listar', [
+            'todos' => $todos,
+            'periodoActual' => $periodoActual,
+            'filtroBuscar' => $buscar,
+            'tiposDocumentosRequeridos' => $tiposDocumentosRequeridos
+        ]);
     }
-    
-    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-    
-    if (!$periodo_id) {
-        return redirect()->back()->with('error', 'No hay un período configurado');
-    }
-    
-    $periodoActual = Periodo::find($periodo_id);
-    
-    // Cargar estudiantes con sus documentos
-    $query = Estudiante::select('estudiantes.*')
-        ->with(['documentos' => function($q) {
-            $q->with('tipoDocumento');
-        }])
-        ->where('estudiantes.carrera_id', $carrera_id)
-        ->where('estudiantes.created_at', '>=', $periodoActual->fecha_inicio)
-        ->where('estudiantes.created_at', '<=', $periodoActual->fecha_final);
-    
-    // Búsqueda
-    if ($buscar) {
-        $query->where(function($q) use ($buscar) {
-            $q->where('estudiantes.nombre', 'like', '%' . $buscar . '%')
-            ->orWhere('estudiantes.apellido_paterno', 'like', '%' . $buscar . '%')
-            ->orWhere('estudiantes.apellido_materno', 'like', '%' . $buscar . '%')
-            ->orWhere('estudiantes.numero_control', 'like', '%' . $buscar . '%')
-            ->orWhere(DB::raw("CONCAT(estudiantes.nombre, ' ', estudiantes.apellido_paterno, ' ', estudiantes.apellido_materno)"), 'like', '%' . $buscar . '%');
-        });
-    }
-    
-    $query->orderBy('estudiantes.apellido_paterno')
-        ->orderBy('estudiantes.apellido_materno')
-        ->orderBy('estudiantes.nombre');
-    
-    $todos = $query->get();
-    
-    // Obtener los tipos de documentos que nos interesan (por nombre)
-    $tiposDocumentosRequeridos = [
-        'KARDEX (SII)',
-        'Afiliación del seguro social (carnet IMSS)',
-        'Constancia de servicio social'
-    ];
-    
-    return Inertia::render('estudiante/listar', [
-        'todos' => $todos,
-        'periodoActual' => $periodoActual,
-        'filtroBuscar' => $buscar,
-        'tiposDocumentosRequeridos' => $tiposDocumentosRequeridos
-    ]);
-}
 
    public function buscarEstudiante(Request $request)
     {
@@ -166,47 +152,33 @@ class EstudianteController extends Controller
         //MOSTRAR FORMULARIO PARA CREAR
         $carreras = Carrera::all();
 
-        
-         // Verificar si el usuario está autenticado y es coordinador
-     // Verificar si el usuario está autenticado (es coordinador)
-    $esCoordinador = auth()->check() && auth()->user()->usa_type === 'App\\Models\\Coordinador';
+        // Verificar si el usuario está autenticado (es coordinador)
+        $esCoordinador = auth()->check() && auth()->user()->usa_type === 'App\\Models\\Coordinador';
     
-    // Obtener datos del usuario autenticado para pasarlos a la vista
-    $authUser = null;
-    if (auth()->check()) {
-        $user = auth()->user();
-        $authUser = [
-            'id' => $user->id,
-            'usa_id' => $user->usa_id,
-            'usa_type' => $user->usa_type,
-            'usa' => $user->usa ? [
-                'nombre' => $user->usa->nombre,
-                'apellido_paterno' => $user->usa->apellido_paterno,
-                'apellido_materno' => $user->usa->apellido_materno,
-            ] : null,
-        ];
-    }
+        // Obtener datos del usuario autenticado para pasarlos a la vista
+        $authUser = null;
+        if (auth()->check()) {
+            $user = auth()->user();
+            $authUser = [
+                'id' => $user->id,
+                'usa_id' => $user->usa_id,
+                'usa_type' => $user->usa_type,
+                'usa' => $user->usa ? [
+                    'nombre' => $user->usa->nombre,
+                    'apellido_paterno' => $user->usa->apellido_paterno,
+                    'apellido_materno' => $user->usa->apellido_materno,
+                ] : null,
+            ];
+        }
 
       //return view('estudiante.crear',compact('carreras'));
        return Inertia::render('estudiante/crear', [
-        'carreras' => $carreras,
-         'esCoordinador' => $esCoordinador,  // Indica si viene del panel del coordinador
-        'auth' => auth()->check(),
-        'authUser' => $authUser  // ✅ Pasar el usuario autenticado
-    ]);
-        
+            'carreras' => $carreras,
+            'esCoordinador' => $esCoordinador,  // Indica si viene del panel del coordinador
+            'auth' => auth()->check(),
+            'authUser' => $authUser  // Pasar el usuario autenticado
+        ]);       
     }
-    /*
-   
-
-    public function create()
-    {
-        //MOSTRAR FORMULARIO PARA CREAR
-        $carreras = Carrera::all();
-        return view('estudiante.crear',compact('carreras'));
-        
-    }
-*/
     
     /**
      * Store a newly created resource in storage.
@@ -218,8 +190,25 @@ class EstudianteController extends Controller
         DB::beginTransaction();
 
         try {
+            // 1. Verificar si el correo ya existe
+            $usuarioExistente = Usuario::where('nombre_usuario', $request->correo_electronico)->exists();
+            
+            if ($usuarioExistente) {
+                return back()->withErrors([
+                    'correo_electronico' => 'El correo ya existe'
+                ]);
+            }
 
-            // 1. Crear estudiante
+            // 2. Verificar si el número de control ya existe
+            $estudianteExistente = Estudiante::where('numero_de_control', $request->numero_de_control)->exists();
+            
+            if ($estudianteExistente) {
+                return back()->withErrors([
+                    'numero_de_control' => 'El número de control ya existe'
+                ]);
+            }
+
+            // 3. Crear estudiante
             $estudiante = new Estudiante();
 
             $estudiante->fill([
@@ -237,51 +226,48 @@ class EstudianteController extends Controller
 
             $estudiante->save();
 
-            // 2. Subir documento de afiliación si existe
+            // 4. Subir documento de afiliación si existe
             if ($request->hasFile('documento_afiliacion')) {
-
                 $archivo = $request->file('documento_afiliacion');
+                
+                // Validar tipo de archivo
+                $extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png'];
+                if (!in_array($archivo->getClientOriginalExtension(), $extensionesPermitidas)) {
+                    throw new \Exception('Formato de archivo no permitido. Formatos aceptados: PDF, JPG, JPEG, PNG');
+                }
 
                 // Buscar tipo de documento
                 $tipoDocumento = TipoDocumento::where('nombre', 'like', '%seguro%')->first();
 
                 // Crear si no existe
                 if (!$tipoDocumento) {
-
                     $tipoDocumento = new TipoDocumento();
-
                     $tipoDocumento->fill([
                         'nombre' => 'Afiliación del seguro social',
                         'es_requerido' => true,
                         'orden' => 5
                     ]);
-
                     $tipoDocumento->save();
                 }
 
                 // Generar nombre del archivo
-                $nombreArchivo =
-                    time() . '_' .
-                    Str::slug($request->institucion_seguridad_social) . '_' .
+                $nombreArchivo = Str::slug($request->institucion_seguridad_social) . '_' .
                     $estudiante->numero_de_control . '.' .
                     $archivo->getClientOriginalExtension();
 
                 // Carpeta destino
-                $carpeta = 'estudiantes/' .
-                    $estudiante->numero_de_control .
-                    '/afiliacion';
+                //$carpeta = 'estudiantes/' . $estudiante->numero_de_control . '/expediente';
+                //carpeta destino estudiantes_$periodo_actual, expedientes,estudiante->nombre con apellidos en mayuscula
+                $periodoActual = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'));
+                $carpeta = 'estudiantes_' . $periodoActual->nombre . '/expedientes/' .
+                    Str::slug($estudiante->nombre . ' ' . $estudiante->apellido_paterno . ' ' . $estudiante->apellido_materno) . '_' .
+                    $estudiante->numero_de_control;
 
                 // Guardar archivo
-                $rutaArchivo = Storage::disk('documentos')
-                ->putFileAs(
-                    $carpeta,
-                    $archivo,
-                    $nombreArchivo
-                );
+                $rutaArchivo = Storage::disk('documentos')->putFileAs($carpeta, $archivo, $nombreArchivo);
 
                 // Guardar registro del documento
                 $documento = new DocumentoEstudiante();
-
                 $documento->fill([
                     'estudiante_id' => $estudiante->id,
                     'tipo_documento_id' => $tipoDocumento->id,
@@ -291,49 +277,77 @@ class EstudianteController extends Controller
                     'mime_type' => $archivo->getMimeType(),
                     'subido_en' => now()
                 ]);
-
                 $documento->save();
             }
 
-            // 3. Crear usuario
-            $usuario = new Usuario();
 
+            // 5. Crear usuario
+            $usuario = new Usuario();
             $usuario->fill([
                 'nombre_usuario' => $estudiante->correo_electronico,
                 'usa_id' => $estudiante->id,
                 'usa_type' => get_class($estudiante),
                 'contraseña' => Hash::make($request->contraseña),
             ]);
-
             $usuario->save();
 
             DB::commit();
 
-            // Redirección dependiendo del usuario autenticado
-            if (
-                auth()->check() &&
-                auth()->user()->usa_type === 'App\\Models\\Coordinador'
-            ) {
-
-                return redirect()
-                    ->route('estudiantes.index')
-                    ->with('success', 'Estudiante registrado correctamente');
+            // 6. Redirección según el contexto
+            
+             if (auth()->check() && auth()->user()->usa_type === 'App\\Models\\Coordinador') {
+                return back()->with(
+                        'success',
+                        '¡Registro exitoso! Ahora puedes ver al estuiante en la lista.'
+                    );
             }
 
-            return redirect()
-                ->route('login')
-                ->with('success', '¡Registro exitoso! Ahora puedes iniciar sesión.');
+           return back()->with(
+                'success',
+                '¡Registro exitoso! Ahora puedes iniciar sesión.'
+            );
 
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            return back()
-                ->withErrors([
-                    'error' => 'Error al registrar: ' . $e->getMessage()
-                ])
-                ->withInput();
+        //  Devolver errores como respaldo (fallback)
+        return redirect()
+            ->back()
+            ->with('error', $e->getMessage())
+            ->withInput();
         }
+    }
+
+    /**
+     * Obtener mensaje de error amigable según la excepción
+     */
+    private function obtenerMensajeAmigable(\Exception $e)
+    {
+        $mensaje = $e->getMessage();
+        
+        // Mensajes personalizados para errores comunes
+        if (str_contains($mensaje, 'Duplicate entry') && str_contains($mensaje, 'correo_electronico')) {
+            return 'El correo electrónico ya está registrado. Por favor, utiliza otro correo o inicia sesión.';
+        }
+        
+        if (str_contains($mensaje, 'Duplicate entry') && str_contains($mensaje, 'numero_de_control')) {
+            return 'El número de control ya está registrado. Verifica tus datos.';
+        }
+        
+        if (str_contains($mensaje, 'formato de archivo') || str_contains($mensaje, 'extensión')) {
+            return 'El archivo tiene un formato no permitido. Por favor, sube un archivo PDF, JPG, JPEG o PNG.';
+        }
+        
+        if (str_contains($mensaje, 'tamaño') || str_contains($mensaje, 'size')) {
+            return 'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.';
+        }
+        
+        // Si el mensaje ya es amigable, devolverlo directamente
+        if (str_contains($mensaje, 'El correo') || str_contains($mensaje, 'El número de control')) {
+            return $mensaje;
+        }
+        
+        // Error genérico
+        return 'Ocurrió un error durante el registro. Por favor, verifica tus datos e intenta nuevamente. Si el problema persiste, contacta al administrador.';
     }
 
     /**
@@ -472,96 +486,65 @@ class EstudianteController extends Controller
     }
 
 
-    /*public function solicitud()
-    {   
-        $estudiante = Auth::getUser()->usa;
-        if (!$estudiante || !$estudiante->proyecto) {
-        return back()->withErrors(['error' => 'No tienes un proyecto asignado.']);
-        }
-        $jefe = ConfiguracionServiceProvider::get('jefe_division');
-        $numeroControl = Auth::user()->numero_de_control; 
-        $cantidadEstudiantes = $estudiante->proyecto->estudiantes()->count();
-        $pdf = Pdf::loadview('estudiante.impresiones.solicitud',compact('jefe','estudiante','cantidadEstudiantes')); 
-        $nombreArchivo = 'Solicitud ' . $estudiante->numero_de_control . '.pdf';
-        return $pdf->download($nombreArchivo);
-    }*/
     public function solicitud()
-{
-    $estudiante = Auth::user()->usa;
-
-    DocumentoAutomaticoService::guardarSolicitud($estudiante);
-
-    $documento = DocumentoEstudiante::where(
-        'estudiante_id',
-        $estudiante->id
-    )
-    ->whereHas('tipoDocumento', function($q) {
-        $q->where(
-            'nombre',
-            'Solicitud de residencia profesional'
-        );
-    })
-    ->first();
-
-    return Storage::disk('documentos')
-        ->download(
-            $documento->ruta_archivo
-        );
-}
-
-    /*public function anteproyecto()
     {
-        $estudiante = Auth::getUser()->usa;
-        if (!$estudiante || !$estudiante->proyecto) 
-        {
-        return redirect()->route('home');
+        if (!Auth::check()) {
+        return redirect()->route('Inicio_Sesion');
         }
-       // $jefe = ConfiguracionServiceProvider::get('jefe_division');
-        $pdf = Pdf::loadview('estudiante.impresiones.anteproyecto',compact('estudiante')); 
-        return $pdf->download('Anteproyecto ' . $estudiante->numero_de_control . '.pdf');
-        //return view('estudiante.impresiones.anteproyecto'); 
-    }*/
+        $estudiante = Auth::user()->usa;
 
-    public function anteproyecto()
-{
-    $estudiante = Auth::user()->usa;
+        DocumentoAutomaticoService::guardarSolicitud($estudiante);
 
-    if (!$estudiante || !$estudiante->proyecto) {
-        return redirect()->route('home');
+        $documento = DocumentoEstudiante::where(
+            'estudiante_id',
+            $estudiante->id
+        )
+        ->whereHas('tipoDocumento', function($q) {
+            $q->where(
+                'nombre',
+                'Solicitud de residencia profesional'
+            );
+        })
+        ->first();
+
+        return Storage::disk('documentos')
+            ->download(
+                $documento->ruta_archivo
+            );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Guardar automáticamente
-    |--------------------------------------------------------------------------
-    */
+    public function anteproyecto()
+    {
+        if (!Auth::check()) {
+        return redirect()->route('Inicio_Sesion');
+        }
+        $estudiante = Auth::user()->usa;
 
-     $estudiante->load([
-        'proyecto.actividades.cronogramas',
-        'proyecto.asesor'
-    ]);
-    
-    DocumentoAutomaticoService::guardarAnteproyecto(
-        $estudiante
-    );
+        if (!$estudiante || !$estudiante->proyecto) {
+            return redirect()->route('home');
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Generar descarga usuario
-    |--------------------------------------------------------------------------
-    */
+        $estudiante->load([
+            'proyecto.actividades.cronogramas',
+            'proyecto.asesor'
+        ]);
+        
+        DocumentoAutomaticoService::guardarAnteproyecto(
+            $estudiante
+        );
 
-    $pdf = Pdf::loadView(
-        'estudiante.impresiones.anteproyecto',
-        compact('estudiante')
-    );
+        $pdf = Pdf::loadView(
+            'estudiante.impresiones.anteproyecto',
+            compact('estudiante')
+        );
 
-    return $pdf->download(
-        'Anteproyecto ' .
-        $estudiante->numero_de_control .
-        '.pdf'
-    );
-}
+        return $pdf->download(
+            'Anteproyecto ' .
+            $estudiante->numero_de_control .
+            '.pdf'
+        );
+    }
+
     public function primer(Estudiante $estudiante)
     {
         if (is_null($estudiante->id)){
@@ -572,10 +555,8 @@ class EstudianteController extends Controller
         ->where('carrera_id', $estudiante->carrera_id)
         ->first();
 
-        $internoActivo = $internoConfig && $internoConfig->valor === 'si';
-        //tendriamos que saber 
-        //si es un estudiante
-        //$externo = Auth::getUser()->usa;
+        $internoActivo =$internoConfig->valor === 'si';
+       
         $primer = $estudiante->primer;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.primer',compact('estudiante','primer','internoActivo')); 
         return $pdf->download('Primer_Seguimiento ' . $estudiante->numero_de_control .'.pdf');
@@ -590,7 +571,7 @@ class EstudianteController extends Controller
         ->where('carrera_id', $estudiante->carrera_id)
         ->first();
 
-        $internoActivo = $internoConfig && $internoConfig->valor === 'si';
+        $internoActivo = $internoConfig->valor === 'si';
         $segundo = $estudiante->segundo;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.segundo',compact('estudiante','segundo','internoActivo')); 
         return $pdf->download('Segundo_Seguimiento ' . $estudiante->numero_de_control . '.pdf');      
@@ -605,7 +586,7 @@ class EstudianteController extends Controller
         ->where('carrera_id', $estudiante->carrera_id)
         ->first();
 
-        $internoActivo = $internoConfig && $internoConfig->valor === 'si';
+        $internoActivo = $internoConfig->valor === 'si';
         $ultimo = $estudiante->ultimo;
         $pdf = Pdf::loadview('estudiante.impresiones.seguimientos.ultimo',compact('estudiante','ultimo','internoActivo')); 
         return $pdf->download('Ultimo_Seguimiento ' . $estudiante->numero_de_control .'.pdf');
@@ -619,17 +600,16 @@ class EstudianteController extends Controller
             'archivo' => 'required|mimes:pdf|max:2048',  // Máximo tamaño 2MB
         ]);
 
-        // Guardar el archivo en una carpeta dentro de 'storage'
+        // Guardar el archivo en una carpeta 
         if ($request->file('archivo')) {
             $archivo = $request->file('archivo');
-            $nombreArchivo = time().'_'.$archivo->getClientOriginalName(); // Nombre único
-            $ruta = $archivo->storeAs('pdfs', $nombreArchivo, 'public'); // Guardar en storage/app/public/pdfs
+            $nombreArchivo = $archivo->getClientOriginalName(); // Nombre único
+            $ruta = $archivo->storeAs('pdfs', $nombreArchivo, 'public'); 
 
             return back()->with('success', 'Archivo subido exitosamente.')->with('ruta', $ruta);
         }
 
         return back()->with('error', 'Hubo un problema al subir el archivo.');
     }
-    
     
 }

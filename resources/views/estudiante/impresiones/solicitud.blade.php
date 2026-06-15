@@ -114,12 +114,19 @@
                     </tr>
                 </table>
                 <table class="tabla">
+                    //si el proyecto tiene asesor externo, se muestra la información del asesor, de lo contrario se deja en blanco
                     <tr>
                     <th class="cuadro sin-bold nsemanas">Nombre del Asesor Externo:  </th>
-                    <th class="cuadro sin-bold" style="width: 40%;">{{$estudiante->proyecto->externo->titulo}} {{$estudiante->proyecto->externo->nombre}} {{$estudiante->proyecto->externo->apellido_paterno}} {{$estudiante->proyecto->externo->apellido_materno}}</th>
-                    <th class="cuadro sin-bold nsemanas">Puesto: </th>
-                    <th class="cuadro sin-bold" style="width: 40%;">{{$estudiante->proyecto->externo->puesto}}</th>
-                    </tr>
+                    @if($estudiante->proyecto->externo){
+                        <th class="cuadro sin-bold" style="width: 40%;">{{$estudiante->proyecto->externo->titulo}} {{$estudiante->proyecto->externo->nombre}} {{$estudiante->proyecto->externo->apellido_paterno}} {{$estudiante->proyecto->externo->apellido_materno}}</th>
+                        <th class="cuadro sin-bold nsemanas">Puesto: </th>
+                        <th class="cuadro sin-bold" style="width: 40%;">{{$estudiante->proyecto->externo->puesto}}</th> }    
+                    @else{
+                        <th class="cuadro sin-bold" style="width: 40%;"></th>
+                        <th class="cuadro sin-bold nsemanas">Puesto: </th>
+                        <th class="cuadro sin-bold" style="width: 40%;"></th>}
+                    @endif
+                     </tr>
                 </table>
             </div>
             

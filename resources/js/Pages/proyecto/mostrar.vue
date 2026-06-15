@@ -204,7 +204,6 @@ const eliminarActividad = (actividadId) => {
 </script>
 
 <script>
-// Esta es la forma de asignar layout en Vue 3 con Options API
 export default {
   layout: AppLayout
 }

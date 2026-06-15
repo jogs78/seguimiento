@@ -36,7 +36,7 @@ class ParcialSeeder extends Seeder
         $parcial->equipo_externo = 10;
         $parcial->iniciativa_externo = 5;
         $parcial->mejoras_externo = 10;
-        $parcial->objetivos_externo = 15;
+        $parcial->objetivos_externo = 2;
         $parcial->orden_externo = 15;
         $parcial->liderazgo_externo = 10;  
         $parcial->conocimiento_externo = 20;
@@ -82,7 +82,7 @@ class ParcialSeeder extends Seeder
         $parcial->equipo_externo = 10;
         $parcial->iniciativa_externo = 5;
         $parcial->mejoras_externo = 10;
-        $parcial->objetivos_externo = 15;
+        $parcial->objetivos_externo = 2;
         $parcial->orden_externo = 15;
         $parcial->liderazgo_externo = 10;  
         $parcial->conocimiento_externo = 20;
@@ -116,7 +116,7 @@ class ParcialSeeder extends Seeder
         $parcial->equipo_externo = 10;
         $parcial->iniciativa_externo = 5;
         $parcial->mejoras_externo = 10;
-        $parcial->objetivos_externo = 15;
+        $parcial->objetivos_externo = 2;
         $parcial->orden_externo = 15;
         $parcial->liderazgo_externo = 10;  
         $parcial->conocimiento_externo = 20;
@@ -167,7 +167,7 @@ class ParcialSeeder extends Seeder
         $parcial->equipo_externo = 10;
         $parcial->iniciativa_externo = 5;
         $parcial->mejoras_externo = 10;
-        $parcial->objetivos_externo = 15;
+        $parcial->objetivos_externo = 2;
         $parcial->orden_externo = 15;
         $parcial->liderazgo_externo = 10;  
         $parcial->conocimiento_externo = 20;

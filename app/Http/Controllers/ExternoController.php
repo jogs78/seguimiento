@@ -70,15 +70,14 @@ public function index(Request $request)
         
         $todos = $query->get();
         
-        // Cargar el proyecto actual y usuario para cada externo
-        // En el controlador, usando query builder directamente
-foreach ($todos as $externo) {
-    $externo->proyecto_actual = Proyecto::where('externo_id', $externo->id)
-        ->where('periodo_id', $periodo_id)
-        ->first();
-    $externo->usuario = $externo->usuario;
-}
-        
+   
+        foreach ($todos as $externo) {
+            $externo->proyecto_actual = Proyecto::where('externo_id', $externo->id)
+                ->where('periodo_id', $periodo_id)
+                ->first();
+            $externo->usuario = $externo->usuario;
+        }
+                
         return Inertia::render('externo/listar', [
             'todos' => $todos,
             'periodoActual' => $periodoActual,
@@ -130,8 +129,7 @@ foreach ($todos as $externo) {
         return Inertia::render('externo/crear', [
             'externos' => $externos
         ]);
-        
-        //return view('externo.crear',compact('externos'));
+     
     }
 
     /**
@@ -145,13 +143,6 @@ foreach ($todos as $externo) {
         return redirect()->route("externos.index");
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Externo $externo)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -210,52 +201,65 @@ foreach ($todos as $externo) {
     }
 
     public function proyecto()
-{
-    $externo = Auth::getUser()->usa;
-    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-    
-    
-    $proyectos = $externo->proyectos($periodo_id)
-        ->with([
-            'empresa',
-            'asesor',
-            'estudiantes.carrera.coordinador', 
-            'estudiantes.primer',
-            'estudiantes.segundo',
-            'estudiantes.ultimo'
-        ])
-        ->get();
-    
-    // Procesar coordinadores
-    foreach ($proyectos as $proyecto) {
-        $coordinadores = [];
-        foreach ($proyecto->estudiantes as $estudiante) {
-            // Ahora $estudiante->carrera debería existir
-            if ($estudiante->carrera && $estudiante->carrera->coordinador) {
-                $coordinador = $estudiante->carrera->coordinador;
-                $coordinadores[$coordinador->id] = $coordinador;
-            }
-        }
-        $proyecto->coordinador = !empty($coordinadores) ? reset($coordinadores) : null;
-    }
-    
-    return Inertia::render('externo/listar-proyecto', [
-        'proyectos' => $proyectos,
-        'periodo_id' => $periodo_id
-    ]);
-}
-
- public function historico(Request $request)
     {
         $externo = Auth::getUser()->usa;
+        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+        $carrera_id = session('carrera_id');
         
+        
+        $proyectos = $externo->proyectos($periodo_id)
+            ->whereHas('estudiantes', function ($q) use ($carrera_id) {
+            if ($carrera_id) {
+                    $q->where('carrera_id', $carrera_id);
+                }
+            })
+            ->with([
+                'empresa',
+                'asesor',
+                'estudiantes.carrera.coordinador', 
+                'estudiantes.primer',
+                'estudiantes.segundo',
+                'estudiantes.ultimo'
+            ])
+            ->get();
+        
+        // Procesar coordinadores
+        foreach ($proyectos as $proyecto) {
+            $coordinadores = [];
+            foreach ($proyecto->estudiantes as $estudiante) {
+                // Ahora $estudiante->carrera debería existir
+                if ($estudiante->carrera && $estudiante->carrera->coordinador) {
+                    $coordinador = $estudiante->carrera->coordinador;
+                    $coordinadores[$coordinador->id] = $coordinador;
+                }
+            }
+            $proyecto->coordinador = !empty($coordinadores) ? reset($coordinadores) : null;
+        }
+        
+        return Inertia::render('externo/listar-proyecto', [
+            'proyectos' => $proyectos,
+            'periodo_id' => $periodo_id
+        ]);
+    }
+
+    public function historico(Request $request)
+    {
+        $externo = Auth::getUser()->usa;
+        $carrera_id = session('carrera_id');
+
         // Obtener el periodo seleccionado (por defecto null para mostrar todos)
         $periodoSeleccionado = $request->input('periodo_id');
         
         // Construir consulta base usando whereHas
-        $proyectosQuery = \App\Models\Proyecto::whereHas('externo', function($q) use ($externo) {
+        $proyectosQuery = Proyecto::whereHas('externo', function($q) use ($externo) {
             $q->where('id', $externo->id);
         });
+
+        if ($carrera_id) {
+            $proyectosQuery->whereHas('estudiantes', function ($q) use ($carrera_id) {
+                $q->where('carrera_id', $carrera_id);
+            });
+        }
         
         // Aplicar filtro de periodo solo si se seleccionó uno
         if ($periodoSeleccionado) {
@@ -303,7 +307,6 @@ foreach ($todos as $externo) {
         $proyectos= $asesor->proyectos($periodo_id)->get();
         $coordinador = Coordinador::all();
 
-//        dd(get_class($asesor));
         if(get_class($asesor)=="App\Models\Externo" )
             return view('externo.listar-proyecto',compact('proyectos','coordinador')); 
         else

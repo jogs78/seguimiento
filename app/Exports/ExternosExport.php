@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Externo;
+use App\Models\Proyecto;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -16,10 +17,34 @@ class ExternosExport implements FromCollection, ShouldAutoSize, WithHeadings, Wi
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $periodo_id;
+    protected $carrera_id;
+
+    public function __construct($periodo_id = null, $carrera_id = null)
+    {
+        $this->periodo_id = $periodo_id ?: ConfiguracionServiceProvider::get('periodo_id');
+        $this->carrera_id = $carrera_id ?: session('carrera_id');
+    }
+
     public function collection()
     {
-        return Externo::select('titulo','nombre','apellido_paterno','apellido_materno','correo_electronico','puesto')->get();
+        // Obtener IDs de externos que tienen proyectos en el período actual
+        $externosIds = Proyecto::where('periodo_id', $this->periodo_id)
+            ->when($this->carrera_id, function($q) {
+                $q->whereHas('estudiantes', function($sq) {
+                    $sq->where('carrera_id', $this->carrera_id);
+                });
+            })
+            ->whereNotNull('externo_id')
+            ->pluck('externo_id')
+            ->unique();
+
+        return Externo::whereIn('id', $externosIds)
+            ->select('titulo', 'nombre', 'apellido_paterno', 'apellido_materno', 'correo_electronico', 'puesto')
+            ->get();
     }
+
     public function headings(): array
     {
         return [

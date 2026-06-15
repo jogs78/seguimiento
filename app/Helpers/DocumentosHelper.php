@@ -14,6 +14,7 @@ class DocumentosHelper
     protected static $mapeoDocumentos = [
         'Solicitud de residencia profesional' => 'solicitud',
         'Anteproyecto' => 'anteproyecto',
+        'Solicitud de cancelación de proyecto' => 'solicitud_cancelacion',
         'KARDEX (SII)' => 'kardex',
         'Afiliación del seguro social' => 'seguro',
         'Constancia de servicio social' => 'servicio',
@@ -52,6 +53,7 @@ class DocumentosHelper
         return [
             'solicitud' => null,
             'anteproyecto' => null,
+            'solicitud_cancelacion' => null,
             'kardex' => null,
             'seguro' => null,
             'servicio' => null,

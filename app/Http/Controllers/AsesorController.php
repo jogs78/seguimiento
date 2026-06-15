@@ -22,83 +22,77 @@ class AsesorController extends Controller
 
     
     public function index(Request $request)
-    {
-        $buscar = $request->input('buscar');
-        $carrera_id = session('carrera_id');
-        
-        // Si no hay carrera seleccionada, redirigir
-        if (!$carrera_id) {
-            return redirect()->route('seleccionar.carrera')
-                ->with('error', 'Debes seleccionar una carrera primero');
-        }
-        
-        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-        
-        $query = Asesor::whereHas('carreras', function($q) use ($carrera_id) {
-            $q->where('carrera_id', $carrera_id);
-        });
-        
-        if ($buscar) {
-            $query->where(function($q) use ($buscar) {
-                $q->where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')
-                  ->orWhere('nombre', 'like', '%' . $buscar . '%')
-                  ->orWhere('apellido_paterno', 'like', '%' . $buscar . '%')
-                  ->orWhere('apellido_materno', 'like', '%' . $buscar . '%');
-            });
-        }
-        
-        $query->orderBy('apellido_paterno')
-              ->orderBy('apellido_materno')
-              ->orderBy('nombre');
-        
-        $todos = $query->get();
-        
-       
-        foreach ($todos as $asesor) {
-            // Cargar TODOS los proyectos del asesor en el período actual
-            $asesor->proyectos_del_periodo = Proyecto::where('asesor_id', $asesor->id)
-                ->where('periodo_id', $periodo_id)
-                ->with(['estudiantes', 'empresa']) // Cargar relaciones para mostrar más info
-                ->get();
-        }
-                
-        return Inertia::render('asesor/listar', [
-            'todos' => $todos,
-            'filtroBuscar' => $buscar
-        ]);
+{
+    $buscar = $request->input('buscar');
+    $carrera_id = session('carrera_id');
+
+    if (!$carrera_id) {
+        return redirect()->route('seleccionar.carrera')
+            ->with('error', 'Debes seleccionar una carrera primero');
     }
 
-    public function buscarAsesor(Request $request)
-    {
-        $termino = $request->input('term');
-        $carrera_id = session('carrera_id');
-        
-        if (!$carrera_id) {
-            return response()->json([]);
-        }
-        
-        $resultados = Asesor::whereHas('carreras', function($q) use ($carrera_id) {
-                $q->where('carrera_id', $carrera_id);
-            })
-            ->where(function($q) use ($termino) {
-                $q->where('nombre', 'like', '%' . $termino . '%')
-                  ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
-                  ->orWhere('apellido_materno', 'like', '%' . $termino . '%');
-            })
-            ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
-            ->limit(10)
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+
+    $query = Asesor::whereHas('carreras', function ($q) use ($carrera_id) {
+        $q->where('carrera_id', $carrera_id);
+    });
+
+    if ($buscar) {
+        $query->where(function ($q) use ($buscar) {
+            $q->where(DB::raw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno)"), 'like', '%' . $buscar . '%')
+              ->orWhere('nombre', 'like', '%' . $buscar . '%')
+              ->orWhere('apellido_paterno', 'like', '%' . $buscar . '%')
+              ->orWhere('apellido_materno', 'like', '%' . $buscar . '%');
+        });
+    }
+
+    $todos = $query->orderBy('apellido_paterno')
+        ->orderBy('apellido_materno')
+        ->orderBy('nombre')
+        ->get();
+
+    foreach ($todos as $asesor) {
+        $asesor->proyectos_del_periodo = $asesor->proyectos($periodo_id)
+            ->with(['estudiantes', 'empresa'])
             ->get();
-
-        $sugerencias = $resultados->map(function ($asesor) {
-            return [
-                'id' => $asesor->id,
-                'value' => $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
-            ];
-        });
-
-        return response()->json($sugerencias);
     }
 
+    return Inertia::render('asesor/listar', [
+        'todos' => $todos,
+        'filtroBuscar' => $buscar
+    ]);
+}
+
+ public function buscarAsesor(Request $request)
+{
+    $termino = $request->input('term');
+    $carrera_id = session('carrera_id');
+
+    if (!$carrera_id) {
+        return response()->json([]);
+    }
+
+    $resultados = Asesor::whereHas('carreras', function($q) use ($carrera_id) {
+            $q->where('carrera_id', $carrera_id);
+        })
+        ->where(function($q) use ($termino) {
+            $q->where('nombre', 'like', '%' . $termino . '%')
+              ->orWhere('apellido_paterno', 'like', '%' . $termino . '%')
+              ->orWhere('apellido_materno', 'like', '%' . $termino . '%');
+        })
+        ->select('id', 'nombre', 'apellido_paterno', 'apellido_materno')
+        ->limit(10)
+        ->get();
+
+    $sugerencias = $resultados->map(function ($asesor) {
+        return [
+            'id' => $asesor->id,
+            'value' => $asesor->nombre . ' ' . $asesor->apellido_paterno . ' ' . $asesor->apellido_materno,
+        ];
+    });
+
+    return response()->json($sugerencias);
+}
     /**
      * Show the form for creating a new resource.
      */
@@ -202,9 +196,15 @@ class AsesorController extends Controller
     {
         $asesor = Auth::getUser()->usa;
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+        $carrera_id = session('carrera_id');
         
         // Cargar proyectos con relaciones necesarias
         $proyectos = $asesor->proyectos($periodo_id)
+            ->whereHas('estudiantes', function ($q) use ($carrera_id) {
+            if ($carrera_id) {
+                    $q->where('carrera_id', $carrera_id);
+                }
+            })
             ->with([
                 'empresa', 
                 'externo', 
@@ -235,44 +235,51 @@ class AsesorController extends Controller
     }
     
     public function historico(Request $request)
-{
-    $asesor = Auth::getUser()->usa;
-    
-    $periodoSeleccionado = $request->input('periodo_id');
-    
-    // Consulta base usando whereHas
-    $proyectosQuery = Proyecto::whereHas('estudiantes', function($q) use ($asesor) {
-        $q->where('asesor_id', $asesor->id);
-    });
-    
-    // Aplicar filtro de periodo solo si se seleccionó uno
-    if ($periodoSeleccionado) {
-        $proyectosQuery->where('periodo_id', $periodoSeleccionado);
+    {
+        $asesor = Auth::getUser()->usa;
+        $carrera_id= session('carrera_id');
+        $periodoSeleccionado = $request->input('periodo_id');
+        
+        // Consulta base usando whereHas
+        $proyectosQuery = Proyecto::whereHas('estudiantes', function($q) use ($asesor) {
+            $q->where('asesor_id', $asesor->id);
+        });
+        //aplicar filtro de carrera de la sesión
+        if ($carrera_id) {
+            $proyectosQuery->whereHas('estudiantes', function($q) use ($carrera_id) {
+                $q->where('carrera_id', $carrera_id);
+            });
+        }
+
+        
+        // Aplicar filtro de periodo solo si se seleccionó uno
+        if ($periodoSeleccionado) {
+            $proyectosQuery->where('periodo_id', $periodoSeleccionado);
+        }
+        
+        $proyectos = $proyectosQuery
+            ->with([
+                'empresa', 
+                'externo', 
+                'asesor',
+                'periodo',
+                'estudiantes.carrera.coordinador', 
+                'estudiantes.primer', 
+                'estudiantes.segundo', 
+                'estudiantes.ultimo'
+            ])
+            ->get();
+        
+        $listaPeriodos = \App\Models\Periodo::orderBy('id', 'desc')->get();
+        
+        $tipo = get_class($asesor) == "App\Models\Externo" ? 'externo' : 'asesor';
+        
+        return Inertia::render($tipo === 'externo' ? 'externo/historico' : 'asesor/historico', [
+            'proyectos' => $proyectos,
+            'periodos' => $listaPeriodos,
+            'periodoSeleccionado' => $periodoSeleccionado,
+            'tipo' => $tipo
+        ]);
     }
-    
-    $proyectos = $proyectosQuery
-        ->with([
-            'empresa', 
-            'externo', 
-            'asesor',
-            'periodo',
-            'estudiantes.carrera.coordinador', 
-            'estudiantes.primer', 
-            'estudiantes.segundo', 
-            'estudiantes.ultimo'
-        ])
-        ->get();
-    
-    $listaPeriodos = \App\Models\Periodo::orderBy('id', 'desc')->get();
-    
-    $tipo = get_class($asesor) == "App\Models\Externo" ? 'externo' : 'asesor';
-    
-    return Inertia::render($tipo === 'externo' ? 'externo/historico' : 'asesor/historico', [
-        'proyectos' => $proyectos,
-        'periodos' => $listaPeriodos,
-        'periodoSeleccionado' => $periodoSeleccionado,
-        'tipo' => $tipo
-    ]);
-}
 
 }

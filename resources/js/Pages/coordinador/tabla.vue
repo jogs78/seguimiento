@@ -215,8 +215,24 @@
                                     <i class="fas fa-folder-open"></i>
                                     <span>{{ proyecto.nombre }}</span>
                                 </div>
-                            </td>
 
+                                <div
+    v-for="estudiante in proyecto.estudiantes"
+    :key="'cancelacion-' + estudiante.id"
+>
+    <a
+        v-if="getDocumentosEstudiante(estudiante.id)?.solicitud_cancelacion?.subido"
+        :href="route(
+            'documentos.download',
+            getDocumentosEstudiante(estudiante.id).solicitud_cancelacion.id
+        )"
+        class="cancelacion-link"
+    >
+        <i class="fas fa-download status-icon"></i>
+        Solicitud de cancelación
+    </a>
+</div>
+                            </td>
                             <!-- Asesor interno -->
                             <td class="advisor-cell">
                                 <form
@@ -364,76 +380,60 @@
                             </td>
 
                            <!-- SOLICITUD -->
-<td class="status-cell">
-    <div
-        v-for="estudiante in proyecto.estudiantes"
-        :key="'solicitud-' + estudiante.id"
-        class="status-item"
-    >
-        <template v-if="getDocumentosEstudiante(estudiante.id)?.solicitud?.subido">
-            <button
-                @click="verDocumento(getDocumentosEstudiante(estudiante.id).solicitud)"
-                class="btn-download"
-                title="Ver solicitud"
-            >
-                <i class="fas fa-eye status-icon" style="color: #28a745;"></i>
-            </button>
+                            <td class="status-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="'solicitud-' + estudiante.id"
+                                    class="status-item"
+                                >
+                                    <template v-if="getDocumentosEstudiante(estudiante.id)?.solicitud?.subido">
+                                        <button
+                                            @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).solicitud)"
+                                            class="btn-download"
+                                            title="Descargar solicitud"
+                                        >
+                                            <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
+                                        </button>
 
-            <button
-                @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).solicitud)"
-                class="btn-download"
-                title="Descargar solicitud"
-            >
-                <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
-            </button>
+                                        <span class="status-label">Cargado</span>
+                                    </template>
 
-            <span class="status-label">Subido</span>
-        </template>
+                                    <template v-else>
+                                        <div class="status-asesor">
+                                            <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
+                                            <span class="status-label">Pendiente</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </td>
 
-        <template v-else>
-            <div class="status-asesor">
-                <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
-                <span class="status-label">Pendiente</span>
-            </div>
-        </template>
-    </div>
-</td>
+                            <!-- ANTEPROYECTO -->
+                            <td class="status-cell">
+                                <div
+                                    v-for="estudiante in proyecto.estudiantes"
+                                    :key="'anteproyecto-' + estudiante.id"
+                                    class="status-item"
+                                >
+                                    <template v-if="getDocumentosEstudiante(estudiante.id)?.anteproyecto?.subido">
+                                        <button
+                                            @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).anteproyecto)"
+                                            class="btn-download"
+                                            title="Descargar anteproyecto"
+                                        >
+                                            <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
+                                        </button>
 
-<!-- ANTEPROYECTO -->
-<td class="status-cell">
-    <div
-        v-for="estudiante in proyecto.estudiantes"
-        :key="'anteproyecto-' + estudiante.id"
-        class="status-item"
-    >
-        <template v-if="getDocumentosEstudiante(estudiante.id)?.anteproyecto?.subido">
-            <button
-                @click="verDocumento(getDocumentosEstudiante(estudiante.id).anteproyecto)"
-                class="btn-download"
-                title="Ver anteproyecto"
-            >
-                <i class="fas fa-eye status-icon" style="color: #28a745;"></i>
-            </button>
+                                        <span class="status-label">Cargado</span>
+                                    </template>
 
-            <button
-                @click="descargarDocumento(getDocumentosEstudiante(estudiante.id).anteproyecto)"
-                class="btn-download"
-                title="Descargar anteproyecto"
-            >
-                <i class="fas fa-download status-icon" style="color: #17a2b8;"></i>
-            </button>
-
-            <span class="status-label">Subido</span>
-        </template>
-
-        <template v-else>
-            <div class="status-asesor">
-                <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
-                <span class="status-label">Pendiente</span>
-            </div>
-        </template>
-    </div>
-</td>
+                                    <template v-else>
+                                        <div class="status-asesor">
+                                            <i class="fas fa-times-circle status-icon" style="color: #d9534f;"></i>
+                                            <span class="status-label">Pendiente</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </td>
 
                             <!-- Seguimiento 1 -->
                             <td class="status-cell">
@@ -808,15 +808,6 @@ const internoActivo = ref(
 )
 
 
-/*
-const cambiarFueraTiempo = () => {
-
-    router.post('/configuracion/fuera-tiempo', {
-        activo: fueraTiempo.value
-    }, {
-        preserveScroll: true
-    })
-}*/
 // Estado para el toggle de fuera de tiempo
 const cambiandoFueraTiempo = ref(null)
 
@@ -1093,7 +1084,7 @@ export default {
 </script>
 
 <style scoped>
-/* ===== VARIABLES ===== */
+/*  VARIABLES  */
 :root {
   --primary-dark: #050E3C;
   --primary-medium: #002455;
@@ -1116,7 +1107,7 @@ export default {
 }
 
 /* Estilos para el toggle switch */
-/* Asegurar que cada celda tenga posición relativa */
+
 .status-cell-f {
     position: relative;
     vertical-align: middle;
@@ -1311,7 +1302,7 @@ input:disabled + .toggle-slider {
     transform:translateX(26px);
 }
 
-/* ===== PAGINACIÓN ===== */
+/* PAGINACIÓN  */
 .pagination-container {
   display: flex;
   justify-content: space-between;
@@ -1393,7 +1384,7 @@ input:disabled + .toggle-slider {
   width: 100%;
   box-sizing: border-box;
 }
-/* ===== SEARCH SECTION ===== */
+/* SEARCH SECTION  */
 .search-section {
   margin-bottom: 2rem;
 }
@@ -1508,7 +1499,7 @@ input:disabled + .toggle-slider {
   background: var(--gray-100);
 }
 
-/* ===== TITLE SECTION ===== */
+/*  TITLE SECTION  */
 .section-title {
   margin-bottom: 1.5rem;
 }
@@ -1530,6 +1521,31 @@ input:disabled + .toggle-slider {
   font-weight: 600;
   color: var(--primary-dark);
   margin: 0;
+}
+
+.cancelacion-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-top: 6px;
+    padding: 3px 8px;
+
+    background: #f8e8ec;
+    color: #800020;
+
+    border: 1px solid #d8a7b5;
+    border-radius: 12px;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.cancelacion-link:hover {
+    background: #f2d6de;
+    color: #610d29;
 }
 
 .periodo-badge {
@@ -1570,12 +1586,12 @@ input:disabled + .toggle-slider {
 .modern-table {
  min-width: 1000px;
   border-collapse: collapse;
-  /* ← Ancho mínimo para que la tabla sea scrollable */
+ 
   
 }
 
 .table-responsive {
-  border: 1px solid red; /* ← Temporal para ver si el contenedor existe */
+  border: 1px solid red; 
 }
 .modern-table thead th {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium));

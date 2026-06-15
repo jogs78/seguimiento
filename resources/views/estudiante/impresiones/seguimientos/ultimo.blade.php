@@ -8,7 +8,7 @@
     <style>
         *{font-size: 12px;}
         p {
-            line-height: 0.5; /* Puedes ajustar este valor según lo que necesites */
+            line-height: 0.5; 
         }
     </style>
 </head>
@@ -179,7 +179,8 @@
                     Sello de la empresa, organismo o dependencia
                 </th>
                 <th style="width: 33.33%; height: 30px; vertical-align: bottom;" class="cuadro dato">
-                    {{ $ultimo->promedio_externo ? \Carbon\Carbon::parse($ultimo->promedio_externo)->format('Y-m-d') : 'No fechado' }}  
+                    {{\Carbon\Carbon::parse($ultimo->califico_externo)->format('Y-m-d')}}  
+                    
                     <br> Fecha de Evaluación
                 </th>
             </tr>

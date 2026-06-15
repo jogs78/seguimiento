@@ -65,6 +65,8 @@
         </table>
       </div>
 
+      <pre>{{ ultimo }}</pre>
+
       <!-- Calificaciones del Asesor Interno -->
       <div class="section-title" style="margin-top: 30px;">
         <i class="fas fa-star"></i>

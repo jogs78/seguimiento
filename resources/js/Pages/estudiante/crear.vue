@@ -2,7 +2,7 @@
   <!-- Si es coordinador (autenticado), usar AppLayout -->
      <AppLayout v-if="esCoordinador" :auth-user="authUser">
     <div class="authenticated-container">
-      <RegistroEstudianteForm :carreras="carreras" />
+      <RegistroEstudianteForm :carreras="carreras" :flash="flash" />
     </div>
   </AppLayout>
 
@@ -38,7 +38,7 @@
     </header>
 
     <main class="main-content">
-      <RegistroEstudianteForm :carreras="carreras" />
+      <RegistroEstudianteForm :carreras="carreras" :flash="flash" />
     </main>
   </div>
 </template>
@@ -50,21 +50,25 @@ import RegistroEstudianteForm from '@/Components/registroEstudianteForm.vue'
 
 const props = defineProps({
   carreras: Array,
-   esCoordinador: Boolean,
+  esCoordinador: Boolean,
   auth: Boolean,
-  authUser: Object  // ✅ Recibir el usuario autenticado
+  authUser: Object,  // ✅ Recibir el usuario autenticado
+  flash: {
+    type: Object,
+    default: () => ({})
+  }
 })
 </script>
 
 <style scoped>
-/* ===== ESTILOS PARA REGISTRO PÚBLICO ===== */
+/*  ESTILOS PARA REGISTRO PÚBLICO  */
 .registro-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e9edf5 100%);
 }
 
 .app-header {
-  background: white;
+  background: rgb(255, 255, 255);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
@@ -161,7 +165,7 @@ const props = defineProps({
   min-height: calc(100vh - 140px);
 }
 
-/* ===== ESTILOS PARA COORDINADOR ===== */
+/*  ESTILOS PARA COORDINADOR */
 .authenticated-container {
   padding: 2rem;
 }

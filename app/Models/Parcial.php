@@ -41,14 +41,15 @@ class Parcial extends Model
         'ruta' 
     ];
     protected $table = "parciales";
-   /*
-    public function seguimiento()
-    {
-        return $this->belongsTo(Seguimiento::class);
-    }*/
+   
 
     public function seguimiento()
     {
         return $this->morphTo();
+    }
+
+    public function estudiante()
+    {
+        return $this->belongsTo(Estudiante::class);
     }
 }

@@ -22,11 +22,13 @@ class StoreProyectoRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "num_registro" => "nullable|unique:proyectos,num_registro",
             "nombre"=>"required",
             "objetivo_general"=>"required",
             "lugar"=>"required",
             "informacion"=>"required",
             "justificacion"=>"required",
+            "origen"=>"required|in:Banco de Proyectos,Propuesta propia,Trabajador",
             "asesor_id"=>"required",
             "empresa_id" => [
                 'required',
@@ -49,6 +51,8 @@ class StoreProyectoRequest extends FormRequest
             "lugar.required"=>"Por favor ingrese un lugar",
             "informacion.required"=>"Por favor llene el campo de informacion",
             "justificacion.required"=>"Por favor llene el campo justificacion",
+            "num_registro.unique"=>"El número de registro ya está en uso",
+            "origen.in" => "El origen seleccionado no es válido",
             "asesor_id.required"=>"asesor_id Es necesario llenar este campo",
             "empresa_id.required"=>"empresa_id Es necesario llenar este campo",
             "periodo_id.required"=>"periodo_id Es necesario llenar este campo",

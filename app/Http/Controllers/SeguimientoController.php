@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Seguimiento;
 use App\Http\Requests\SeguimientoRequest;
+use App\Providers\ConfiguracionServiceProvider;
 use App\Models\Estudiante;
 use App\Models\Parcial;
 use App\Models\Ultimo;
@@ -53,6 +54,8 @@ class SeguimientoController extends Controller
                     $segui->califico_interno = Carbon::now();
                     $segui->save();
 
+                    //dump($segui->toArray());
+
                     return Inertia::render('seguimientos/parcial/calificar-interno', [
                         'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
                         'consecutivo' => $consecutivo,
@@ -62,20 +65,21 @@ class SeguimientoController extends Controller
                 }
                 
                 if($consecutivo == 'ultimo' ){
-                    $ultimo = Parcial::firstOrCreate(
+                    $ultimo = Ultimo::firstOrCreate(
                         ['estudiante_id' => $estudiante->id], 
                     );
-                    $ultimo->califico_interno=Carbon::now();
+                    $ultimo->created_at=Carbon::now();
                     $ultimo->save();
+                    
+                    //dump($ultimo->toArray());
+
                     //con inertia
                     return Inertia::render('seguimientos/ultimo/calificar-interno', [
                         'estudiante' => $estudiante->load(['proyecto.periodo', 'carrera']),
                         'consecutivo' => $consecutivo,
                         'ultimo' => $ultimo
                     ]);
-                    //return view('seguimientos.ultimo.calificar-interno',compact('estudiante','
-                    //return view('seguimientos.ultimo.calificar-interno',compact('estudiante','consecutivo','ultimo'));
-
+                
                 }
                 break;
             
@@ -95,10 +99,10 @@ class SeguimientoController extends Controller
                     ]);          
                 }
                 if($consecutivo == 'ultimo' ){
-                    $ultimo = Parcial::firstOrCreate(
+                    $ultimo = Ultimo::firstOrCreate(
                         ['estudiante_id' => $estudiante->id],
                     );
-                    $ultimo->califico_externo=Carbon::now();
+                    $ultimo->created_at=Carbon::now();
                     $ultimo->save();
                     //con inertia
                     return Inertia::render('seguimientos/ultimo/calificar-externo', [
@@ -115,146 +119,166 @@ class SeguimientoController extends Controller
                 echo "este usuario no puede crear segumientos";
                 break;
         }
-        //ahorita solo estamos trabajando con parciales no con ultimo
-       // echo "le vamos a hacer su seguimiento $consecutivo al estudiante $estudiante->nombre"; 
     }
 
     public function calificar(SeguimientoRequest $request, Estudiante $estudiante, $consecutivo)
-    {
-        $usuario = Auth::getUser();
-        $tipo = $usuario->usa_type;
+{
+    $usuario = Auth::getUser();
+    $tipo = $usuario->usa_type;
 
-         // Verificar si la delegación está activa
-        $internoConfig = Configuracion::where('variable', 'interno')
+    // Configuracion interno
+    $internoConfig = Configuracion::where('variable', 'interno')
         ->where('carrera_id', $estudiante->carrera_id)
         ->first();
 
-        $internoActivo = $internoConfig && $internoConfig->valor === 'si';
-        
-        switch ($tipo) {
-            case 'App\Models\Asesor':
-                    $campos = [
-                    'puntualidad_interno',
-                    'conocimiento_interno',
-                    'equipo_interno',
-                    'dedicado_interno',
-                    'orden_interno',
-                    'mejoras_interno',
+    $internoActivo = $internoConfig && $internoConfig->valor === 'si';
 
-                    'portada_interno',
-                    'agradecimientos_interno',
-                    'resumen_interno',
-                    'indice_interno',
-                    'introduccion_interno',
-                    'problemas_interno',
-                    'objetivos_interno',
-                    'justificacion_interno',
-                    'marco_teorico_interno',
-                    'procedimiento_interno',
-                    'resultados_interno',
-                    'conclusiones_interno',
-                    'competencias_interno',
-                    'fuentes_interno'
-                ];
-                $campos2 = [
-                    'comentarios_interno',
-                ];
-                break;
-            
-            case 'App\Models\Externo':
-                $campos = [
-                    'puntualidad_externo',
-                    'equipo_externo',
-                    'iniciativa_externo',
-                    'mejoras_externo', 
-                    'objetivos_externo', 
-                    'orden_externo', 
-                    'liderazgo_externo', 
-                    'conocimiento_externo',
-                    'etico_externo', 
-                    'portada_externo',
-                    'agradecimientos_externo',
-                    'resumen_externo',
-                    'indice_externo',
-                    'introduccion_externo',
-                    'problemas_externo',
-                    'justificacion_externo',
-                    'marco_teorico_externo',
-                    'procedimiento_externo',
-                    'resultados_externo',
-                    'conclusiones_externo',
-                    'competencias_externo',
-                    'fuentes_externo',
-                ];
-                $campos2 = [
-                    'comentarios_externo',
-                ];
-                break;
-            case 'App\Models\Estudiante':
-                # code...
-                break;
-            
-            default:
-                # code...
-                break;
-        }
+    switch ($tipo) {
 
-        if($consecutivo=='primer' or $consecutivo=='segundo'){
-            $segui = Parcial::firstOrCreate(
-                ['estudiante_id' => $estudiante->id, 'consecutivo' => $consecutivo ], 
-                ['consecutivo' => $consecutivo ] 
-            );
-        }else{
-            $segui = Ultimo::firstOrCreate(
-                ['estudiante_id' => $estudiante->id ], 
-            );
-        }
-            //dd(get_class($segui));
-            $suma = 0;
-            foreach ($campos as $campo) {
-                if($request->has($campo)){
-                    $segui->$campo=$request->input($campo);
-                    
-                    $suma += (int) $request->input($campo);
-                }
-            }
-            foreach ($campos2 as $campo) {
-                if($request->has($campo)){
-                    $segui->$campo=$request->input($campo);
-                }
-            }
-            $suma = $suma;
-            switch ($tipo) {
-                case 'App\Models\Asesor':
-                    $segui->promedio_interno =  $suma;
-                    break;
-                case 'App\Models\Externo':
-                    $segui->promedio_externo =  $suma;
-                    break;
-                case 'App\Models\Estudiante':
-                    # code...
-                    break;                
-                default:
-                    # code...
-                    break;
-            }
+        case 'App\Models\Asesor':
 
-            // Si está activa la delegación y está calificando el asesor interno,
-        // copiar automáticamente las calificaciones al asesor externo
-        if ($internoActivo && $tipo === 'App\Models\Asesor') {
-            //si es ultimo no realizar esta accion
-            if($consecutivo != 'primer' and $consecutivo != 'segundo'){
-                $segui->promedio_externo = $segui->promedio_interno;      
-            }else{  
-            $segui->promedio_externo = $segui->promedio_interno;
-            $segui->califico_externo = $segui->califico_interno;
-            $segui->comentarios_externo = "Proyecto interno - No se requisita esta sección.";
-            }
-        }
-            $segui->save();
-        
-        return redirect()->route("home");
+            $campos = [
+                'puntualidad_interno',
+                'conocimiento_interno',
+                'equipo_interno',
+                'dedicado_interno',
+                'orden_interno',
+                'mejoras_interno',
+
+                'portada_interno',
+                'agradecimientos_interno',
+                'resumen_interno',
+                'indice_interno',
+                'introduccion_interno',
+                'problemas_interno',
+                'objetivos_interno',
+                'justificacion_interno',
+                'marco_teorico_interno',
+                'procedimiento_interno',
+                'resultados_interno',
+                'conclusiones_interno',
+                'competencias_interno',
+                'fuentes_interno'
+            ];
+
+            $campos2 = ['comentarios_interno'];
+
+        break;
+
+
+        case 'App\Models\Externo':
+
+            $campos = [
+                'puntualidad_externo',
+                'equipo_externo',
+                'iniciativa_externo',
+                'mejoras_externo',
+                'objetivos_externo',
+                'orden_externo',
+                'liderazgo_externo',
+                'conocimiento_externo',
+                'etico_externo',
+
+                'portada_externo',
+                'agradecimientos_externo',
+                'resumen_externo',
+                'indice_externo',
+                'introduccion_externo',
+                'problemas_externo',
+                'justificacion_externo',
+                'marco_teorico_externo',
+                'procedimiento_externo',
+                'resultados_externo',
+                'conclusiones_externo',
+                'competencias_externo',
+                'fuentes_externo'
+            ];
+
+            $campos2 = ['comentarios_externo'];
+
+        break;
     }
+
+    if ($consecutivo == 'primer' || $consecutivo == 'segundo') {
+        $segui = Parcial::firstOrCreate([
+            'estudiante_id' => $estudiante->id,
+            'consecutivo' => $consecutivo
+        ]);
+
+    } else {
+        $segui = Ultimo::firstOrCreate([
+            'estudiante_id' => $estudiante->id
+        ]);
+    }
+
+    $suma = 0;
+
+    foreach ($campos as $campo) {
+        if ($request->has($campo)) {
+            $segui->$campo = $request->input($campo);
+            $suma += (int) $request->input($campo);
+        }
+    }
+
+    foreach ($campos2 as $campo) {
+        if ($request->has($campo)) {
+            $segui->$campo = $request->input($campo);
+        }
+    }
+
+    if ($tipo == 'App\Models\Asesor') {
+
+        $segui->promedio_interno = $suma;
+
+    } elseif ($tipo == 'App\Models\Externo') {
+
+        $segui->promedio_externo = $suma;
+    }
+
+    //VERIFICAR SI ES PROYECTO INTERNO
+    $esProyectoInterno = false;
+    $proyecto = $estudiante->proyecto;
+
+    if ($proyecto && $proyecto->empresa) {
+
+        $empresa = $proyecto->empresa;
+        $tecnologico = ConfiguracionServiceProvider::get('tecnologico');
+        $normalizar = function ($texto) {
+            $texto = mb_strtolower($texto ?? '', 'UTF-8');
+            $texto = str_replace(
+                ['á','é','í','ó','ú'],
+                ['a','e','i','o','u'],
+                $texto
+            );
+            return trim($texto);
+        };
+
+
+        $nombreEmpresa = $normalizar($empresa->nombre);
+        $esProyectoInterno =
+            $nombreEmpresa === $normalizar($tecnologico)
+            || $nombreEmpresa === $normalizar('Instituto Tecnológico de Tuxtla Gutiérrez')
+            || $nombreEmpresa === $normalizar('Tecnológico de Tuxtla Gutiérrez')
+            || $empresa->rfc === 'TNM140723GFA';
+    }
+    // DELEGACION AUTOMATICA PARA PROYECTOS INTERNOS
+    if ($internoActivo && $esProyectoInterno) {
+
+        if ($consecutivo != 'primer' && $consecutivo != 'segundo') {
+            $segui->promedio_externo = $segui->promedio_interno;
+            $segui->comentarios_externo ='Proyecto interno - No se requisita esta sección.';
+        } else {
+
+            $segui->promedio_externo = $segui->promedio_interno;
+            $segui->califico_externo = now();
+            $segui->comentarios_externo ='Proyecto interno - No se requisita esta sección.';
+        }
+    }
+
+    $segui->save();
+
+    return redirect()->route('home');
+}
 
 
     /**
@@ -262,7 +286,6 @@ class SeguimientoController extends Controller
      */
     public function show(Seguimiento $seguimiento)
     {
-        //
     }
 
     /**
@@ -280,8 +303,8 @@ class SeguimientoController extends Controller
     {
         //encontrar ese parcial
         $segui = Parcial::where('estudiante_id', $estudiante->id)
-                          ->where('consecutivo',$consecutivo)
-                          ->first();
+                        ->where('consecutivo',$consecutivo)
+                        ->first();
 
         $segui->promedio_parcial = $request->promedio;
         //guardar el archivo

@@ -176,7 +176,7 @@ const criteriosExternos = [
   { name: 'equipo_externo', label: 'Trabaja en equipo y se comunica de forma efectiva (oral y escrita).', max: 10 },
   { name: 'iniciativa_externo', label: 'Tiene iniciativa para colaborar.', max: 5 },
   { name: 'mejoras_externo', label: 'Propone mejoras al proyecto.', max: 10 },
-  { name: 'objetivos_externo', label: 'Cumple con los objetivos correspondientes al proyecto.', max: 15 },
+  { name: 'objetivos_externo', label: 'Cumple con los objetivos correspondientes al proyecto.', max: 2 },
   { name: 'orden_externo', label: 'Es ordenado y cumple satisfactoriamente con las actividades encomendadas en los tiempos establecidos del cronograma.', max: 15 },
   { name: 'liderazgo_externo', label: 'Demuestra liderazgo en su actuar.', max: 10 },
   { name: 'conocimiento_externo', label: 'Demuestra conocimiento en el área de su especialidad.', max: 20 },
@@ -189,7 +189,7 @@ const form = ref({
   equipo_externo: props.segui.equipo_externo ?? 10,
   iniciativa_externo: props.segui.iniciativa_externo ?? 5,
   mejoras_externo: props.segui.mejoras_externo ?? 10,
-  objetivos_externo: props.segui.objetivos_externo ?? 15,
+  objetivos_externo: props.segui.objetivos_externo ?? 2,
   orden_externo: props.segui.orden_externo ?? 15,
   liderazgo_externo: props.segui.liderazgo_externo ?? 10,
   conocimiento_externo: props.segui.conocimiento_externo ?? 20,
@@ -373,7 +373,6 @@ const guardarCalificacion = () => {
 .slider {
   flex: 1;
   height: 6px;
-  -webkit-appearance: none;
   background: #dee2e6;
   border-radius: 3px;
   outline: none;

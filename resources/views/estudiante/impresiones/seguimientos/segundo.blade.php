@@ -8,7 +8,7 @@
     <style>
         *{font-size: 12px;}
         p {
-            line-height: 0.5; /* Puedes ajustar este valor según lo que necesites */
+            line-height: 0.5; 
         }
     </style>
 </head>

@@ -52,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parcials');
+        Schema::dropIfExists('parciales');
     }
 };

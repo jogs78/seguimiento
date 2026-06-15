@@ -63,6 +63,7 @@
         <div class="card-body">
           <form @submit.prevent="registrarProyecto" class="form-grid">
             <!-- Datos del proyecto -->
+
             <div class="form-group full-width">
               <label>Nombre del proyecto <span class="required">*</span></label>
               <input type="text" v-model="form.nombre" class="input-text" required />
@@ -90,6 +91,60 @@
               <textarea v-model="form.justificacion" rows="4" class="textarea"></textarea>
             </div>
 
+            <!-- Origen del Proyecto -->
+            <div class="form-group full-width">
+              <label>Origen del Proyecto <span class="required">*</span></label>
+              <div class="radio-group-origen">
+                <label>
+                  <input type="radio" v-model="form.origen" value="Banco de Proyectos" />
+                  Banco de Proyectos
+                </label>
+                <label>
+                  <input type="radio" v-model="form.origen" value="Propuesta propia" />
+                  Propuesta propia
+                </label>
+                <label>
+                  <input type="radio" v-model="form.origen" value="Trabajador" />
+                  Trabajador
+                </label>
+              </div>
+              <span v-if="errores.origen" class="error">{{ errores.origen }}</span>
+            </div>
+
+            <!-- ¿Participó en el seminario? (no se guarda en BD) -->
+            <div class="form-group full-width">
+              <label>¿Este proyecto participó en el seminario de investigación?</label>
+              <div class="radio-group-seminario">
+                <label>
+                  <input type="radio" v-model="participoSeminario" :value="true" />
+                  Sí, participó en el seminario
+                </label>
+                <label>
+                  <input type="radio" v-model="participoSeminario" :value="false" />
+                  No, es un proyecto nuevo
+                </label>
+              </div>
+            </div>
+
+            <!-- Número de Registro (solo si participó en el seminario) -->
+            <div v-if="participoSeminario === true" class="form-group full-width">
+              <label>Número de Registro del Seminario <span class="required">*</span></label>
+              <input 
+                type="text" 
+                v-model="form.num_registro" 
+                class="input-text" 
+                placeholder="Ej: RES-2024-001"
+              />
+              <small class="help-text">Ingresa el número de registro asignado en el seminario</small>
+              <span v-if="errores.num_registro" class="error">{{ errores.num_registro }}</span>
+            </div>
+
+            <!-- Mensaje informativo para proyectos nuevos -->
+            <div v-if="participoSeminario === false" class="info-message">
+              <i class="fas fa-info-circle"></i>
+              Este proyecto será registrado como proyecto nuevo. Se generará automáticamente un número de registro al finalizar el proceso (si aplica).
+            </div>
+
             <!-- Asesor Interno -->
             <div class="form-group">
               <label>Propón a tu Asesor Interno <span class="required">*</span></label>
@@ -102,32 +157,44 @@
 
             <!-- Asesor Externo -->
             <div class="form-group">
-              <label>Correo del Asesor Externo</label>
+              <label>Correo del Asesor Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="email" v-model="form.correo_ae" class="input-text" />
             </div>
 
             <div class="form-group">
-              <label>Título del Asesor Externo</label>
+              <label>Título del Asesor Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="text" v-model="form.titulo_ae" class="input-text" placeholder="Ej: Dr., Mtro., Ing." />
             </div>
 
             <div class="form-group">
-              <label>Nombre del Asesor Externo</label>
+              <label>Nombre del Asesor Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="text" v-model="form.nombre_ae" class="input-text" />
             </div>
 
             <div class="form-group">
-              <label>Apellido paterno</label>
+              <label>Apellido paterno del Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="text" v-model="form.apellido_paterno_ae" class="input-text" />
             </div>
 
             <div class="form-group">
-              <label>Apellido materno</label>
+              <label>Apellido materno del Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="text" v-model="form.apellido_materno_ae" class="input-text" />
             </div>
 
             <div class="form-group">
-              <label>Puesto del Asesor Externo</label>
+              <label>Puesto del Asesor Externo
+                <span v-if="!esProyectoInterno" class="required">*</span>
+              </label>
               <input type="text" v-model="form.puesto_ae" class="input-text" />
             </div>
 
@@ -239,20 +306,23 @@
         </div>
       </div>
     </div>
-  </AppLayout>
+    </AppLayout>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/appLayout.vue'
 
 import axios from 'axios'
 
+const participoSeminario = ref(false)
+
 const props = defineProps({
   asesores: Array,
   empresas: Array,
   periodo: Object,
+  tecnologico: String,
   flash: Object
 })
 
@@ -260,6 +330,42 @@ const props = defineProps({
 const unirseForm = ref({
   id: '',
   nombre: ''
+})
+
+const normalizar = (texto) => {
+  return (texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+const esProyectoInterno = computed(() => {
+
+  const nombresValidos = [
+    props.tecnologico,
+    'Instituto Tecnológico de Tuxtla Gutiérrez',
+    'Tecnológico de Tuxtla Gutiérrez'
+  ].map(normalizar)
+
+  // Empresa existente
+  if (form.value.empresa_id != '-1') {
+
+    const empresa = props.empresas.find(
+      e => e.id == form.value.empresa_id
+    )
+
+    if (!empresa) return false
+
+    return nombresValidos.includes(
+      normalizar(empresa.nombre)
+    )
+  }
+
+  // Nueva empresa
+  return nombresValidos.includes(
+    normalizar(form.value.nombre_e)
+  )
 })
 
 // Formulario para nuevo proyecto
@@ -277,6 +383,11 @@ const form = ref({
   apellido_materno_ae: '',
   puesto_ae: '',
   empresa_id: props.empresas?.[0]?.id || '',
+
+  origen: 'Propuesta propia', // valor por defecto
+  //num_registro: '', // solo se envía si participoSeminario es true
+   // Si participó en seminario, enviar el número, si no, enviar null
+  num_registro: null,
   // Campos para nueva empresa
   nombre_e: '',
   giro: '',
@@ -381,11 +492,34 @@ const onEmpresaChange = () => {
 
 // Registrar nuevo proyecto
 const registrarProyecto = () => {
+
+  // Validar asesor externo cuando NO sea proyecto interno
+  if (!esProyectoInterno.value) {
+
+    if (
+      !form.value.correo_ae ||
+      !form.value.nombre_ae ||
+      !form.value.apellido_paterno_ae ||
+      !form.value.apellido_materno_ae ||
+      !form.value.puesto_ae
+    ) {
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Datos incompletos',
+        text: 'Debes capturar todos los datos del asesor externo.'
+      })
+
+      return
+    }
+  }
+
   cargando.value = true
   errores.value = {}
-  
+
   router.post(route('proyectos.store'), form.value, {
     preserveScroll: true,
+
     onSuccess: () => {
       Swal.fire({
         icon: 'success',
@@ -396,7 +530,9 @@ const registrarProyecto = () => {
         router.visit(route('home'))
       })
     },
+
     onError: (errors) => {
+
       if (errors.error) {
         Swal.fire({
           icon: 'error',
@@ -406,6 +542,7 @@ const registrarProyecto = () => {
         })
       } else {
         errores.value = errors
+
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -414,6 +551,7 @@ const registrarProyecto = () => {
         })
       }
     },
+
     onFinish: () => {
       cargando.value = false
     }

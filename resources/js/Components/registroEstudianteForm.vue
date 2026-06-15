@@ -50,7 +50,7 @@
         <div class="form-row two-cols">
           <div class="form-group">
             <label class="parrafo">Correo Electrónico <span class="required">*</span></label>
-            <input type="email" v-model="form.correo_electronico" class="form-control" :class="{ 'is-invalid': form.errors.correo_electronico }" placeholder="ejemplo@correo.com">
+            <input type="email" v-model="form.correo_electronico" class="form-control" :class="{ 'is-invalid': form.errors.correo_electronico }" placeholder="ejemplo@tuxtla.tecnm.mx">
             <div v-if="form.errors.correo_electronico" class="error-message">{{ form.errors.correo_electronico }}</div>
           </div>
 
@@ -188,24 +188,34 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
+
 
 const props = defineProps({
-  carreras: Array
+  carreras: {
+    type: Array,
+    default: () => []
+  },
+  flash: {
+    type: Object,
+    default: () => ({})
+  }
 })
+
+// Obtener page de forma segura
+const page = usePage()
 
 // Estado del wizard
 const currentStep = ref(1)
 const totalSteps = 3
 const confirmarContraseña = ref('')
-
-// Archivo subido (UN SOLO ARCHIVO)
-const fileInput = ref(null)
 const archivoSeleccionado = ref(null)
 const documentoSubido = ref(null)
+const fileInput = ref(null)
 
-// Formulario principal
+// Formulario
 const form = useForm({
   nombre: '',
   apellido_paterno: '',
@@ -221,7 +231,7 @@ const form = useForm({
   documento_afiliacion: null
 })
 
-// Validaciones por paso
+// Validaciones
 const passwordMismatch = computed(() => {
   return form.contraseña && confirmarContraseña.value && form.contraseña !== confirmarContraseña.value
 })
@@ -241,7 +251,28 @@ const canSubmit = computed(() => {
   return form.institucion_seguridad_social && form.numero_de_seguridad_social
 })
 
-// Funciones de navegación
+
+
+// ✅ Watch seguro para form.errors
+watch(
+  () => form.errors,
+  (errors) => {
+    if (errors && Object.keys(errors).length > 0) {
+      const primerError = Object.values(errors)[0]
+      if (primerError) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de validación',
+          text: Array.isArray(primerError) ? primerError[0] : primerError,
+          confirmButtonText: 'OK'
+        })
+      }
+    }
+  },
+  { deep: true }
+)
+
+// Navegación
 const nextStep = () => {
   if (currentStep.value < totalSteps && canGoNext.value) {
     currentStep.value++
@@ -256,7 +287,7 @@ const prevStep = () => {
   }
 }
 
-// Manejo de archivo (SIMPLIFICADO)
+// Manejo de archivo
 const abrirSelectorArchivo = () => {
   if (fileInput.value) {
     fileInput.value.click()
@@ -267,7 +298,12 @@ const handleFileChange = (event) => {
   const file = event.target.files[0]
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
-      alert('El archivo no debe superar los 5MB')
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El archivo no debe superar los 5MB',
+        confirmButtonText: 'OK'
+      })
       return
     }
     archivoSeleccionado.value = file
@@ -276,10 +312,15 @@ const handleFileChange = (event) => {
   }
 }
 
-// Enviar formulario completo
+// Enviar formulario
 const submit = () => {
   if (passwordMismatch.value) {
-    alert('Las contraseñas no coinciden')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Las contraseñas no coinciden',
+      confirmButtonText: 'OK'
+    })
     return
   }
   
@@ -290,18 +331,39 @@ const submit = () => {
     }
   })
   
- 
-  
-  router.post('/estudiantes', formData, {
-    preserveScroll: true,
-    onSuccess: () => {
-      form.reset()
-      confirmarContraseña.value = ''
-    },
-    onError: (errors) => {
-      console.error(errors)
+ form.post('/estudiantes', {
+  forceFormData: true,
+  preserveScroll: true,
+
+  onSuccess: () => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Registro exitoso',
+      text: 'Tu cuenta fue creada correctamente'
+    }).then(() => {
+      window.location.href = route('Inicio_Sesion')
+    })
+  },
+
+  onError: (errors) => {
+
+    let mensaje = 'Verifica los datos'
+
+    if (errors.numero_de_control) {
+      mensaje = errors.numero_de_control
     }
-  })
+
+    if (errors.correo_electronico) {
+      mensaje = errors.correo_electronico
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: mensaje
+    })
+  }
+})
 }
 </script>
 

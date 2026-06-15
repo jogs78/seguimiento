@@ -8,7 +8,7 @@
         </div>
         
         <nav class="nav-menu" v-if="!user">
-          <Link href="/ejemplo" class="nav-link login">
+          <Link href="/login" class="nav-link login">
             <i class="fas fa-sign-in-alt"></i>
             <span>Iniciar Sesión</span>
           </Link>
@@ -23,10 +23,10 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
           </Link>
-          <button @click="logout" class="nav-link logout">
+          <Link :href="route('salida')" class="nav-link logout">
             <i class="fas fa-sign-out-alt"></i>
             <span>Cerrar Sesión</span>
-          </button>
+          </Link>
         </nav>
       </div>
     </header>
@@ -51,7 +51,7 @@
           </p>
           
           <div class="hero-actions" v-if="!user">
-            <Link href="/ejemplo" class="btn btn-primary">
+            <Link href="/login" class="btn btn-primary">
               <i class="fas fa-sign-in-alt"></i>
               Comenzar ahora
             </Link>
@@ -531,6 +531,5 @@ const logout = () => {
   animation: fadeIn 1s ease-out 0.3s both;
 }
 
-/* Asegurar que los íconos de Font Awesome estén disponibles */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
 </style>

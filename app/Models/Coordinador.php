@@ -19,25 +19,10 @@ class Coordinador extends Model
     }
     public function periodos()
     {
-        return $this->hasMany(Periodo::class)/*->where('periodo_id', $periodo_id)*/;
+        return $this->hasMany(Periodo::class);
     }
 
-    /*
-    public function proyectos($periodo_id){
-        $resultados = DB::table('coordinadores')
-        ->join('carreras', 'carreras.id', '=', 'coordinadores.carrera_id')
-        ->join('estudiantes', 'carreras.id', '=', 'estudiantes.carrera_id')
-        ->join('proyectos', 'proyectos.id', '=', 'estudiantes.proyecto_id')
-        ->where('carreras.id', '=', $this->carrera_id)
-        ->where('proyectos.periodo_id', '=', $periodo_id)
-        ->select('proyectos.*')
-        ->groupBy('proyectos.id')
-        ->get();
-
-        // Hidrata la colección de stdClass a una colección de modelos Proyecto
-        return Proyecto::hydrate($resultados->toArray());
-    }
-    */
+   
     //cambiado por lo de la relacion hasMany entre coordinador y carrera
     public function proyectos($periodo_id)
     {

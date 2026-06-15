@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('ultimos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('estudiante_id')->nullable()->default(null)->constrained('estudiantes');
-            //$table->float  ('promedio_parcial')->nullable()->default(null); 
-            //$table->enum('consecutivo',['primer','segundo'])->nullable()->default(null);
-            
             $table->integer('portada_externo')->nullable()->default(null);
             $table->integer('agradecimientos_externo')->nullable()->default(null);
             $table->integer('resumen_externo')->nullable()->default(null);

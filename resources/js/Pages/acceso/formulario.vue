@@ -36,7 +36,7 @@
             {{ form.errors.contra }}
           </span>
 
-          <a href="#"><h3 id="forget">¿Olvidaste tu contraseña?</h3></a>
+          <a :href="route('password.request')"><h3 id="forget">¿Olvidaste tu contraseña?</h3></a>
           <button type="submit" :disabled="form.processing">
             {{ form.processing ? 'Enviando...' : 'Entrar' }}
           </button>
@@ -54,7 +54,7 @@
             <div class="login-text">
               <p>
                 ¿Aún no tienes una cuenta?
-                <Link :href="route('estudiantes.create')" class="nav-link register">
+                <Link :href="route('estudiantes.create')" class="registrate">
                   Regístrate
                 </Link>
               </p>
@@ -68,17 +68,30 @@
 </template>
 
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { useForm, Link, usePage } from '@inertiajs/vue3'
+import { ref, onMounted } from 'vue'
 
-// Activar/desactivar modo debug , quitar despues
-const debug = ref(true)
+
 
 const form = useForm({
   nombre: '',
   contra: ''
 })
 
+const page = usePage()
+
+onMounted(() => {
+
+    if (page.props.flash?.success) {
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: page.props.flash.success,
+            confirmButtonText: 'OK'
+        })
+    }
+})
 const submit = () => {
   console.log(' Enviando formulario con datos:', form.data())
 

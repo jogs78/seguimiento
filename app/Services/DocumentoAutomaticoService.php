@@ -15,145 +15,74 @@ use Illuminate\Support\Str;
 
 class DocumentoAutomaticoService
 {
-    public static function guardarAnteproyecto(Estudiante $estudiante)
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | Obtener tipo documento
-        |--------------------------------------------------------------------------
-        */
-        $tipoDocumento = TipoDocumento::where('nombre', 'Anteproyecto')->first();
-
-        if (!$tipoDocumento) {
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cargar relaciones necesarias
-        |--------------------------------------------------------------------------
-        */
-        $estudiante->load([
-            'proyecto.actividades.cronogramas',
-            'proyecto.asesor'
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generar PDF
-        |--------------------------------------------------------------------------
-        */
-        $pdf = Pdf::loadView('estudiante.impresiones.anteproyecto', compact('estudiante'));
-        
-        // Configurar PDF
-        $pdf->setPaper('letter', 'portrait');
-        $pdf->setOptions([
-            'defaultFont' => 'sans-serif',
-            'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Nombre archivo
-        |--------------------------------------------------------------------------
-        */
-        $nombreArchivo = 'anteproyecto_' . $estudiante->numero_de_control . '.pdf';
-
-        /*
-        |--------------------------------------------------------------------------
-        | Carpeta estudiante
-        |--------------------------------------------------------------------------
-        */
+    /**
+ * Guardar o actualizar un documento PDF
+ */
+    private static function guardarOActualizarDocumento(
+        Estudiante $estudiante,
+        TipoDocumento $tipoDocumento,
+        $pdfContent,
+        $nombreArchivo
+    ) {
         $carpeta = 'estudiantes/' . $estudiante->numero_de_control;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ruta final
-        |--------------------------------------------------------------------------
-        */
         $rutaCompleta = $carpeta . '/' . $nombreArchivo;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Guardar PDF físicamente
-        |--------------------------------------------------------------------------
-        */
-        Storage::disk('documentos')->put($rutaCompleta, $pdf->output());
-
-        /*
-        |--------------------------------------------------------------------------
-        | Guardar o actualizar BD
-        |--------------------------------------------------------------------------
-        */
-        DocumentoEstudiante::updateOrCreate(
-            [
+        
+        // Guardar PDF
+        Storage::disk('documentos')->put($rutaCompleta, $pdfContent);
+        
+        $documentoExistente = DocumentoEstudiante::where('estudiante_id', $estudiante->id)
+            ->where('tipo_documento_id', $tipoDocumento->id)
+            ->first();
+        
+        $data = [
+            'ruta_archivo' => $rutaCompleta,
+            'nombre_original' => $nombreArchivo,
+            'mime_type' => 'application/pdf',
+            'peso_bytes' => Storage::disk('documentos')->size($rutaCompleta),
+        ];
+        
+        if ($documentoExistente) {
+            // Actualizar
+            $data['actualizado_en'] = now();
+            $documentoExistente->update($data);
+        } else {
+            // Crear
+            $data['subido_en'] = now();
+            $data['actualizado_en'] = null;
+            DocumentoEstudiante::create(array_merge([
                 'estudiante_id' => $estudiante->id,
                 'tipo_documento_id' => $tipoDocumento->id,
-            ],
-            [
-                'ruta_archivo' => $rutaCompleta,
-                'nombre_original' => $nombreArchivo,
-                'mime_type' => 'application/pdf',
-                'peso_bytes' => Storage::disk('documentos')->size($rutaCompleta),
-                'subido_en' => now(),
-            ]
-        );
+            ], $data));
+        }
+    }
+
+    public static function guardarAnteproyecto(Estudiante $estudiante)
+    {
+        $tipoDocumento = TipoDocumento::where('nombre', 'Anteproyecto')->first();
+        if (!$tipoDocumento) return;
+        
+        $estudiante->load(['proyecto.actividades.cronogramas', 'proyecto.asesor']);
+        
+        $pdf = Pdf::loadView('estudiante.impresiones.anteproyecto', compact('estudiante'));
+        $pdf->setPaper('letter', 'portrait');
+        
+        $nombreArchivo = 'anteproyecto_' . $estudiante->numero_de_control . '.pdf';
+        
+        self::guardarOActualizarDocumento($estudiante, $tipoDocumento, $pdf->output(), $nombreArchivo);
     }
 
     public static function guardarSolicitud($estudiante)
     {
-        $tipoDocumento = TipoDocumento::where(
-            'nombre',
-            'Solicitud de residencia profesional'
-        )->first();
-
+        $tipoDocumento = TipoDocumento::where('nombre', 'Solicitud de residencia profesional')->first();
+        if (!$tipoDocumento) return;
+        
         $jefe = ConfiguracionServiceProvider::get('jefe_division');
-
-        $cantidadEstudiantes =
-            $estudiante->proyecto
-                ->estudiantes()
-                ->count();
-
-        $pdf = Pdf::loadView(
-            'estudiante.impresiones.solicitud',
-            compact(
-                'jefe',
-                'estudiante',
-                'cantidadEstudiantes'
-            )
-        );
-
-        $nombreArchivo =
-            'solicitud_' .
-            $estudiante->numero_de_control .
-            '.pdf';
-
-        $carpeta =
-            'estudiantes/' .
-            $estudiante->numero_de_control;
-
-        $ruta =
-            $carpeta . '/' . $nombreArchivo;
-
-        Storage::disk('documentos')->put(
-            $ruta,
-            $pdf->output()
-        );
-
-        DocumentoEstudiante::updateOrCreate(
-
-            [
-                'estudiante_id' => $estudiante->id,
-                'tipo_documento_id' => $tipoDocumento->id
-            ],
-
-            [
-                'ruta_archivo' => $ruta,
-                'nombre_original' => $nombreArchivo,
-                'mime_type' => 'application/pdf',
-                'peso_bytes' => Storage::disk('documentos')->size($ruta),
-                'subido_en' => now(),
-            ]);
+        $cantidadEstudiantes = $estudiante->proyecto->estudiantes()->count();
+        
+        $pdf = Pdf::loadView('estudiante.impresiones.solicitud', compact('jefe', 'estudiante', 'cantidadEstudiantes'));
+        
+        $nombreArchivo = 'solicitud_' . $estudiante->numero_de_control . '.pdf';
+        
+        self::guardarOActualizarDocumento($estudiante, $tipoDocumento, $pdf->output(), $nombreArchivo);
     }
 }

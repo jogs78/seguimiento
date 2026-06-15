@@ -30,7 +30,6 @@
       </div>
 
       <!-- Grid de documentos -->
-      <!-- Grid de documentos -->
 <div class="documentos-grid">
   <div 
     v-for="tipo in tiposDocumento" 
@@ -43,7 +42,6 @@
       <h3>
         {{ tipo.nombre }}
         <span v-if="tipo.obligatorio" class="required">*</span>
-        <span v-else class="opcional">(Opcional)</span>
       </h3>
       <span class="estado" :class="{ 'subido': getDocumentoPorTipo(tipo.id) }">
         <i v-if="getDocumentoPorTipo(tipo.id)" class="fas fa-check-circle"></i>
@@ -124,6 +122,7 @@ import AppLayout from '@/Layouts/appLayout.vue'
 import { router } from '@inertiajs/vue3'
 
 
+
 const props = defineProps({
   documentos: {
     type: Array,
@@ -133,6 +132,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  proyecto: Object,
   flash: Object
 })
 
@@ -299,13 +299,13 @@ const formatFecha = (fecha) => {
 
 // Calcular progreso
 const totalDocumentos = computed(() => {
-  return props.tiposDocumento.filter(t => t.es_requerido).length
+  return props.tiposDocumento.filter(t => t.obligatorio).length
 })
 
 const documentosCompletados = computed(() => {
   let completados = 0
   for (const tipo of props.tiposDocumento) {
-    if (tipo.es_requerido && documentosMap.value[tipo.id]) {
+    if (tipo.obligatorio && documentosMap.value[tipo.id]) {
       completados++
     }
   }

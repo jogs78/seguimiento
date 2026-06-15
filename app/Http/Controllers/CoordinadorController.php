@@ -25,21 +25,6 @@ use Inertia\Inertia;
 
 class CoordinadorController extends Controller
 {
-
-
-    /*
-    public function tabla(){
-        $coordinador = Auth::getUser()->usa;
-        $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-        $proyectos = $coordinador->proyectos( $periodo_id);
-        $proyectos = Proyecto::where('periodo_id', $periodo_id)->get();
-        $asesores = Asesor::all();
-        //return view ('coordinador.tabla', compact('proyectos','asesores'));
-        //retornar con inertia
-        return Inertia::render('coordinador/tabla', compact('proyectos','asesores'));
-    } */
-
-
     private function getPeriodoActual()
     {
         // Obtener el periodo_id de configuraciones
@@ -125,7 +110,6 @@ class CoordinadorController extends Controller
     }
     public function asignarAsesor3(Request $request, $proyecto_id){
         
-
         //aqui debemos implementar el chequedo
         Log::channel('debug')->info('checar');
         $proyecto = Proyecto::find($proyecto_id);
@@ -201,14 +185,25 @@ class CoordinadorController extends Controller
     {
         $coordinador = Auth::getUser()->usa;
         $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
-
-
-        return view('coordinador.periodo.listar',compact('periodo_id')); 
+        //permitir acceso solo a coordinadores
+        if($usuario->usa_type !== "App\Models\Coordinador"){
+            return redirect()->route('home')->with('error', 'No tienes permiso para acceder a esta página.');
+         }
+        return Inertia::render('coordinador/periodo/listar', [
+            'periodo_id' => $periodo_id
+        ]);
     }
 
     public function historico(Request $request)
     {
+        
         $coordinador = Auth::getUser()->usa;
+        $usuario = Auth::user();
+        //permitir acceso solo a coordinadores
+        if($usuario->usa_type !== "App\Models\Coordinador"){
+            return redirect()->route('home')->with('error', 'No tienes permiso para acceder a esta página.');
+         }
+
         $carrera_id = session('carrera_id');
         
         // Obtener el periodo seleccionado (por defecto null para mostrar todos)
@@ -289,43 +284,34 @@ class CoordinadorController extends Controller
         return Excel::download(new AsesoresExport($carrera_id), 'Asesores_Internos.xlsx');
     }
 
-    public function exportLista(){
-        return Excel::download(new ExternosExport, 'Asesores_Externos.xlsx');
+    public function exportLista()
+{
+    $periodo_id = ConfiguracionServiceProvider::get('periodo_id');
+    $carrera_id = session('carrera_id');
+    
+    if (!$carrera_id) {
+        return redirect()->route('coordinadores.seleccionarCarrera')->with('error', 'Debes seleccionar una carrera primero');
     }
+    
+    return Excel::download(new ExternosExport($periodo_id, $carrera_id), 'Asesores_Externos.xlsx');
+}
 
-    //agregando nuevo
-    /*
+    
     public function seleccionarCarrera(Request $request)
     {
-    session(['carrera_id' => $request->carrera_id]);
-    //return view('acceso.adentro');
-    
-     return Inertia::render('acceso/adentro');//ruta para Inertia
-      //return redirect()->route('adentro'); //  ruta para Blade
-
+        // Validar que la carrera existe
+        $request->validate([
+            'carrera_id' => 'required|exists:carreras,id'
+        ]);
+        
+        // Obtener la carrera completa
+        $carrera = Carrera::find($request->carrera_id);
+        
+        // Guardar en sesión TANTO el ID como el NOMBRE
+        session(['carrera_id' => $request->carrera_id]);
+        session(['carrera_nombre' => $carrera->nombre]); 
+        
+        return Inertia::render('acceso/adentro');//ruta para Inertia
     }
-
-*/
-public function seleccionarCarrera(Request $request)
-{
-    // Validar que la carrera existe
-    $request->validate([
-        'carrera_id' => 'required|exists:carreras,id'
-    ]);
-    
-    // Obtener la carrera completa
-    $carrera = Carrera::find($request->carrera_id);
-    
-    // Guardar en sesión TANTO el ID como el NOMBRE
-    session(['carrera_id' => $request->carrera_id]);
-    session(['carrera_nombre' => $carrera->nombre]); // ← Esto es crucial
-    
-    // También puedes guardar el objeto completo si prefieres
-    // session(['carrera_actual' => $carrera]);
-    
-    // Redirigir al dashboard
-    //return redirect()->route('welcome'); // o 'adentro'
-    return Inertia::render('acceso/adentro');//ruta para Inertia
-}
 
 }

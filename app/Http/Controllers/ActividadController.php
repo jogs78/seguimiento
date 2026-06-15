@@ -20,10 +20,20 @@ class ActividadController extends Controller
      */
     public function index(Proyecto $proyecto)
     {
+  
         if (!Gate::allows('update', $proyecto)) {
             return view('estudiante.aviso.no-autorizado');
         }
         
+        $proyecto->load([
+            'empresa',
+            'periodo',
+            'actividades.cronogramas',
+            'asesor',
+            'externo',
+            'estudiantes'
+        ]);
+
         // Cargar actividades con sus cronogramas
         $actividades = $proyecto->actividades()->with('cronogramas')->get();
         

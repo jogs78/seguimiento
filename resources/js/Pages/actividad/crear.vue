@@ -336,7 +336,6 @@ const guardarActividades = () => {
 </script>
 
 <style scoped>
-/* Estilos existentes... */
 
 .orden-container {
   display: flex;
