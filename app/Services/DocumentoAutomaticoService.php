@@ -6,6 +6,8 @@ use App\Models\DocumentoEstudiante;
 use App\Models\Estudiante;
 use App\Models\TipoDocumento;
 use App\Providers\ConfiguracionServiceProvider;
+use App\Models\Periodo;
+
 
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,7 +26,10 @@ class DocumentoAutomaticoService
         $pdfContent,
         $nombreArchivo
     ) {
-        $carpeta = 'estudiantes/' . $estudiante->numero_de_control;
+        $periodoActual = Periodo::find(ConfiguracionServiceProvider::get('periodo_id'));
+        $carpeta = 'estudiantes_' . $periodoActual->nombre . '/expedientes/' .
+                    Str::slug($estudiante->nombre . ' ' . $estudiante->apellido_paterno . ' ' . $estudiante->apellido_materno) . '_' .
+                    $estudiante->numero_de_control;
         $rutaCompleta = $carpeta . '/' . $nombreArchivo;
         
         // Guardar PDF
